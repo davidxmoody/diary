@@ -2,7 +2,6 @@
 # Script to search diary entries for tags or sequences of words or quoted text. 
 
 DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
-NUM_ENTRIES=10
 SEP="\e[0;34m"$(hline)"\e[0m"
 
 function search_tags {
@@ -13,7 +12,7 @@ function search_tags {
 		search_string=$search_string"\|\(#$tag\)"
 	done
 
-	for entry in $(ls $DIARY_DIR | tail --lines=$NUM_ENTRIES | sort -r); do
+	for entry in $(ls $DIARY_DIR -r); do
 		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
 		fold -s -w $(tput cols) $DIARY_DIR/$entry | grep --colour=always -i "\|$search_string" 
 		echo -e $SEP
