@@ -5,33 +5,44 @@ DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
 SEP="\e[0;34m"$(hline)"\e[0m"
 
 function search_tags {
-	[ $# == 0 ] && exit 1
-	search_string="\(#$1\)"
-	shift
-	for tag in "$@"; do 
-		search_string=$search_string"\|\(#$tag\)"
-	done
-
-	for entry in $(ls $DIARY_DIR -r); do
-		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
-		fold -s -w $(tput cols) $DIARY_DIR/$entry | grep --colour=always -i "\|$search_string" 
-		echo -e $SEP
-		fi
-	done | less -R
+	# Re-use search_words by prefixing each argument with a '#'.
+	search_words $(for tag in "$@"; do echo \#$tag; done)
 }
 
 function search_words {
-	#TODO
-	echo words
+	# If no arguments then exit. 
+	[ $# == 0 ] && exit 1
+
+	# Build search string.
+	search_string="\($1\)"
+	shift
+	for word in "$@"; do 
+		search_string=$search_string"\|\($word\)"
+	done
+
+	# Search the diary entries. 
+	do_search "$search_string"
 }
 
 function search_quoted {
 	#TODO
-	echo quoted
+	echo quoted not implemented
 }
 
 function search_default {
 	search_tags $@
+}
+
+function do_search {
+	search_string="$1"
+
+	# Search every single entry in $DIARY_DIR.
+	for entry in $(ls -r $DIARY_DIR); do
+		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
+			fold -s -w $(tput cols) $DIARY_DIR/$entry | grep --colour=always -i "\|$search_string" 
+			echo -e $SEP
+		fi
+	done | less -R
 }
 
 
@@ -40,11 +51,9 @@ function usage_and_exit {
         exit
 }
 
+
 # If no arguments then quit.
-if [ $# == 0 ] ; then 
-	usage_and_exit
-        exit
-fi
+[ $# == 0 ] && usage_and_exit
 
 # Decide what the user is searching for.
 case $1 in 
