@@ -15,7 +15,7 @@ function search_tags {
 
 	for entry in $(ls $DIARY_DIR | tail --lines=$NUM_ENTRIES | sort -r); do
 		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
-		grep --colour=always -i "\|$search_string" $DIARY_DIR/$entry | fold -s -w $(tput cols)
+		fold -s -w $(tput cols) $DIARY_DIR/$entry | grep --colour=always -i "\|$search_string" 
 		echo -e $SEP
 		fi
 	done | less -R
