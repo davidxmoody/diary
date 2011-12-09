@@ -3,19 +3,22 @@
 
 DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
 NUM_ENTRIES=10
+SEP="\e[0;34m"$(hline)"\e[0m"
 
 function search_tags {
 	[ $# == 0 ] && exit 1
-	search_string="(#$1)"
+	search_string="\(#$1\)"
 	shift
 	for tag in "$@"; do 
-		search_string=$search_string"|(#$tag)"
+		search_string=$search_string"\|\(#$tag\)"
 	done
 
 	for entry in $(ls $DIARY_DIR | tail --lines=$NUM_ENTRIES | sort -r); do
-		echo $entry $search_string
-		grep --ignore-case "$search_string" $DIARY_DIR/$entry
-	done
+		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
+		grep --colour=always -i "\|$search_string" $DIARY_DIR/$entry | fold -s -w $(tput cols)
+		echo -e $SEP
+		fi
+	done | less -R
 }
 
 function search_words {
