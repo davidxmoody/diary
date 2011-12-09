@@ -1,0 +1,40 @@
+#!/bin/bash
+# Script to launch the default editor on a specified diary entry and then perform a backup.
+
+DIARY_DIRECTORY="${HOME}/.diary/data/entries"
+
+function usage_and_exit {
+	echo "Help not implemented yet."
+	exit 1
+}
+
+# Work out what entry the user wants to edit.
+# No arguments - edit most recent entry.
+# One number - edit entry made that number of entries ago. 
+# Anything else - print usage and exit. 
+entries_ago=0
+[ $# == 1 ] && entries_ago="$1"
+[ $# -gt 1 ] && usage_and_exit
+[ "$entries_ago" -ge 0 ] 2>/dev/null || usage_and_exit
+
+for entry in $(ls -r $DIARY_DIRECTORY); do 
+	if [ $entries_ago == 0 ]; then 
+		file_path=$DIARY_DIRECTORY/$entry
+		break
+	else
+		entries_ago=$((entries_ago-1))
+	fi
+done
+
+if [ -z $file_path ]; then 
+	echo "Error: entry is not available" >&2
+	exit 1
+fi
+
+
+function use_vim {
+	vim $file_path
+}
+
+use_vim
+diary-backup > /dev/null &
