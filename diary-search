@@ -6,7 +6,7 @@ SEP="\e[0;34m"$(hline)"\e[0m"
 
 function search_tags {
 	# Re-use search_words by prefixing each argument with a '#'.
-	search_words $(for tag in "$@"; do echo \#$tag; done)
+	search_words $(for tag in $@; do echo \#$tag; done)
 }
 
 function search_words {
@@ -20,22 +20,6 @@ function search_words {
 		search_string=$search_string"\|\($word\)"
 	done
 
-	# Search the diary entries. 
-	do_search "$search_string"
-}
-
-function search_quoted {
-	#TODO
-	echo quoted not implemented
-}
-
-function search_default {
-	search_tags $@
-}
-
-function do_search {
-	search_string="$1"
-
 	# Search every single entry in $DIARY_DIR.
 	for entry in $(ls -r $DIARY_DIR); do
 		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
@@ -45,6 +29,9 @@ function do_search {
 	done | less -R
 }
 
+function search_default {
+	search_tags "$@"
+}
 
 function usage_and_exit {
         echo "Help not implemented yet."
@@ -57,8 +44,7 @@ function usage_and_exit {
 
 # Decide what the user is searching for.
 case $1 in 
-	-t | --tags ) shift; search_tags $@ ;;
-	-w | --words ) shift; search_words $@ ;;
-	-q | --quoted ) shift; search_quoted $@ ;;
-	* ) search_default $@ ;;
+	-t | --tags ) shift; search_tags "$@" ;;
+	-w | --words ) shift; search_words "$@" ;;
+	* ) search_default "$@" ;;
 esac
