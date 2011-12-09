@@ -1,0 +1,24 @@
+#!/bin/bash
+# Backs up all diary related data to multiple sources.
+
+BACKUP_DIRECTORY="${HOME}/.diary/backup"
+DATA_DIRECTORY="${HOME}/.diary/data"
+
+#VERBOSE=""
+#if [ "$1" == -v ] || [ "$1" == --verbose ] ; then
+#	VERBOSE="--verbose"
+#fi
+
+
+# $1=original, $2=backup
+function do_backup {
+	echo ${2#${BACKUP_DIRECTORY}/}: $(cp -urv $1 $2 | wc -l)
+}
+
+
+for d in $BACKUP_DIRECTORY/* ; do
+	do_backup $DATA_DIRECTORY $d &
+done | cat 
+# Hack to ensure that all backups are executed at the same time and 
+# the prompt does not return until all have been completed. 
+

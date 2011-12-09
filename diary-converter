@@ -1,0 +1,14 @@
+#!/bin/bash
+# Script to convert multiple diary entries in a plain text file into multiple files containing those entries.
+
+ENTRIES_DIR="$HOME/diarytest"
+
+function process {
+	#TODO
+}
+
+# All command line args are locations of files containing diary entries.
+while [ $# != 0 ] ; do
+	process "$1"
+	shift
+done

@@ -1,0 +1,27 @@
+#!/bin/bash
+# The script that launches other diary related scripts.
+
+function help_and_exit {
+	echo "Help not implemented yet."
+	exit
+}
+
+function usage_and_exit {
+	echo "Help not implemented yet."
+	exit
+}
+
+# If no arguments then run diary-default.
+if [ $# == 0 ] ; then 
+	diary-default
+	exit
+fi
+
+# Otherwise check for options.
+case "$1" in
+	-h | --help ) help_and_exit ;;
+	-b | --backup ) diary-backup ;;
+	-l | --list ) shift ; diary-list $@ ;;
+	* ) usage_and_exit ;;
+esac
+

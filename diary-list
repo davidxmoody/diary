@@ -1,0 +1,17 @@
+#!/bin/bash
+# Backs up all diary related data to multiple sources.
+
+DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
+COLS=$(tput cols)
+SEP="\e[0;34m"$(hline)"\e[0m"
+
+NUM_ENTRIES=50
+if [ $# -gt 0 ] ; then
+	NUM_ENTRIES=$1
+fi
+
+for entry in $(ls $DIARY_DIR | tail --lines=$NUM_ENTRIES | sort -r) ; do
+	fold -s -w $COLS $DIARY_DIR/$entry 
+	echo -e $SEP
+done | less -R
+
