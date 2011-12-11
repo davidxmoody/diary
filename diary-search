@@ -59,8 +59,11 @@ function usage_and_exit {
 }
 
 
-# If no arguments then quit.
-[ $# == 0 ] && usage_and_exit
+# If no arguments then search for the anonymous tag (##).
+if [ $# == 0 ]; then 
+	search_words '##'
+	exit
+fi
 
 # Is the user searching for words or tags?
 case $1 in 
