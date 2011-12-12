@@ -7,7 +7,7 @@ MAX_MATCHES=40
 
 function search_tags {
 	# Re-use search_words by prefixing each argument with a '#'.
-	search_words $(for tag in $@; do echo \#$tag; done)
+	search_words $(for tag in $@; do echo "#$tag\S*"; done)
 }
 
 function search_words {
