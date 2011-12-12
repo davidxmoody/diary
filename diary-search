@@ -61,7 +61,7 @@ function usage_and_exit {
 
 # If no arguments then search for the anonymous tag (##).
 if [ $# == 0 ]; then 
-	search_words '##'
+	search_words '#\S*'
 	exit
 fi
 
