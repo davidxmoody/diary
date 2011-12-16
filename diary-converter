@@ -1,14 +1,61 @@
 #!/bin/bash
-# Script to convert multiple diary entries in a plain text file into multiple files containing those entries.
+# Script to convert multiple diary entries in a plain text file into multiple files containing those entries. Since this script is only going to be used once I decided not to worry about making it particularly versatile or pretty.
 
-ENTRIES_DIR="$HOME/diarytest"
+#set -e
+cd $HOME/diarytest
 
-function process {
-	#TODO
-}
+# First remove all \r to get just \n.
+[[ ! -f diary-no-r ]] && tr -d '\r' < diary-originals > diary-no-r
 
-# All command line args are locations of files containing diary entries.
-while [ $# != 0 ] ; do
-	process "$1"
-	shift
+# Then split the file into separate entries with arbitrary names.
+file_num=1001
+empty_lines=0
+
+if [[ -f split/$file_num ]]; then
+	echo skipping split stage
+else 
+
+while read line; do 
+	if grep -q '^\s*$' <<< "$line"; then 
+		((empty_lines++))
+	else
+		# echo the correct number of blank lines or start a new file. 
+		if ((empty_lines<4)); then 
+			while ((empty_lines>0)); do
+				echo "" >> split/$file_num
+				((empty_lines--))
+			done
+		else
+			((file_num++))
+		fi
+
+		# Non empty line, echo into file.
+		echo "$line" >> split/$file_num
+		((empty_lines=0))
+	fi
+done < diary-no-r
+
+fi
+
+
+# Then sort out file names. 
+for entry in split/*; do 
+	# Try to identify the date formatted properly.
+	read old < $entry
+	stripped=${old//st / }
+	stripped=${stripped//nd / }
+	stripped=${stripped//rd / }
+	stripped=${stripped//th / }
+	stripped=${stripped//Augu/August}
+	read day_name day_no month time <<< "$stripped"
+	new=$(date +"%s" -d "$day_name $month $day_no $time 2011")
+
+	# Copy old file to new location with new name. 
+	cp $entry new/diary-${new}-unknown.txt
 done
+
+
+
+
+
+
