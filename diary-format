@@ -1,18 +1,87 @@
 #!/bin/bash
 # Script to format and print a single diary entry. 
 
+minimum_width=10
+
 function format_entry {
-	while read line; do 
+	# First do any text changing edits.
+	do_edits | \
+	# Then fold the text.
+	fold -s -w "$width" | \
+	# Then do highlighting. 
+	do_highlight
+}
+
+function do_edits {
+	while read line; do
 		echo $line
 	done
 }
 
+function do_highlight {
+	while read line; do
+		echo $line
+	done
+}
+
+function print_metadata {
+	# Argument must be in the format: diary-<TIMESTAMP>-<DEVICE>.txt
+	entry="$1"
+	entry=${entry#diary-}
+	timestamp=${entry%%-*}
+	entry=${entry#*-}
+	device=${entry%.*}
+
+	if [[ $timestamp && $device ]]; then 
+		hline
+		echo $timestamp
+	fi
+}
 
 
+function usage_and_exit {
+	echo "Help not implemented yet."
+	exit 1
+}
+
+function check_width {
+	[ "$1" -ge $minimum_width ] 2>/dev/null || usage_and_exit
+}
+
+# Set default width.
+width=$(tput cols)
+
+# Process command line args.
+while true; do
+	case $1 in 
+		-w ) 
+			shift
+			width="$1"
+			shift
+			check_width "$width"
+		;;
+		--width=* ) 
+			width=${1#--width=}
+			shift
+			check_width "$width"
+		;;
+		-m | --metadata )
+			metadata=true
+		;;
+		* ) 
+			echo other
+			break
+		;;
+	esac
+done
+
+echo exited loop
+exit
 
 # Single argument is a filename or '-' or empty for stdin. 
 if [[ $# == 0 || $1 == '-' ]]; then 
 	format_entry
 else
+	[[ $metadata ]] && print_metadata "$1"
 	format_entry < "$1"
 fi

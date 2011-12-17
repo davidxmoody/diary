@@ -33,7 +33,7 @@ fi
 
 
 function use_vim {
-	vim $file_path
+	vim "+set spell" $file_path
 }
 
 use_vim
