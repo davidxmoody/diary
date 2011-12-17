@@ -3,36 +3,26 @@
 
 DEVICE_NAME="$(hostname)"
 TIMESTAMP="$(date +%s)"
-DATE_STRING="$(date +'%A %d %B %I:%M%p')"
 FILE_NAME="diary-${TIMESTAMP}-${DEVICE_NAME}.txt"
 
 DIARY_DIRECTORY="${HOME}/.diary/data/entries"
 FILE_PATH="${DIARY_DIRECTORY}/${FILE_NAME}"
 
 function use_gedit {
-	echo "" >> $FILE_PATH
 	gedit --new-window $FILE_PATH + &
 }
 
 function use_cat {
-	echo $DATE_STRING
 	cat >> $FILE_PATH 
 }
 
-function use_nano {
-	nano $FILE_PATH
-}
-
-function use_aoeui {
-	aoeui $FILE_PATH
-}
-
 function use_vim {
-	vim $FILE_PATH
+	vim "+set spell" $FILE_PATH
 }
 
-touch $FILE_PATH
-echo $DATE_STRING >> $FILE_PATH
+function usage_and_exit {
+	echo "Help not implemented yet."
+}
 
 if [ $# = 0 ] ; then 
 	use_vim
@@ -42,8 +32,7 @@ fi
 case "$1" in
 	-c | --cat ) use_cat ;;
 	-g | --gedit ) use_gedit ;;
-	-n | --nano ) use_nano ;;
-	-a | --aoeui ) use_aoeui ;;
+	-v | --vim ) use_vim ;;
 	* ) usage_and_exit ;;
 esac
 
