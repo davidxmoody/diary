@@ -1,0 +1,18 @@
+#!/bin/bash
+# Script to format and print a single diary entry. 
+
+function format_entry {
+	while read line; do 
+		echo $line
+	done
+}
+
+
+
+
+# Single argument is a filename or '-' or empty for stdin. 
+if [[ $# == 0 || $1 == '-' ]]; then 
+	format_entry
+else
+	format_entry < "$1"
+fi
