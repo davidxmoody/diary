@@ -2,10 +2,10 @@
 # Script to format and print a single diary entry. 
 
 minimum_width=10
-date_format="%c" #TODO make a proper date format string
+date_format="%c"  #TODO make a proper date format string
 pad_char="-"
-metadata_colour="\e[1;34m"
-pad_colour="\e[0;34m"
+metadata_colour="\e[1;34m"  # Bold blue.
+pad_colour="\e[0;34m"       # Blue.
 end_colour="\e[0m"
 
 function format_entry {
@@ -28,14 +28,18 @@ function do_edits {
 
 function do_highlight {
     while read line; do
-        echo $line
+        if [[ $search_string ]]; then
+            grep --colour=always -i "\|$search_string" <<< "$line"
+        else
+            echo $line
+        fi
     done
 }
 
 function print_metadata {
     # Argument must be in the format: diary-<TIMESTAMP>-<DEVICE>.txt
     entry="$1"
-    entry=${entry#diary-}
+    entry=${entry##*diary-}
     timestamp=${entry%%-*}
     entry=${entry#*-}
     device=${entry%.*} # Device is not currently used. 
@@ -96,6 +100,15 @@ while true; do
         ;;
         -m | --metadata )
             metadata=true
+            shift
+        ;;
+        -s )
+            shift
+            search_string="$1"
+            shift
+        ;;
+        --search=* ) 
+            search_string=${1#--search=}
             shift
         ;;
         * ) 

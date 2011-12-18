@@ -30,8 +30,10 @@ function search_words {
 		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
 
 			# Wrap at word boundaries and highlight search terms.
-			fold -s -w $(tput cols) $DIARY_DIR/$entry | grep --colour=always -i "\|$search_string" 
-			echo -e $SEP
+			#fold -s -w $(tput cols) $DIARY_DIR/$entry | \
+                #grep --colour=always -i "\|$search_string" 
+			#echo -e $SEP
+            diary-format -m --search="$search_string" $DIARY_DIR/$entry
 			
 			num_matches=$((num_matches+1))
 			if [ $num_matches -ge $MAX_MATCHES ]; then 

@@ -11,7 +11,8 @@ if [ $# -gt 0 ] ; then
 fi
 
 for entry in $(ls $DIARY_DIR | tail --lines=$NUM_ENTRIES | sort -r) ; do
-	fold -s -w $COLS $DIARY_DIR/$entry 
-	echo -e $SEP
+	#fold -s -w $COLS $DIARY_DIR/$entry 
+	#echo -e $SEP
+    diary-format -m $DIARY_DIR/$entry
 done | less -R
 
