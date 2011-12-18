@@ -3,26 +3,49 @@
 
 function help_and_exit {
 	echo "Help not implemented yet."
-	exit
+	exit 0
 }
 
 function usage_and_exit {
-	echo "Help not implemented yet."
-	exit
+	echo "Usage not implemented yet."
+	exit 1
 }
 
 # Default action to be taken if the script is run with no arguments.
-if [ $# == 0 ] ; then 
+if [[ $# == 0 ]]; then 
     diary-new-entry
     diary-backup > /dev/null &
 	exit
 fi
 
-# Otherwise check for options.
+# Check for command.
 case "$1" in
-	-h | --help ) help_and_exit ;;
-	-b | --backup ) diary-backup ;;
-	-l | --list ) shift ; diary-list $@ ;;
-	* ) usage_and_exit ;;
+	backup | backu | back | bac | ba | b )
+        shift
+        diary-backup $@ 
+    ;;
+    edit | edi | ed | e )
+        shift
+        diary-edit $@ 
+    ;;
+	help | hel | he | h | -h | --help )
+        shift
+        help_and_exit $@ 
+    ;;
+	list | lis | li | l )
+        shift
+        diary-list $@ 
+    ;;
+    new | ne | n )
+        shift
+        diary-new-entry $@ 
+    ;;
+    search | searc | sear | sea | se | s )
+        shift
+        diary-search $@ 
+    ;;
+	* )
+        usage_and_exit 
+    ;;
 esac
 
