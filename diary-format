@@ -2,50 +2,79 @@
 # Script to format and print a single diary entry. 
 
 minimum_width=10
+date_format="%c" #TODO make a proper date format string
+pad_char="-"
+metadata_colour="\e[1;34m"
+pad_colour="\e[0;34m"
+end_colour="\e[0m"
 
 function format_entry {
-	# First do any text changing edits.
-	do_edits | \
-	# Then fold the text.
-	fold -s -w "$width" | \
-	# Then do highlighting. 
-	do_highlight
+    # First do any text changing edits.
+    do_edits | \
+    # Then fold the text.
+    fold -s -w "$width" | \
+    # Then do highlighting. 
+    do_highlight
+
+    # Echo one more empty line at the end. 
+    echo ""
 }
 
 function do_edits {
-	while read line; do
-		echo $line
-	done
+    while read line; do
+        echo $line
+    done
 }
 
 function do_highlight {
-	while read line; do
-		echo $line
-	done
+    while read line; do
+        echo $line
+    done
 }
 
 function print_metadata {
-	# Argument must be in the format: diary-<TIMESTAMP>-<DEVICE>.txt
-	entry="$1"
-	entry=${entry#diary-}
-	timestamp=${entry%%-*}
-	entry=${entry#*-}
-	device=${entry%.*}
+    # Argument must be in the format: diary-<TIMESTAMP>-<DEVICE>.txt
+    entry="$1"
+    entry=${entry#diary-}
+    timestamp=${entry%%-*}
+    entry=${entry#*-}
+    device=${entry%.*} # Device is not currently used. 
 
-	if [[ $timestamp && $device ]]; then 
-		hline
-		echo $timestamp
-	fi
+    # If there was an error in extracting the information then skip this.
+    if [[ $timestamp && $device ]]; then 
+
+        # Metadata string currently consists of just the date. 
+        date_string=$(date "+$date_format" -d "@$timestamp")
+        metadata_string=" $date_string "
+
+        # Make sure there is the right amount of padding on either side.
+        start_padding=""
+        end_padding=""
+        if (( (width-${#metadata_string})%2==1 )); then 
+            end_padding=$pad_char
+        fi
+        while (( ${#metadata_string} + ${#start_padding} + \
+                 ${#end_padding} < $width )); do 
+            start_padding=$start_padding$pad_char
+            end_padding=$end_padding$pad_char
+        done
+        
+        # Print it, with colours. 
+        start_padding=$pad_colour$start_padding$end_colour
+        end_padding=$pad_colour$end_padding$end_colour
+        metadata_string=$metadata_colour$metadata_string$end_colour
+        echo -e $start_padding$metadata_string$end_padding
+    fi
 }
 
 
 function usage_and_exit {
-	echo "Help not implemented yet."
-	exit 1
+    echo "Help not implemented yet."
+    exit 1
 }
 
 function check_width {
-	[ "$1" -ge $minimum_width ] 2>/dev/null || usage_and_exit
+    [ "$1" -ge $minimum_width ] 2>/dev/null || usage_and_exit
 }
 
 # Set default width.
@@ -53,35 +82,33 @@ width=$(tput cols)
 
 # Process command line args.
 while true; do
-	case $1 in 
-		-w ) 
-			shift
-			width="$1"
-			shift
-			check_width "$width"
-		;;
-		--width=* ) 
-			width=${1#--width=}
-			shift
-			check_width "$width"
-		;;
-		-m | --metadata )
-			metadata=true
-		;;
-		* ) 
-			echo other
-			break
-		;;
-	esac
+    case $1 in 
+        -w ) 
+            shift
+            width="$1"
+            shift
+            check_width "$width"
+        ;;
+        --width=* ) 
+            width=${1#--width=}
+            shift
+            check_width "$width"
+        ;;
+        -m | --metadata )
+            metadata=true
+            shift
+        ;;
+        * ) 
+            break
+        ;;
+    esac
 done
 
-echo exited loop
-exit
 
 # Single argument is a filename or '-' or empty for stdin. 
 if [[ $# == 0 || $1 == '-' ]]; then 
-	format_entry
+    format_entry
 else
-	[[ $metadata ]] && print_metadata "$1"
-	format_entry < "$1"
+    [[ $metadata ]] && print_metadata "$1"
+    format_entry < "$1"
 fi
