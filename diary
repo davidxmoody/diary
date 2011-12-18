@@ -11,9 +11,10 @@ function usage_and_exit {
 	exit
 }
 
-# If no arguments then run diary-default.
+# Default action to be taken if the script is run with no arguments.
 if [ $# == 0 ] ; then 
-	diary-default
+    diary-new-entry
+    diary-backup > /dev/null &
 	exit
 fi
 

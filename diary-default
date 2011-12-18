@@ -1,5 +1,0 @@
-#!/bin/bash
-# The default script to be run if diary is run with no arguments.
-
-diary-new-entry
-diary-backup > /dev/null &
