@@ -32,8 +32,10 @@ fi
 # Find the specified entry.
 entry=$(ls $reverse -1 $DIARY_DIRECTORY | awk "FNR==$entry_no")
 
-if [[ -z "$entry" ]]; then 
-	echo "Error: entry is not available" >&2
+file_path="$DIARY_DIRECTORY/$entry"
+
+if [[ ! -w "$file_path" ]]; then 
+	echo "Error: entry is not available: $file_path" >&2
 	exit 1
 fi
 
