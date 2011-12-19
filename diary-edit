@@ -10,23 +10,29 @@ function usage_and_exit {
 
 # Work out what entry the user wants to edit.
 # No arguments - edit most recent entry.
-# One number - edit entry made that number of entries ago. 
+# Positive number - edit entry with that index.
+# Negative number - edit entry made that number of entries ago. 
 # Anything else - print usage and exit. 
-entries_ago=0
-[ $# == 1 ] && entries_ago="$1"
-[ $# -gt 1 ] && usage_and_exit
-[ "$entries_ago" -ge 0 ] 2>/dev/null || usage_and_exit
+entry_no=-1
+[[ $# == 1 ]] && entry_no="$1"
+[[ $# -gt 1 ]] && usage_and_exit
+[[ "$entry_no" =~ ^(\+|-)?[0-9]+$ ]] || usage_and_exit
 
-for entry in $(ls -r $DIARY_DIRECTORY); do 
-	if [ $entries_ago == 0 ]; then 
-		file_path=$DIARY_DIRECTORY/$entry
-		break
-	else
-		entries_ago=$((entries_ago-1))
-	fi
-done
+# If negative then list entries in reverse order.
+if [[ "$entry_no" -lt 0 ]]; then 
+    reverse="-r"
+    let entry_no*=-1
 
-if [ -z $file_path ]; then 
+# If positive then add one (to change to 1-based indexing). 
+else
+    reverse=""
+    let entry_no++
+fi
+
+# Find the specified entry.
+entry=$(ls $reverse -1 $DIARY_DIRECTORY | awk "FNR==$entry_no")
+
+if [[ -z "$entry" ]]; then 
 	echo "Error: entry is not available" >&2
 	exit 1
 fi
