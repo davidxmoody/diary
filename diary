@@ -1,6 +1,11 @@
 #!/bin/bash
 # The script that launches other diary related scripts.
 
+diary_dir="${HOME}/.diary/backup/dropbox/data/entries"
+
+wc_colour="\e[1;37m"
+end_colour="\e[0m"
+
 function help_and_exit {
 	echo "Help not implemented yet."
 	exit 0
@@ -10,6 +15,26 @@ function usage_and_exit {
 	echo "Usage not implemented yet."
 	exit 1
 }
+
+function do_wordcount {
+    # Count the number of words and entries. 
+    num_words=$(cat $diary_dir/* | wc --words)
+    num_entries=$(ls -1 $diary_dir | wc -l)
+    
+    # Find the elapsed time since the first entry was written. 
+    first=$(ls -1 $diary_dir | head -1)
+    first=${first#diary-}
+    first=${first%%-*}
+    now=$(date +%s)
+    let time_diff=$now-$first
+    let "days=$time_diff/(60*60*24)"
+
+    # Print it all in a nice format. 
+    echo -e "You have written $wc_colour$num_words$end_colour words,"\
+            "in $wc_colour$num_entries$end_colour entries,"\
+            "over $wc_colour$days$end_colour days."
+}
+
 
 # Default action to be taken if the script is run with no arguments.
 if [[ $# == 0 ]]; then 
@@ -43,6 +68,10 @@ case "$1" in
     search | searc | sear | sea | se | s )
         shift
         diary-search $@ 
+    ;;
+    wc | w | wordcount )
+        shift
+        do_wordcount $@
     ;;
 	* )
         usage_and_exit 
