@@ -14,7 +14,8 @@ function format_entry {
     # First do any text changing edits.
     do_edits | \
     # Then fold the text.
-    fold -s -w "$width" | \
+    #fold -s -w "$width" | \
+    fmt -w "$width"
     # Then do highlighting. 
     do_highlight
 
