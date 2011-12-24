@@ -2,17 +2,34 @@
 # Backs up all diary related data to multiple sources.
 
 DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
-COLS=$(tput cols)
-SEP="\e[0;34m"$(hline)"\e[0m"
 
-NUM_ENTRIES=50
-if [ $# -gt 0 ] ; then
-	NUM_ENTRIES=$1
-fi
+# Set the default number of entries to show.
+num_entries=50
 
-for entry in $(ls $DIARY_DIR | tail --lines=$NUM_ENTRIES | sort -r) ; do
-	#fold -s -w $COLS $DIARY_DIR/$entry 
-	#echo -e $SEP
-    diary-format -m $DIARY_DIR/$entry
+while true; do
+    case $1 in
+        -n) 
+            shift
+            num_entries="$1"
+            shift
+        ;;
+        --number=*)
+            num_entries=${1#--number=}
+            shift
+        ;;
+        -r | --reverse)
+            reverse=true
+            shift
+        ;;
+        *)
+            break
+        ;;
+    esac
+done
+
+entries=$(ls -1r $DIARY_DIR | head --lines=$num_entries)
+[[ $reverse ]] && entries=$(for entry in $entries; do echo $entry; done | sort)
+
+for entry in $entries; do
+    diary-format -m "$DIARY_DIR/$entry"
 done | less -R
-
