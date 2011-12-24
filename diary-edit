@@ -4,8 +4,8 @@
 DIARY_DIRECTORY="${HOME}/.diary/data/entries"
 
 function usage_and_exit {
-	echo "Help not implemented yet."
-	exit 1
+    echo "Help not implemented yet."
+    exit 1
 }
 
 # Work out what entry the user wants to edit.
@@ -35,13 +35,13 @@ entry=$(ls $reverse -1 $DIARY_DIRECTORY | awk "FNR==$entry_no")
 file_path="$DIARY_DIRECTORY/$entry"
 
 if [[ ! -w "$file_path" ]]; then 
-	echo "Error: entry is not available: $file_path" >&2
-	exit 1
+    echo "Error: entry is not available: $file_path" >&2
+    exit 1
 fi
 
 
 function use_vim {
-	vim "+set spell" $file_path
+    vim "+set spell" $file_path
 }
 
 use_vim

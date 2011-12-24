@@ -7,13 +7,13 @@ wc_colour="\e[1;37m"
 end_colour="\e[0m"
 
 function help_and_exit {
-	echo "Help not implemented yet."
-	exit 0
+    echo "Help not implemented yet."
+    exit 0
 }
 
 function usage_and_exit {
-	echo "Usage not implemented yet."
-	exit 1
+    echo "Usage not implemented yet."
+    exit 1
 }
 
 function do_wordcount {
@@ -40,12 +40,12 @@ function do_wordcount {
 if [[ $# == 0 ]]; then 
     diary-new-entry
     diary-backup > /dev/null &
-	exit
+    exit
 fi
 
 # Check for command.
 case "$1" in
-	backup | backu | back | bac | ba | b )
+    backup | backu | back | bac | ba | b )
         shift
         diary-backup $@ 
     ;;
@@ -53,11 +53,11 @@ case "$1" in
         shift
         diary-edit $@ 
     ;;
-	help | hel | he | h | -h | --help )
+    help | hel | he | h | -h | --help )
         shift
         help_and_exit $@ 
     ;;
-	list | lis | li | l )
+    list | lis | li | l )
         shift
         diary-list $@ 
     ;;
@@ -73,7 +73,7 @@ case "$1" in
         shift
         do_wordcount $@
     ;;
-	* )
+    * )
         usage_and_exit 
     ;;
 esac

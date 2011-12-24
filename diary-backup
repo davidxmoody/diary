@@ -7,19 +7,19 @@ DATA_DIRECTORY="${DIARY_DIRECTORY}/data"
 
 #VERBOSE=""
 #if [ "$1" == -v ] || [ "$1" == --verbose ] ; then
-#	VERBOSE="--verbose"
+#    VERBOSE="--verbose"
 #fi
 
 
 # $1=original, $2=backup
 function do_backup {
-	echo ${2##*/}: $(cp -urv $3 $1 $2 | wc -l)
+    echo ${2##*/}: $(cp -urv $3 $1 $2 | wc -l)
 }
 
 # First copy everything from the data directory into the backup directories
 # and then copy everything from the dropbox directory into the data directory.
 for d in $BACKUP_DIRECTORY/* ; do
-	do_backup $DATA_DIRECTORY $d &
+    do_backup $DATA_DIRECTORY $d &
 done | cat 
 
 do_backup ${BACKUP_DIRECTORY}/dropbox/data $DIARY_DIRECTORY --preserve=timestamps

@@ -6,53 +6,53 @@ SEP="\e[0;34m"$(hline)"\e[0m"
 MAX_MATCHES=40
 
 function search_tags {
-	# Re-use search_words by prefixing each argument with a '#'.
-	search_words $(for tag in $@; do echo "#$tag\S*"; done)
+    # Re-use search_words by prefixing each argument with a '#'.
+    search_words $(for tag in $@; do echo "#$tag\S*"; done)
 }
 
 function search_words {
-	# If no arguments then exit. 
-	[ $# == 0 ] && exit 1
+    # If no arguments then exit. 
+    [ $# == 0 ] && exit 1
 
-	# Build search string.
-	search_string="\($1\)"
-	shift
-	for word in "$@"; do 
-		search_string=$search_string"\|\($word\)"
-	done
+    # Build search string.
+    search_string="\($1\)"
+    shift
+    for word in "$@"; do 
+    	search_string=$search_string"\|\($word\)"
+    done
 
-	# Spawn a new subshell.
-	(
-	num_matches=0
+    # Spawn a new subshell.
+    (
+    num_matches=0
 
-	# Search every single entry in $DIARY_DIR.
-	for entry in $(ls -r $DIARY_DIR); do
-		if grep -qi "$search_string" $DIARY_DIR/$entry; then 
+    # Search every single entry in $DIARY_DIR.
+    for entry in $(ls -r $DIARY_DIR); do
+    	if grep -qi "$search_string" $DIARY_DIR/$entry; then 
 
-			# Wrap at word boundaries and highlight search terms.
-			#fold -s -w $(tput cols) $DIARY_DIR/$entry | \
+    		# Wrap at word boundaries and highlight search terms.
+    		#fold -s -w $(tput cols) $DIARY_DIR/$entry | \
                 #grep --colour=always -i "\|$search_string" 
-			#echo -e $SEP
+    		#echo -e $SEP
             diary-format -m --search="$search_string" $DIARY_DIR/$entry
-			
-			num_matches=$((num_matches+1))
-			if [ $num_matches -ge $MAX_MATCHES ]; then 
-				echo "$num_matches entries found, max search depth reached."
-				exit 0
-			fi
-		fi
-	done 
+    		
+    		num_matches=$((num_matches+1))
+    		if [ $num_matches -ge $MAX_MATCHES ]; then 
+    			echo "$num_matches entries found, max search depth reached."
+    			exit 0
+    		fi
+    	fi
+    done 
 
-	if [ $num_matches == 0 ]; then 
-		echo "No matches for the search term: $search_string"
-	fi
-	
-	# Pipe everything to less and enable colour. 
-	) | less -R
+    if [ $num_matches == 0 ]; then 
+    	echo "No matches for the search term: $search_string"
+    fi
+    
+    # Pipe everything to less and enable colour. 
+    ) | less -R
 }
 
 function search_default {
-	search_tags "$@"
+    search_tags "$@"
 }
 
 function usage_and_exit {
@@ -63,13 +63,13 @@ function usage_and_exit {
 
 # If no arguments then search for the anonymous tag (##).
 if [ $# == 0 ]; then 
-	search_words '#\S*'
-	exit
+    search_words '#\S*'
+    exit
 fi
 
 # Is the user searching for words or tags?
 case $1 in 
-	-t | --tags ) shift; search_tags "$@" ;;
-	-w | --words ) shift; search_words "$@" ;;
-	* ) search_default "$@" ;;
+    -t | --tags ) shift; search_tags "$@" ;;
+    -w | --words ) shift; search_words "$@" ;;
+    * ) search_default "$@" ;;
 esac
