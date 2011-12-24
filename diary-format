@@ -14,8 +14,7 @@ function format_entry {
     # First do any text changing edits.
     do_edits | \
     # Then fold the text.
-    #fold -s -w "$width" | \
-    fmt -w "$width"
+    fold -s -w "$width" | \
     # Then do highlighting. 
     do_highlight
 
@@ -106,6 +105,7 @@ function get_date_string {
     # Yesterday
     elif (( (this_year==year && this_day-day==1) || \
             (this_year-year==1 && $(date +%j -d yesterday)==day) )); then
+            # TODO fix bug where day is interpreted as an octal number
         echo Yesterday $(date "+$very_short_date_format" -d "@$timestamp")
 
     # Over two days ago, still this year
@@ -168,7 +168,7 @@ done
 
 
 # Single argument is a filename or '-' or empty for stdin. 
-if [[ $# == 0 || $1 == '-' ]]; then 
+if [[ $# == 0 || "$1" == "-" ]]; then 
     format_entry
 else
     [[ $metadata ]] && print_metadata "$1"
