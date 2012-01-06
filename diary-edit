@@ -41,7 +41,7 @@ fi
 
 
 function use_vim {
-    vim "+set spell" $file_path
+    vim "+set spell" "+syntax off" $file_path
 }
 
 use_vim

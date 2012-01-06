@@ -17,7 +17,7 @@ function use_cat {
 }
 
 function use_vim {
-    vim "+set spell" "+startinsert" $FILE_PATH
+    vim "+set spell" "+syntax off" "+startinsert" $FILE_PATH
 }
 
 function usage_and_exit {
