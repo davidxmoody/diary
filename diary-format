@@ -94,6 +94,22 @@ function get_date_string {
         "$(date '+%Y %j %H %M' -d @$now)"
 
 
+    # Find yesterday's day number.
+    yesterday=$(date +%j -d yesterday)
+
+    # Remove leading zeros (extended globbing does not work here).
+    yesterday=${yesterday#0}
+    yesterday=${yesterday#0}
+    this_day=${this_day#0}
+    this_day=${this_day#0}
+    this_hour=${this_hour#0}
+    this_minute=${this_minute#0}
+    day=${day#0}
+    day=${day#0}
+    hour=${hour#0}
+    minute=${minute#0}
+
+
     # In the future
     if ((timestamp>now)); then 
         echo $(date "+$long_date_format" -d "@$timestamp") "(in the future)"
@@ -104,8 +120,7 @@ function get_date_string {
     
     # Yesterday
     elif (( (this_year==year && this_day-day==1) || \
-            (this_year-year==1 && $(date +%j -d yesterday)==day) )); then
-            # TODO fix bug where day is interpreted as an octal number
+            (this_year-year==1 && yesterday==day) )); then
         echo Yesterday $(date "+$very_short_date_format" -d "@$timestamp")
 
     # Over two days ago, still this year
