@@ -49,6 +49,8 @@ case "$1" in
         shift
         diary-backup $@ 
     ;;
+    # TODO add a command called cd that can change the current dir easily to 
+    # one of the commonly used diary directories (e.g. .diary, data, entries).
     edit | edi | ed | e )
         shift
         diary-edit $@ 
