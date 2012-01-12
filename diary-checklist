@@ -1,0 +1,66 @@
+#!/bin/bash
+# Script to manage checklists.
+
+date_format="%F"
+
+checklist_dir="${HOME}/.diary/data/checklists"
+cd "$checklist_dir"
+
+
+use_vim() {
+    vim "+set spell" "+syntax off" "$1"
+}
+
+edit_checklist() {
+    # First generate the relevant file path.
+    date_to_use=$(date +%F -d "$1")
+    file_name="checklist-$date_to_use.txt"
+
+    # If the file does not exist then ask the user if they would like to 
+    # import any uncompleted (not yet deleted) lines from the last file.
+    query="Would you like to import your previous uncompleted items [Y/n]?"
+    if [[ ! -e "$file_name" ]] && yesno -Y "$query"; then
+        previous_file=$(ls -1r | head -1)
+        cp -n -T "$previous_file" "$file_name"
+    else
+        touch "$file_name"
+    fi
+
+    # File now exists (assume it is an editable text file or link to one).
+
+    # Record date for later commit message.
+    pre_edit_date=$(date)
+
+    # Open it with vim.
+    use_vim "$file_name"
+
+    # Now backup all changes made with vim using mercurial. 
+    commit_message=\
+"Automatic commit by diary-checklist
+Edit started at: $pre_edit_date
+Edit ended at:   $(date)
+Committed from $(hostname)"
+
+    hg commit --addremove --user "diary-checklist" --exclude '.*.swp' \
+              --message "$commit_message"
+}
+
+
+# Process command line arguments.
+checklist_date=today
+while true; do
+    case $1 in
+        today)
+            checklist_date=today
+        ;;
+        tomorrow)
+            checklist_date=tomorrow
+        ;;
+        *)
+            break
+        ;;
+    esac
+done
+
+# Edit the relevant checklist.
+edit_checklist "$checklist_date"
