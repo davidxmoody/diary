@@ -1,0 +1,73 @@
+#!/bin/bash
+# Calculates total number of words written in all diary entries. 
+
+diary_dir="${HOME}/.diary/data/entries"
+cd "$diary_dir"
+
+bold_colour="\e[1;37m"  # Bold White.
+end_colour="\e[0m"
+
+
+# Process command line options.
+time_period=total
+case $1 in 
+    -m | --month)
+        time_period=month
+    ;;
+esac
+
+
+# Find the elapsed time since the first entry was written. 
+first_month=$(ls -1 | head -n 1)
+[[ -z "$first_month" ]] && { echo "No entries found." >2; exit 1; }
+first=$(ls -1 "$first_month" | head -1)
+first=${first#diary-}
+first=${first%%-*}
+now=$(date +%s)
+let "time_diff=$now-$first"
+let "days=$time_diff/(60*60*24)"
+
+
+# For every month, find the word counts and entry counts.
+index=0
+total_words=
+total_entries=
+for month in *; do
+    
+    # Record which month it is.
+    months[index]=$month
+
+    # Word count.
+    words[index]=$(cat $month/* | wc -w)
+
+    # Entry count.
+    entries[index]=$(ls -1 $month | wc -l)
+
+    # Totals.
+    let "total_words += ${words[index]}"
+    let "total_entries += ${entries[index]}"
+
+    let "index++"
+
+done
+
+months[index]="Total"
+words[index]=$total_words
+entries[index]=$total_entries
+
+
+# Print it all in a nice format. 
+case "$time_period" in
+    total)
+        echo -e "You have written $bold_colour$total_words$end_colour words,"\
+                "in $bold_colour$total_entries$end_colour entries,"\
+                "over $bold_colour$days$end_colour days."
+    ;;
+    month)
+        index=0
+        until [[ -z ${months[index]} ]]; do
+            printf "%7s:%8s words,%6s entries\n" "${months[index]}" "${words[index]}" "${entries[index]}"
+            let "index++"
+        done
+    ;;
+esac

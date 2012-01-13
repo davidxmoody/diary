@@ -1,38 +1,16 @@
 #!/bin/bash
 # The script that launches other diary related scripts.
 
-diary_dir="${HOME}/.diary/backup/dropbox/data/entries"
-
-wc_colour="\e[1;37m"
-end_colour="\e[0m"
-
 function help_and_exit {
+    # TODO
     echo "Help not implemented yet."
     exit 0
 }
 
 function usage_and_exit {
+    # TODO
     echo "Usage not implemented yet."
     exit 1
-}
-
-function do_wordcount {
-    # Count the number of words and entries. 
-    num_words=$(cat $diary_dir/* | wc --words)
-    num_entries=$(ls -1 $diary_dir | wc -l)
-    
-    # Find the elapsed time since the first entry was written. 
-    first=$(ls -1 $diary_dir | head -1)
-    first=${first#diary-}
-    first=${first%%-*}
-    now=$(date +%s)
-    let time_diff=$now-$first
-    let "days=$time_diff/(60*60*24)"
-
-    # Print it all in a nice format. 
-    echo -e "You have written $wc_colour$num_words$end_colour words,"\
-            "in $wc_colour$num_entries$end_colour entries,"\
-            "over $wc_colour$days$end_colour days."
 }
 
 
@@ -40,43 +18,42 @@ function do_wordcount {
 if [[ $# == 0 ]]; then 
     diary-new-entry
     diary-backup > /dev/null &
-    exit
+    exit 0
 fi
 
 # Check for command.
 case "$1" in
     backup | backu | back | bac | ba | b )
         shift
-        diary-backup $@ 
+        diary-backup "$@" 
     ;;
     # TODO add a command called cd that can change the current dir easily to 
     # one of the commonly used diary directories (e.g. .diary, data, entries).
     edit | edi | ed | e )
         shift
-        diary-edit $@ 
+        diary-edit "$@" 
     ;;
     help | hel | he | h | -h | --help )
         shift
-        help_and_exit $@ 
+        help_and_exit "$@" 
     ;;
     list | lis | li | l )
         shift
-        diary-list $@ 
+        diary-list "$@" 
     ;;
     new | ne | n )
         shift
-        diary-new-entry $@ 
+        diary-new-entry "$@" 
     ;;
     search | searc | sear | sea | se | s )
         shift
-        diary-search $@ 
+        diary-search "$@" 
     ;;
     wc | w | wordcount )
         shift
-        do_wordcount $@
+        diary-wordcount "$@"
     ;;
     * )
         usage_and_exit 
     ;;
 esac
-
