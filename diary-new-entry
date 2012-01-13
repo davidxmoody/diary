@@ -1,38 +1,39 @@
 #!/bin/bash
 # Simple script to create a new text file to write a diary entry in.
 
-DEVICE_NAME="$(hostname)"
-TIMESTAMP="$(date +%s)"
-FILE_NAME="diary-${TIMESTAMP}-${DEVICE_NAME}.txt"
+# Determine file name and path.
+device_name="$(hostname)"
+timestamp="$(date +%s)"
+file_name="diary-$timestamp-$device_name.txt"
 
-DIARY_DIRECTORY="${HOME}/.diary/data/entries"
-FILE_PATH="${DIARY_DIRECTORY}/${FILE_NAME}"
+diary_directory="$HOME/.diary/data/entries"
+month=$(date '+%Y-%m')
+file_path="$diary_directory/$month/$file_name"
 
-function use_gedit {
-    gedit --new-window $FILE_PATH + &
+
+use_gedit() {
+    gedit --new-window "$file_path" + &
 }
 
-function use_cat {
-    cat >> $FILE_PATH 
+use_vim() {
+    vim "+set spell" "+syntax off" "+startinsert" "$file_path"
 }
 
-function use_vim {
-    vim "+set spell" "+syntax off" "+startinsert" $FILE_PATH
-}
-
-function usage_and_exit {
-    echo "Help not implemented yet."
-}
-
-if [ $# = 0 ] ; then 
+# If no args then use Vim.
+if [[ $# == 0 ]] ; then 
     use_vim
     exit
 fi
 
+# Process command line options.
 case "$1" in
-    -c | --cat ) use_cat ;;
-    -g | --gedit ) use_gedit ;;
-    -v | --vim ) use_vim ;;
-    * ) usage_and_exit ;;
+    -g | --gedit)
+        use_gedit
+    ;;
+    -v | --vim)
+        use_vim
+    ;;
+    *)
+        exit 1
+    ;;
 esac
-
