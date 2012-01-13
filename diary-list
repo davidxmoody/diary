@@ -23,11 +23,6 @@ do_it() {
     # Find the required entries. 
     for month in $months; do
         
-        # Only consider directories of the format YYYY-MM.
-        if [[ ! -d "$month" ]] || [[ ! "$month" =~ ^[0-9]{4}-[0-9]{2}$ ]]; then
-           continue 
-        fi
-
         # Add entries to entries array, stopping if num_entries is reached.
         for entry in $(ls -1r "$month"); do 
             entries[index++]=$month/$entry
