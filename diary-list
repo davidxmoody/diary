@@ -1,11 +1,62 @@
 #!/bin/bash
-# Backs up all diary related data to multiple sources.
+# Dilplays diary entries in less. 
 
-DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
+# cd to the diary directory to save time later.
+diary_dir="${HOME}/.diary/data/entries"
+cd "$diary_dir"
 
 # Set the default number of entries to show.
 num_entries=50
 
+# Default is to show newest entries first.
+reverse=
+
+# Default is to use less and not print to standard output.
+print=
+
+# Main function to print all entries to standard output. 
+do_it() {
+
+    index=0
+    months=$(ls -1r)
+
+    # Find the required entries. 
+    for month in $months; do
+        
+        # Only consider directories of the format YYYY-MM.
+        if [[ ! -d "$month" ]] || [[ ! "$month" =~ ^[0-9]{4}-[0-9]{2}$ ]]; then
+           continue 
+        fi
+
+        # Add entries to entries array, stopping if num_entries is reached.
+        for entry in $(ls -1r "$month"); do 
+            entries[index++]=$month/$entry
+            (( index >= num_entries )) && break
+        done
+
+        (( index >= num_entries )) && break
+
+    done
+
+    # Now print the required entries.
+
+    # Start from 0 again unless reverse is set, then start at the end.
+    index=0
+    [[ "$reverse" ]] && (( index = ${#entries[@]} -1 ))
+
+    # Go through all entries (in regular or reverse order) and print each one.
+    until (( index >= num_entries )) || (( index < 0 )) || \
+          [[ "${entries[$index]}" == "" ]]; do
+
+        diary-format -m "${entries[$index]}"
+
+        if [[ "$reverse" ]]; then (( index-- )); else (( index++ )); fi
+
+    done
+}
+
+
+# Process command line options. 
 while true; do
     case $1 in
         -n) 
@@ -15,6 +66,10 @@ while true; do
         ;;
         --number=*)
             num_entries=${1#--number=}
+            shift
+        ;;
+        -p | --print)
+            print=true
             shift
         ;;
         -r | --reverse)
@@ -27,9 +82,9 @@ while true; do
     esac
 done
 
-entries=$(ls -1r $DIARY_DIR | head --lines=$num_entries)
-[[ $reverse ]] && entries=$(for entry in $entries; do echo $entry; done | sort)
-
-for entry in $entries; do
-    diary-format -m "$DIARY_DIR/$entry"
-done | less -R
+# If print then print to standard output if not print then use less.
+if [[ "$print" ]]; then 
+    do_it
+else
+    do_it | less -R
+fi
