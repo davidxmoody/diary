@@ -1,18 +1,17 @@
 #!/bin/bash
 # Script to search diary entries for tags or sequences of words or quoted text. 
 
-DIARY_DIR="${HOME}/.diary/backup/dropbox/data/entries"
-SEP="\e[0;34m"$(hline)"\e[0m"
-MAX_MATCHES=40
+diary_dir="${HOME}/.diary/data/entries"
+cd "$diary_dir"
+
+max_matches=40
 
 function search_tags {
     # Re-use search_words by prefixing each argument with a '#'.
-    search_words $(for tag in $@; do echo "#$tag\S*"; done)
+    search_words $(for tag in $@; do echo "#$tag\S*"; done)  # TODO change so that it stops the highlight at certain chars.
 }
 
 function search_words {
-    # If no arguments then exit. 
-    [ $# == 0 ] && exit 1
 
     # Build search string.
     search_string="\($1\)"
@@ -21,55 +20,73 @@ function search_words {
     	search_string=$search_string"\|\($word\)"
     done
 
-    # Spawn a new subshell.
-    (
     num_matches=0
 
-    # Search every single entry in $DIARY_DIR.
-    for entry in $(ls -r $DIARY_DIR); do
-    	if grep -qi "$search_string" $DIARY_DIR/$entry; then 
+    # Search every entry in every month.
+    for month in $(ls -r); do
+        for entry in $(ls -r "$month"); do
 
-    		# Wrap at word boundaries and highlight search terms.
-    		#fold -s -w $(tput cols) $DIARY_DIR/$entry | \
-                #grep --colour=always -i "\|$search_string" 
-    		#echo -e $SEP
-            diary-format -m --search="$search_string" $DIARY_DIR/$entry
-    		
-    		num_matches=$((num_matches+1))
-    		if [ $num_matches -ge $MAX_MATCHES ]; then 
-    			echo "$num_matches entries found, max search depth reached."
-    			exit 0
-    		fi
-    	fi
-    done 
+            # If the entry contains the search string.
+            if grep -qi "$search_string" "$month/$entry"; then 
 
-    if [ $num_matches == 0 ]; then 
+                # Print the entry using diary-format.
+                diary-format -m --search="$search_string" "$month/$entry"
+                
+                # Keep track of the number of matches found so far.
+                let 'num_matches++'
+                if (( num_matches >= max_matches )); then 
+                    echo "$num_matches entries found, max search depth reached."
+                    return
+                fi
+
+            fi
+
+        done 
+    done
+
+    if (( num_matches == 0 )); then 
     	echo "No matches for the search term: $search_string"
     fi
     
-    # Pipe everything to less and enable colour. 
-    ) | less -R
-}
-
-function search_default {
-    search_tags "$@"
-}
-
-function usage_and_exit {
-        echo "Help not implemented yet."
-        exit
 }
 
 
-# If no arguments then search for the anonymous tag (##).
+# Process command line args.
+print=
+while true; do
+    case "$1" in 
+        -p | --print)
+            print=true
+        ;;
+        -t | --tags)
+            shift
+            mode=tags
+        ;;
+        -w | --words)
+            shift
+            mode=words
+        ;;
+        *)
+            break
+        ;;
+    esac
+done
+
+# If no arguments then search for all tags.
 if [ $# == 0 ]; then 
-    search_words '#\S*'
+    search_words '#\S*'  # TODO change to only search for specific character set.
     exit
 fi
 
 # Is the user searching for words or tags?
-case $1 in 
-    -t | --tags ) shift; search_tags "$@" ;;
-    -w | --words ) shift; search_words "$@" ;;
-    * ) search_default "$@" ;;
+case "$mode" in
+    tags)
+        search_tags "$@" | less -R
+    ;;
+    words)
+        search_words "$@" | less -R
+    ;;
+    *)
+        search_tags "$@" | less -R
+    ;;
 esac
