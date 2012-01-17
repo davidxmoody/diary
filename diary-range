@@ -27,13 +27,18 @@ get_months() {
 
 get_entries() {
     # $1 is -r if reverse order is required empty otherwise, 
-    # $2 is start index (inclusive) may be empty for 0,
+    # $2 is start index (inclusive),
     # $3 is end index (exclusive) may be empty for no end.
     reverse=$1
     entry_counter=0
     start_index=$2
     [[ -z "$start_index" ]] && start_index=0
     end_index=$3
+
+    # If start_index or end_index are negative then return.
+    # TODO make it so that I don't have to do this. 
+    (( start_index < 0 )) && return
+    (( end_index < 0 )) && return
 
     for month in $(get_months $reverse); do
         for entry in $(ls -1B $reverse "$month"); do
@@ -98,32 +103,29 @@ else
 
 fi
 
-# Replace leading '_'s with '-'s
+# Replace leading '_'s with '-'s.
 low=${low/#_/-}
 high=${high/#_/-}
 stride=${stride/#_/-}
 
+# If low is empty then set it to 0.
+[[ -z "$low" ]] && low=0
 
 
-
-# :
-# +x:
-# :+x
-# +x:+y  (x<y)
-# -x:
-# :-x
-# -x:-y  (x>y)
-
-
-
-
-
-
-
-# Either low < high
-# Or they are BOTH negative numbers (or empty)
-# Note that this does not allow for one positive and one negative number
-
+# +x:       (get_entries ""  x "")
+# +x:+y     (get_entries ""  x  y)
+# -x:  :-1  (get_entries -r  0 -x)
+# -x:-y:-1  (get_entries -r -y -x)
+case "$stride" in
+    1|+1)
+        get_entries "" "$low" "$high"
+    ;;
+    -1)
+        let 'low *= -1'
+        let 'high *= -1'
+        get_entries -r "$high" "$low"
+    ;;
+esac
 
 
 

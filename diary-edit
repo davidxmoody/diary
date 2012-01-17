@@ -1,48 +1,23 @@
 #!/bin/bash
-# Script to launch the default editor on a specified diary entry and then perform a backup.
-
-DIARY_DIRECTORY="${HOME}/.diary/data/entries"
-
-function usage_and_exit {
-    echo "Help not implemented yet."
-    exit 1
-}
-
-# Work out what entry the user wants to edit.
-# No arguments - edit most recent entry.
-# Positive number - edit entry with that index.
-# Negative number - edit entry made that number of entries ago. 
-# Anything else - print usage and exit. 
-entry_no=-1
-[[ $# == 1 ]] && entry_no="$1"
-[[ $# -gt 1 ]] && usage_and_exit
-[[ "$entry_no" =~ ^(\+|-)?[0-9]+$ ]] || usage_and_exit
-
-# If negative then list entries in reverse order.
-if [[ "$entry_no" -lt 0 ]]; then 
-    reverse="-r"
-    let entry_no*=-1
-
-# If positive then add one (to change to 1-based indexing). 
-else
-    reverse=""
-    let entry_no++
-fi
-
-# Find the specified entry.
-entry=$(ls $reverse -1 $DIARY_DIRECTORY | awk "FNR==$entry_no")
-
-file_path="$DIARY_DIRECTORY/$entry"
-
-if [[ ! -w "$file_path" ]]; then 
-    echo "Error: entry is not available: $file_path" >&2
-    exit 1
-fi
-
+# Script to launch the default editor on a specified diary entry.
 
 function use_vim {
-    vim "+set spell" "+syntax off" $file_path
+    vim "+set spell" "+syntax off" "$1"
 }
 
-use_vim
-diary-backup > /dev/null &
+
+# Decide which entry the user wants to edit.
+range="-1::-1"
+if [[ "$1" =~ ^(-|_)[0-9]+$ ]]; then
+    low=${1/#_/-}
+    high=$((low+1))
+    range="$low:$high:-1"
+    echo "range=$range"
+elif [[ "$1" =~ ^\+?[0-9]+$ ]]; then
+    low=$1
+    high=$((low+1))
+    range="$low:$high:1"
+fi
+
+use_vim "$(diary-range -r $range)"
+# TODO backup with hg
