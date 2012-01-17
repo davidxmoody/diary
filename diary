@@ -1,13 +1,13 @@
 #!/bin/bash
 # The script that launches other diary related scripts.
 
-function help_and_exit {
+help_and_exit() {
     # TODO
     echo "Help not implemented yet."
     exit 0
 }
 
-function usage_and_exit {
+usage_and_exit() {
     # TODO
     echo "Usage not implemented yet."
     exit 1
@@ -17,16 +17,11 @@ function usage_and_exit {
 # Default action to be taken if the script is run with no arguments.
 if [[ $# == 0 ]]; then 
     diary-new-entry
-    diary-backup > /dev/null &
     exit 0
 fi
 
 # Check for command.
 case "$1" in
-    backup | backu | back | bac | ba | b )
-        shift
-        diary-backup "$@" 
-    ;;
     # TODO add a command called cd that can change the current dir easily to 
     # one of the commonly used diary directories (e.g. .diary, data, entries).
     edit | edi | ed | e )
@@ -37,7 +32,7 @@ case "$1" in
         shift
         help_and_exit "$@" 
     ;;
-    list | lis | li | l )
+    list | lis | li | l | ls )
         shift
         diary-list "$@" 
     ;;
