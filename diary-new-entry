@@ -1,37 +1,33 @@
 #!/bin/bash
 # Simple script to create a new text file to write a diary entry in.
 
-# Determine file name and path.
-device_name="$(hostname)"
-timestamp="$(date +%s)"
-file_name="diary-$timestamp-$device_name.txt"
-
-diary_directory="$HOME/.diary/data/entries"
-month=$(date '+%Y-%m')
-file_path="$diary_directory/$month/$file_name"
-
-
 use_gedit() {
     gedit --new-window "$file_path" + &
+    # TODO do backup (with hg)
 }
 
 use_vim() {
     vim "+set spell" "+syntax off" "+startinsert" "$file_path"
+    # TODO do backup (with hg)
 }
+
+
+# Get the file path for a new entry.
+file_path=$(diary-range --new)
 
 # If no args then use Vim.
 if [[ $# == 0 ]] ; then 
-    use_vim
-    exit
+    use_vim "$file_path"
+    exit 0
 fi
 
 # Process command line options.
 case "$1" in
     -g | --gedit)
-        use_gedit
+        use_gedit "$file_path"
     ;;
     -v | --vim)
-        use_vim
+        use_vim "$file_path"
     ;;
     *)
         exit 1

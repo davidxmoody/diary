@@ -1,0 +1,130 @@
+#!/bin/bash
+# Script for finding the filenames of diary entries, 
+# supports simple slice notation (no steps). 
+
+entries_dir="$HOME/.diary/data/entries"
+cd "$entries_dir"
+
+
+new_entry() {
+    # Determine file name.
+    device_name="$(hostname)"
+    timestamp="$(date +%s)"
+    file_name="diary-$timestamp-$device_name.txt"
+
+    # Determine file path.
+    month=$(date '+%Y-%m')
+    file_path="$entries_dir/$month/$file_name"
+
+    # Echo it.
+    echo "$file_path"
+}
+
+get_months() {
+    # Use the -r or --reverse option to sort in reverse order.
+    ls -1 $1 
+}
+
+get_entries() {
+    # $1 is -r if reverse order is required empty otherwise, 
+    # $2 is start index (inclusive) may be empty for 0,
+    # $3 is end index (exclusive) may be empty for no end.
+    reverse=$1
+    entry_counter=0
+    start_index=$2
+    [[ -z "$start_index" ]] && start_index=0
+    end_index=$3
+
+    for month in $(get_months $reverse); do
+        for entry in $(ls -1B $reverse "$month"); do
+
+            # If the end of the desired entries has been reached, stop.
+            [[ "$end_index" ]] && (( entry_counter >= end_index )) && return
+            
+            # Only consider entries past the start index. 
+            if (( entry_counter >= start_index )); then
+                echo "$entries_dir/$month/$entry"
+            fi
+
+            # Increment the entry counter. 
+            let entry_counter++
+
+        done
+    done
+}
+
+
+
+# Process command line arguments.
+range=
+while true; do
+    case "$1" in 
+        -n | --new)
+            shift
+            new_entry "$@"
+        ;;
+        # TODO add options for referencing by fixed id, by timestamp, etc.
+        # TODO add support for multiple ranges
+        # TODO add support for reversing the order of entries
+        -r)
+            shift
+            range="$1"
+            shift
+        ;;
+        --range=*)
+            range=${1#--range=}
+            shift
+        ;;
+        *)
+            break
+        ;;
+    esac
+done
+
+# Extract slice information.
+if [[ "$range" =~ ^((\+|-|_)?[0-9]+)?:((\+|-|_)?[0-9]+)?$ ]]; then
+    low=${range%%:*}
+    high=${range##*:}
+    stride=1
+
+elif [[ "$range" =~ ^((\+|-|_)?[0-9]+)?:((\+|-|_)?[0-9]+)?:((\+|-|_)?[0-9]+)?$ ]]; then
+    low=${range%%:*}
+    stride=${range##*:}
+    high=${range#*:}
+    high=${high%:*}
+
+else
+    exit 1
+
+fi
+
+# Replace leading '_'s with '-'s
+low=${low/#_/-}
+high=${high/#_/-}
+stride=${stride/#_/-}
+
+
+
+
+# :
+# +x:
+# :+x
+# +x:+y  (x<y)
+# -x:
+# :-x
+# -x:-y  (x>y)
+
+
+
+
+
+
+
+# Either low < high
+# Or they are BOTH negative numbers (or empty)
+# Note that this does not allow for one positive and one negative number
+
+
+
+
+# TODO make vim store .swp files in separate location
