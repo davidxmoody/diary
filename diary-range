@@ -27,7 +27,7 @@ get_months() {
 
 get_entries() {
     # $1 is -r if reverse order is required empty otherwise, 
-    # $2 is start index (inclusive),
+    # $2 is start index (inclusive) may be empty for no start,
     # $3 is end index (exclusive) may be empty for no end.
     reverse=$1
     entry_counter=0
@@ -107,9 +107,6 @@ low=${low/#_/-}
 high=${high/#_/-}
 stride=${stride/#_/-}
 
-# If low is empty then set it to 0.
-[[ -z "$low" ]] && low=0
-
 
 # +x:       (get_entries ""  x "")
 # +x:+y     (get_entries ""  x  y)
@@ -120,8 +117,8 @@ case "$stride" in
         get_entries "" "$low" "$high"
     ;;
     -1)
-        let 'low *= -1'
-        let 'high *= -1'
+        [[ "$low" ]] && let 'low *= -1'
+        [[ "$high" ]] && let 'high *= -1'
         get_entries -r "$high" "$low"
     ;;
 esac

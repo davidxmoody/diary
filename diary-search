@@ -1,11 +1,6 @@
 #!/bin/bash
 # Script to search diary entries for tags or sequences of words or quoted text. 
 
-diary_dir="${HOME}/.diary/data/entries"
-cd "$diary_dir"
-
-max_matches=40
-
 search_tags() {
     # Re-use search_words by prefixing each argument with a '#'.
     search_words $(for tag in $@; do echo "#$tag\S*"; done)  # TODO change so that it stops the highlight at certain chars.
@@ -22,41 +17,54 @@ search_words() {
 
     num_matches=0
 
-    # Search every entry in every month.
-    for month in $(ls -r); do
-        for entry in $(ls -r "$month"); do
+    for entry in $(diary-range -r "$range"); do
+        
+        # If the entry contains the search string.
+        if grep -qi "$search_string" "$entry"; then 
 
-            # If the entry contains the search string.
-            if grep -qi "$search_string" "$month/$entry"; then 
-
-                # Print the entry using diary-format.
-                diary-format -m --search="$search_string" "$month/$entry"
-                
-                # Keep track of the number of matches found so far.
-                let 'num_matches++'
-                if (( num_matches >= max_matches )); then 
-                    echo "$num_matches entries found, max search depth reached."
-                    return
-                fi
-
+            # Print the entry using diary-format.
+            diary-format -m --search="$search_string" "$entry"
+            
+            # Keep track of the number of matches found so far.
+            let 'num_matches++'
+            if (( num_matches >= max_matches )); then 
+                echo "$num_matches entries found, max search depth reached."
+                return
             fi
 
-        done 
+        fi
+
     done
 
+    # Useful information to help the user work out why there were no matches. 
     if (( num_matches == 0 )); then 
-    	echo "No matches for the search term: $search_string"
+    	echo "No matches."
+        echo "Range: $range"
+        echo "Search term: $search_string"
     fi
-    
 }
 
 
 # Process command line args.
 print=
+range="-200::-1"
+max_matches=40
 while true; do
     case "$1" in 
+        --max-matches=*)
+            max_matches="${1#--max-matches=}"
+        ;;
         -p | --print)
             print=true
+        ;;
+        -r)
+            shift
+            range="$1"
+            shift
+        ;;
+        --range=*)
+            range="${1#--range=}"
+            shift
         ;;
         -t | --tags)
             shift
