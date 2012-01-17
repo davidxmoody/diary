@@ -10,7 +10,8 @@ metadata_colour="\e[1;34m"  # Bold blue.
 pad_colour="\e[0;34m"       # Blue.
 end_colour="\e[0m"
 
-function format_entry {
+
+format_entry() {
     # First do any text changing edits.
     do_edits | \
     # Then fold the text.
@@ -22,13 +23,13 @@ function format_entry {
     echo ""
 }
 
-function do_edits {
+do_edits() {
     while read line; do
         echo $line
     done
 }
 
-function do_highlight {
+do_highlight() {
     while read line; do
         if [[ $search_string ]]; then
             grep --colour=always -i "\|$search_string" <<< "$line"
@@ -38,7 +39,7 @@ function do_highlight {
     done
 }
 
-function print_metadata {
+print_metadata() {
     # Argument must be in the format: diary-<TIMESTAMP>-<DEVICE>.txt
     entry="$1"
     entry=${entry##*diary-}
@@ -85,19 +86,10 @@ function print_metadata {
     fi
 }
 
-function get_date_string {
+get_date_string() {
 
     timestamp="$1"
     now=$(date +%s)
-
-    #let time_diff=now-timestamp
-    #let seconds=time_diff%60
-    #let time_diff=time_diff/60
-    #let minutes=time_diff%60
-    #let time_diff=time_diff/60
-    #let hours=time_diff%24
-    #let time_diff=time_diff/24
-    #let days=time_diff
 
     # Get date information
     read year day hour minute <<< \
@@ -147,13 +139,7 @@ function get_date_string {
 
 }
 
-
-function usage_and_exit {
-    echo "Help not implemented yet."
-    exit 1
-}
-
-function check_width {
+check_width() {
     [ "$1" -ge $minimum_width ] 2>/dev/null || usage_and_exit
 }
 

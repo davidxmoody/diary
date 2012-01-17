@@ -6,12 +6,12 @@ cd "$diary_dir"
 
 max_matches=40
 
-function search_tags {
+search_tags() {
     # Re-use search_words by prefixing each argument with a '#'.
     search_words $(for tag in $@; do echo "#$tag\S*"; done)  # TODO change so that it stops the highlight at certain chars.
 }
 
-function search_words {
+search_words() {
 
     # Build search string.
     search_string="\($1\)"
@@ -73,7 +73,7 @@ while true; do
 done
 
 # If no arguments then search for all tags.
-if [ $# == 0 ]; then 
+if [[ $# == 0 ]]; then 
     search_words '#\S*'  # TODO change to only search for specific character set.
     exit
 fi
@@ -81,12 +81,17 @@ fi
 # Is the user searching for words or tags?
 case "$mode" in
     tags)
-        search_tags "$@" | less -R
+        if [[ "$print" ]]; then
+            search_tags "$@"
+        else
+            search_tags "$@" | less -R
+        fi
     ;;
     words)
-        search_words "$@" | less -R
-    ;;
-    *)
-        search_tags "$@" | less -R
+        if [[ "$print" ]]; then
+            search_words "$@"
+        else
+            search_words "$@" | less -R
+        fi
     ;;
 esac
