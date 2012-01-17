@@ -1,74 +1,33 @@
 #!/bin/bash
 # Dilplays diary entries in less. 
 
-# cd to the diary directory to save time later.
-diary_dir="${HOME}/.diary/data/entries"
-cd "$diary_dir"
-
-# Set the default number of entries to show.
-num_entries=50
-
-# Default is to show newest entries first.
-reverse=
-
-# Default is to use less and not print to standard output.
-print=
-
-# Main function to print all entries to standard output. 
-do_it() {
-
-    index=0
-    months=$(ls -1r)
-
-    # Find the required entries. 
-    for month in $months; do
-        
-        # Add entries to entries array, stopping if num_entries is reached.
-        for entry in $(ls -1r "$month"); do 
-            entries[index++]=$month/$entry
-            (( index >= num_entries )) && break
-        done
-
-        (( index >= num_entries )) && break
-
-    done
-
-    # Now print the required entries.
-
-    # Start from 0 again unless reverse is set, then start at the end.
-    index=0
-    [[ "$reverse" ]] && (( index = ${#entries[@]} -1 ))
-
-    # Go through all entries (in regular or reverse order) and print each one.
-    until (( index >= num_entries )) || (( index < 0 )) || \
-          [[ "${entries[$index]}" == "" ]]; do
-
-        diary-format -m "${entries[$index]}"
-
-        if [[ "$reverse" ]]; then (( index-- )); else (( index++ )); fi
-
-    done
-}
-
-
 # Process command line options. 
+print=
+range="-40::-1"
 while true; do
     case $1 in
         -n) 
             shift
-            num_entries="$1"
+            [[ ! "$1" -gt 0 ]] && exit 1
+            range="-$1::-1"
             shift
         ;;
         --number=*)
-            num_entries=${1#--number=}
+            [[ ! "${1#--number=}" -gt 0 ]] && exit 1
+            range="-${1#--number=}::-1"
             shift
         ;;
         -p | --print)
             print=true
             shift
         ;;
-        -r | --reverse)
-            reverse=true
+        -r)
+            shift
+            range=$1
+            shift
+        ;;
+        --range=*)
+            range=${1#--range=}
             shift
         ;;
         *)
@@ -76,6 +35,12 @@ while true; do
         ;;
     esac
 done
+
+do_it() {
+    for entry in $(diary-range -r "$range"); do
+        diary-format -m "$entry"
+    done
+}
 
 # If print then print to standard output if not print then use less.
 if [[ "$print" ]]; then 
