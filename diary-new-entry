@@ -1,35 +1,11 @@
 #!/bin/bash
-# Simple script to create a new text file to write a diary entry in.
-
-use_gedit() {
-    gedit --new-window "$file_path" + &
-    # TODO do backup (with hg)
-}
-
-use_vim() {
-    vim "+set spell" "+syntax off" "+startinsert" "$file_path"
-    # TODO do backup (with hg)
-}
-
+# Script to create a new entry with the default editor.
 
 # Get the file path for a new entry.
-file_path=$(diary-range --new)
+entry_filename=$(diary-range --new)
 
-# If no args then use Vim.
-if [[ $# == 0 ]] ; then 
-    use_vim "$file_path"
-    exit 0
-fi
+# Get default editor and use it on $entry_filename.
+editor=$(diary-settings get diary_new_entry_default_editor)
+eval "$editor $entry_filename"
 
-# Process command line options.
-case "$1" in
-    -g | --gedit)
-        use_gedit "$file_path"
-    ;;
-    -v | --vim)
-        use_vim "$file_path"
-    ;;
-    *)
-        exit 1
-    ;;
-esac
+# TODO back up with hg

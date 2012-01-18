@@ -3,6 +3,14 @@
 
 diary_default_action="diary-new-entry"
 diary_edit_default_editor="vim '+set spell' '+syntax off'"
+diary_new_entry_default_editor="vim '+set spell' '+syntax off' '+startinsert'"
+
+dir_diary="$HOME/.diary"
+dir_data="$dir_diary/data"
+dir_entries="$dir_data/entries"
+dir_checklists="$dir_data/checklists"
+
+
 
 
 
