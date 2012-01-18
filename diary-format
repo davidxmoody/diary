@@ -13,7 +13,7 @@ end_colour="\e[0m"
 
 format_entry() {
     # First do any text changing edits.
-    do_edits | \
+    #do_edits | \
     # Then fold the text.
     fold -s -w "$width" | \
     # Then do highlighting. 
@@ -24,19 +24,15 @@ format_entry() {
 }
 
 do_edits() {
-    while read line; do
-        echo $line
-    done
+    cat
 }
 
 do_highlight() {
-    while read line; do
-        if [[ $search_string ]]; then
-            grep --colour=always -i "\|$search_string" <<< "$line"
-        else
-            echo $line
-        fi
-    done
+    if [[ "$search_string" ]]; then
+        grep --colour=always -i "\|$search_string"
+    else 
+        cat
+    fi
 }
 
 print_metadata() {
@@ -140,7 +136,7 @@ get_date_string() {
 }
 
 check_width() {
-    [ "$1" -ge $minimum_width ] 2>/dev/null || usage_and_exit
+    [ "$1" -ge $minimum_width ] 2>/dev/null || exit 1
 }
 
 # Set default width.
@@ -150,24 +146,22 @@ width=$(tput cols)
 while true; do
     case $1 in 
         -w ) 
-            shift
-            width="$1"
-            shift
+            width="$2"
             check_width "$width"
+            shift; shift
         ;;
         --width=* ) 
             width=${1#--width=}
-            shift
             check_width "$width"
+            shift
         ;;
         -m | --metadata )
             metadata=true
             shift
         ;;
         -s )
-            shift
-            search_string="$1"
-            shift
+            search_string="$2"
+            shift; shift
         ;;
         --search=* ) 
             search_string=${1#--search=}
