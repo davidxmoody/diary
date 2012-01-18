@@ -1,4 +1,0 @@
-#!/bin/bash
-# Dilplays diary entries, uses diary-search to do so.
-
-diary-search --list "$@"
