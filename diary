@@ -16,7 +16,8 @@ usage_and_exit() {
 
 # Default action to be taken if the script is run with no arguments.
 if [[ $# == 0 ]]; then 
-    diary-new-entry
+    action="$(diary-settings get diary_default_action)"
+    eval "$action"
     exit 0
 fi
 
@@ -49,6 +50,6 @@ case "$1" in
         diary-wordcount "$@"
     ;;
     * )
-        usage_and_exit 
+        usage_and_exit "$@"
     ;;
 esac

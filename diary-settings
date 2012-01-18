@@ -1,0 +1,26 @@
+#!/bin/bash
+# Script to view and modify user settings.
+
+diary_default_action="diary-new-entry"
+diary_edit_default_editor="vim '+set spell' '+syntax off'"
+
+
+
+# Process arguments, first one is always a command.
+command="$1"
+shift
+case "$command" in
+    get)
+        var="${!1}"
+        [[ "$var" ]] && echo "$var"
+    ;;
+    set)
+        echo "Setting commands is not supported yet." >%2
+    ;;
+    interactive)
+        echo "Interactive mode is not supported yet." >%2
+    ;;
+    list)
+        echo "List mode is not supported yet." >%2
+    ;;
+esac

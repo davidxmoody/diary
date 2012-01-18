@@ -1,23 +1,35 @@
 #!/bin/bash
 # Script to launch the default editor on a specified diary entry.
 
-function use_vim {
-    vim "+set spell" "+syntax off" "$1"
-}
 
-
-# Decide which entry the user wants to edit.
+# Default range is the last entry.
 range="-1::-1"
+
+# $1 is a negative number.
 if [[ "$1" =~ ^(-|_)[0-9]+$ ]]; then
     low=${1/#_/-}
     high=$((low+1))
     range="$low:$high:-1"
-    echo "range=$range"
+
+# $1 is a positive number.
 elif [[ "$1" =~ ^\+?[0-9]+$ ]]; then
     low=$1
     high=$((low+1))
     range="$low:$high:1"
 fi
 
-use_vim "$(diary-range -r $range)"
+
+# Get filename and check it is okay.
+entry_filename="$(diary-range -r $range)"
+if [[ ! -w "$entry_filename" ]]; then
+    echo "$(basename $0): cannot edit the file: \"$entry_filename\"" >&2
+    exit 1
+fi
+
+# Get default editor and launch it on the filename. 
+editor="$(diary-settings get diary_edit_default_editor)"
+eval "$editor $entry_filename"
+
+
+
 # TODO backup with hg
