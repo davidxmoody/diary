@@ -1,9 +1,10 @@
 #!/bin/bash
-# Script to search diary entries for tags or sequences of words or quoted text. 
+# Script to search diary entries for tags or text. 
 
 search_tags() {
     # Re-use search_words by prefixing each argument with a '#'.
-    search_words $(for tag in $@; do echo "#$tag\S*"; done)  # TODO change so that it stops the highlight at certain chars.
+    search_words $(for tag in $@; do echo "#$tag\S*"; done)
+    # TODO change so that it stops the highlight at certain chars.
 }
 
 search_words() {
@@ -15,19 +16,26 @@ search_words() {
     	search_string=$search_string"\|\($word\)"
     done
 
-    num_matches=0
+    do_search "$search_string"
+}
+
+do_search() {
+
+    search_string="$1"
+    local -i num_matches=0
 
     for entry in $(diary-range -r "$range"); do
         
         # If the entry contains the search string.
-        if grep -qi "$search_string" "$entry"; then 
+        if [[ -z "$search_string" ]] || \
+                grep -qi "$search_string" "$entry"; then 
 
             # Print the entry using diary-format.
             diary-format -m --search="$search_string" "$entry"
             
             # Keep track of the number of matches found so far.
             let 'num_matches++'
-            if (( num_matches >= max_matches )); then 
+            if [[ "$max_matches" ]] && (( num_matches >= max_matches )); then 
                 echo "$num_matches entries found, max search depth reached."
                 return
             fi
@@ -38,7 +46,7 @@ search_words() {
 
     # Useful information to help the user work out why there were no matches. 
     if (( num_matches == 0 )); then 
-    	echo "No matches."
+    	echo "No entries found."
         echo "Range: $range"
         echo "Search term: $search_string"
     fi
@@ -49,30 +57,48 @@ search_words() {
 print=
 range="-200::-1"
 max_matches=40
+mode=tags
 while true; do
     case "$1" in 
+        -l | --list)
+            mode=list
+            shift
+        ;;
+        -m)
+            max_matches="$2"
+            shift; shift
+        ;;
         --max-matches=*)
             max_matches="${1#--max-matches=}"
+            shift
+        ;;
+        -n) 
+            range="-$2::-1"
+            shift; shift
+        ;;
+        --number=*)
+            range="-${1#--number=}::-1"
+            shift
         ;;
         -p | --print)
             print=true
+            shift
         ;;
         -r)
-            shift
-            range="$1"
-            shift
+            range="$2"
+            shift; shift
         ;;
         --range=*)
             range="${1#--range=}"
             shift
         ;;
         -t | --tags)
-            shift
             mode=tags
+            shift
         ;;
         -w | --words)
-            shift
             mode=words
+            shift
         ;;
         *)
             break
@@ -80,14 +106,25 @@ while true; do
     esac
 done
 
+# If mode has not been set then use tags.
+[[ -z "$mode" ]] && mode=tags
+
 # If no arguments then search for all tags.
-if [[ $# == 0 ]]; then 
-    search_words '#\S*'  # TODO change to only search for specific character set.
+if [[ "$mode" != list && $# == 0 ]]; then 
+    search_words '#\S*' | less -R
+    # TODO change to only search for specific character set.
     exit
 fi
 
-# Is the user searching for words or tags?
+# What is the user searching for?
 case "$mode" in
+    list)
+        if [[ "$print" ]]; then
+            do_search
+        else
+            do_search | less -R
+        fi
+    ;;
     tags)
         if [[ "$print" ]]; then
             search_tags "$@"
