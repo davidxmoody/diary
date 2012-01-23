@@ -13,6 +13,10 @@ usage_and_exit() {
     exit 1
 }
 
+# Find out which diary script was actually executed and then use the 
+# corresponding subscripts. 
+real_path=$(readlink -f $0)
+real_path=${real_path%/*}
 
 # Default action to be taken if the script is run with no arguments.
 if [[ $# == 0 ]]; then 
@@ -27,7 +31,8 @@ case "$1" in
     # one of the commonly used diary directories (e.g. .diary, data, entries).
     edit | edi | ed | e )
         shift
-        diary-edit "$@" 
+        source "$real_path/diary-edit" "$@"
+        #diary-edit "$@" 
     ;;
     help | hel | he | h | -h | --help )
         shift
@@ -35,19 +40,23 @@ case "$1" in
     ;;
     list | lis | li | l | ls )
         shift
-        diary-search --list "$@"
+        source "$real_path/diary-search" --list "$@"
+        #diary-search --list "$@"
     ;;
     new | ne | n )
         shift
-        diary-new-entry "$@" 
+        source "$real_path/diary-new-entry" "$@"
+        #diary-new-entry "$@" 
     ;;
     search | searc | sear | sea | se | s )
         shift
-        diary-search "$@" 
+        source "$real_path/diary-search" "$@"
+        #diary-search "$@" 
     ;;
     wc | w | wordcount )
         shift
-        diary-wordcount "$@"
+        source "$real_path/diary-wordcount" "$@"
+        #diary-wordcount "$@"
     ;;
     * )
         usage_and_exit "$@"
