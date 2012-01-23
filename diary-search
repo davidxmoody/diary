@@ -62,6 +62,7 @@ while true; do
     case "$1" in 
         -l | --list)
             mode=list
+            max_matches=
             shift
         ;;
         -m)
