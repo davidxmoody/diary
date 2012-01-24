@@ -63,6 +63,7 @@ while true; do
         -l | --list)
             mode=list
             max_matches=
+            range="-30::-1"
             shift
         ;;
         -m)
