@@ -18,16 +18,6 @@ usage_and_exit() {
 real_path=$(readlink -f $0)
 real_path=${real_path%/*}
 
-#diary-checklist() { source "$real_path/diary-checklist" "$@"; }
-#diary-edit()      { source "$real_path/diary-edit" "$@"; }
-#diary-format()    { source "$real_path/diary-format" "$@"; }
-#diary-list()      { source "$real_path/diary-search" --list "$@"; }
-#diary-new-entry() { source "$real_path/diary-new-entry" "$@"; }
-#diary-range()     { source "$real_path/diary-range" "$@"; }
-#diary-search()    { source "$real_path/diary-search" "$@"; }
-#diary-settings()  { source "$real_path/diary-settings" "$@"; }
-#diary-wordcount() { source "$real_path/diary-wordcount" "$@"; }
-
 eval "diary-checklist() { '$real_path/diary-checklist'     \$@; }"
 eval "diary-edit()      { '$real_path/diary-edit'          \$@; }"
 eval "diary-format()    { '$real_path/diary-format'        \$@; }"
@@ -37,6 +27,16 @@ eval "diary-range()     { '$real_path/diary-range'         \$@; }"
 eval "diary-search()    { '$real_path/diary-search'        \$@; }"
 eval "diary-settings()  { '$real_path/diary-settings'      \$@; }"
 eval "diary-wordcount() { '$real_path/diary-wordcount'     \$@; }"
+
+export -f diary-checklist
+export -f diary-edit
+export -f diary-format
+export -f diary-list
+export -f diary-new-entry
+export -f diary-range
+export -f diary-search
+export -f diary-settings
+export -f diary-wordcount
 
 
 # Default action to be taken if the script is run with no arguments.
