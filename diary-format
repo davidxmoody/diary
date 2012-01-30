@@ -5,7 +5,7 @@ minimum_width=10
 long_date_format="%A %d %B %Y %I:%M%p"
 short_date_format="%A %d %B %I:%M%p"
 very_short_date_format="%I:%M%p"
-pad_char="-"
+pad_char='='
 metadata_colour="\e[1;34m"  # Bold blue.
 pad_colour="\e[0;34m"       # Blue.
 end_colour="\e[0m"
@@ -52,8 +52,8 @@ print_metadata() {
 
         # Make sure there is the right amount of padding on either side.
         # Also insert aditional information into the padding.
-        start_padding=
-        end_padding=$device
+        start_padding="=$device"
+        end_padding="$timestamp="
 
         while (( ${#start_padding} > ${#end_padding} )); do
             end_padding=$pad_char$end_padding
