@@ -20,11 +20,15 @@ new_entry() {
     echo "$file_path"
 }
 
-get_months() {
-    # Use the -r or --reverse option to sort in reverse order.
-    ls -1 $1 
+# Method is not used.
+extract_timestamp() {
+    # Extract the timestamp from any correctly formatted diary entry filename.
+    # Filename can be relative or absolute.
+    timestamp="${1##*diary-}"
+    timestamp="${timestamp%%-*}"
+    echo "$timestamp"
 }
-
+    
 get_entries() {
     # $1 is -r if reverse order is required empty otherwise, 
     # $2 is start index (inclusive) may be empty for no start,
@@ -40,7 +44,7 @@ get_entries() {
     (( start_index < 0 )) && return
     (( end_index < 0 )) && return
 
-    for month in $(get_months $reverse); do
+    for month in $(ls -1 $reverse); do
         for entry in $(ls -1B $reverse "$month"); do
 
             # If the end of the desired entries has been reached, stop.
@@ -61,22 +65,31 @@ get_entries() {
 
 # Process command line arguments.
 range=
+timestamp=
 while true; do
     case "$1" in 
         -n | --new)
             shift
             new_entry "$@"
+            exit
         ;;
-        # TODO add options for referencing by fixed id, by timestamp, etc.
+        # TODO add options for referencing by fixed id, etc.
         # TODO add support for multiple ranges
         # TODO add support for reversing the order of entries
         -r)
-            shift
-            range="$1"
-            shift
+            range="$2"
+            shift; shift
         ;;
         --range=*)
-            range=${1#--range=}
+            range="${1#--range=}"
+            shift
+        ;;
+        -t)
+            timestamp="$2"
+            shift; shift
+        ;;
+        --timestamp=*)
+            timestamp="${1#--timestamp=}"
             shift
         ;;
         *)
@@ -84,6 +97,20 @@ while true; do
         ;;
     esac
 done
+
+
+# Handle timestamp requests first.
+# TODO move this to a separate method and enable ranges of dates.
+if [[ "$timestamp" ]]; then
+    month="$(date '+%Y-%m' -d @$timestamp)"
+    for entry in $month/diary-$timestamp-*.txt; do
+        if [[ -f "$entry" ]]; then
+            echo $entry
+        fi
+    done
+    exit
+fi
+
 
 # Extract slice information.
 if [[ "$range" =~ ^((\+|-|_)?[0-9]+)?:((\+|-|_)?[0-9]+)?$ ]]; then
