@@ -105,7 +105,7 @@ if [[ "$timestamp" ]]; then
     month="$(date '+%Y-%m' -d @$timestamp)"
     for entry in $month/diary-$timestamp-*.txt; do
         if [[ -f "$entry" ]]; then
-            echo $entry
+            echo "$entries_dir/$entry"
         fi
     done
     exit
