@@ -1,28 +1,12 @@
 #!/bin/bash
 # Script to launch the default editor on a specified diary entry.
 
-# Default range is the last entry.
-range="-1::-1"
-
-# $1 is a negative number.
-if [[ "$1" =~ ^(-|_)[0-9]+$ ]]; then
-    low=${1/#_/-}
-    high=$((low+1))
-    range="$low:$high:-1"
-
-# $1 is a positive number.
-elif [[ "$1" =~ ^\+?[0-9]+$ ]]; then
-    low=$1
-    high=$((low+1))
-    range="$low:$high:1"
-fi
-
-
-# Get filename and check it is okay.
-entry_filename="$(diary-range -r $range)"
-if [[ ! -w "$entry_filename" ]]; then
-    echo "$(basename $0): cannot edit the file: \"$entry_filename\"" >&2
-    exit 1
+# If no arguments then use the last entry, otherwise use the given arguments 
+# as arguments to diary-range and edit the first entry that it returns.
+if [[ "$#" == 0 ]]; then 
+    entry_filename=$(diary-range "--range=-1::-1")
+else
+    entry_filename=$(diary-range "$@" | head -q --lines=1)
 fi
 
 # Get default editor and launch it on the filename. 
