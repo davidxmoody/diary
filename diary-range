@@ -16,6 +16,11 @@ new_entry() {
     month=$(date '+%Y-%m')
     file_path="$entries_dir/$month/$file_name"
 
+    # If the month folder does not already exist then create it.
+    if [[ ! -e "$entries_dir/$month" ]]; then
+        mkdir -p "$entries_dir/$month"
+    fi
+
     # Echo it.
     echo "$file_path"
 }
