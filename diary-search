@@ -60,6 +60,11 @@ max_matches=40
 mode=tags
 while true; do
     case "$1" in 
+        -a | --all)
+            range="::-1"
+            max_matches=
+            shift
+        ;;
         -l | --list)
             mode=list
             max_matches=
