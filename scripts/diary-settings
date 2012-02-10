@@ -1,7 +1,6 @@
 #!/bin/bash
 # Script to view and modify user settings.
 
-diary_default_action="diary-new-entry"
 diary_edit_default_editor="vim '+set spell' '+syntax off'"
 diary_new_entry_default_editor="vim '+set spell' '+syntax off' '+startinsert'"
 

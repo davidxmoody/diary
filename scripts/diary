@@ -8,10 +8,23 @@ help_and_exit() {
 }
 
 usage_and_exit() {
-    # TODO
-    echo "Usage not implemented yet."
+    echo "usage: $(basename $0) command [option]... [argument]..." >&2
+    echo "" >&2
+    echo "basic commands:" >&2
+    echo "" >&2
+    echo " edit       edit the most recent entry or older entries" >&2
+    echo " list       display the most recent entries or a given range of entries" >&2
+    echo " new        start a new diary entry in the default editor" >&2
+    echo " search     search diary entries for words or tags" >&2
+    echo " wordcount  print wordcount information" >&2
+    echo "" >&2
+    echo "use \"$(basename $0) help\" for the full list of commands" >&2
     exit 1
 }
+
+# If no arguments then print usage and exit.
+[[ $# == 0 ]] && usage_and_exit
+
 
 # Find out which diary script was actually executed and then use the 
 # corresponding subscripts. 
@@ -39,14 +52,6 @@ export -f diary-settings
 export -f diary-wordcount
 
 
-# Default action to be taken if the script is run with no arguments.
-if [[ $# == 0 ]]; then 
-    action="$(diary-settings get diary_default_action)"
-    eval "$action"
-    exit 0
-fi
-
-
 # Check for command.
 command="$1"
 shift
@@ -63,7 +68,7 @@ case "$command" in
     format)
         diary-format "$@"
     ;;
-    help | -h | --help)
+    help | -h | -help | --help)
         help_and_exit "$@" 
     ;;
     list | ls)
