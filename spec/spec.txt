@@ -1,0 +1,165 @@
+Diary App Specification
+By David Moody <david.doomy@gmail.com>
+
+
+
+
+** Overview
+
+The diary app/project is a collection of scripts to help the user write and search through their own personal diaries. The scripts allow the user to write new entries, list previous entries, search through old entries using tags or words and edit old entries. 
+
+This specification is for an early version of the project. It does not support many of the features that will eventually be added. For example, diary entries can currently only be plain text files. 
+
+Note that this specification is not complete. 
+
+
+
+
+** Scenarios
+
+Since, in early iterations, I will be the primary user, the following scenarios will be written from a first person perspective. 
+
+Also, some of the commands might be a bit too long for the user to type in every time. It is expected that they will create custom aliases (in .bash_aliases or otherwise) to help them use these scripts more efficiently. 
+
+
+Scenario 1 - New entries and online backup
+I have just walked up the Tor in the snow! It was really really snowing hard and I took lots of photos. I had to wear two pairs of trousers and three jumpers just to stay warm! I want to write down my memories before they start to fade. I switch on my netbook, type in my password and open up my favourite terminal program, Terminator. I type the command to create a new diary entry, 'diary new', and it opens up my preferred editor, Vim, on a new unsaved file. I type in everything that I can remember about the walk and the snow, saving the file as I type. When I have finished, I save and exit Vim. I notice the Dropbox icon spinning around, signifying that the file is being synced to my Dropbox account. I sigh in relief, knowing that even if I took my netbook outside and used it as a toboggan, the file would be safe. 
+
+
+Scenario 2 - Tagging and tag searching
+I have just managed to set a new personal record for the number of push ups I can perform (it was 3). So that I don't forget this stunning achievement, I decide to write it down in my diary. I use the 'diary new' command to open a new entry in Vim. I want to be able to find it again so in the entry I write the phrase '#record'. I am curious to see what my previous record was. I remember tagging my previous record with the phrase '#record' as well. I use the command 'diary search record' to search for the '#record' tag. I see the entry I just wrote as well as the entry containing my previous record.
+
+
+Scenario 3 - List recent entries and entry headers
+I remember that I recently wrote a list of things I have to do in order to implement a kick ass feature in my new home-setup script. I know I wrote it in my diary very not long ago. I type the command for listing recent entries, 'diary list', and scroll through the first couple of entries until I find the one I want. Unfortunately that wasn't the right list! I realise that the actual list I wanted must have been written a little while ago. I know I included the string '#plan' in that entry so I use the command for searching for tags to search for the plan tag, 'diary search plan'. Now, I use the plan tag quite a lot so I'll have to scroll through the first few entries to find it. I remember that I wrote the entry on a Saturday on my desktop. I scroll through the entries until I find one whose header says it was written on a Saturday. The header also says it was written on my desktop. I read through the entry and discover that it is the right one. 
+
+
+Scenario 4 - Word searching and search term highlighting
+I am making a stir fry and I have no sauce! I'll have to improvise. I think really hard and I decide to use a mixture of toothpaste and ginger. But then I realise that my dad doesn't like ginger. I think really hard again but can't come up with anything else. I remember making a tasty sauce before. I rack my brain trying to remember it but can't. I realise that I must have written it down so I get my netbook, log on and search for the plain text phrase 'stir fry' using the command 'diary search --words "stir fry"'. I get several results. Looking down the list, and using the highlighted words to help me find it, I locate the recipe. "Excellent!" I exclaim. I make the sauce just in time to save lunch.
+
+
+Scenario 5 - Editing last entry
+I am sitting at my desk and I suddenly have a thought: "I'm hungry." I realise how important this might be to me in the near future so I whip open my terminal, type 'dr', type the thought and exit Vim. I then make myself a delicious bacon and cheese sandwich. As I finish eating it, I decide that I am no longer hungry. Since I want my diary to contain the most relevant information I open my terminal, type my bash alias to edit the previous entry, 'de', and append: "Not anymore, bacon is nice :)."
+
+
+Scenario 6 - Editing old entries
+I am about to write an email to a close friend. I want to tell him all about my recent trip to the orthodontist. However, that was a week ago and I can't quite remember all the details. I open my terminal and use the alias 'dsw' to search for the word 'orthodontist', 'dsw orthodontist'. I find the entry but I notice an error. I double click the timestamp of the entry (which is in the header) to copy it to the clipboard. I then open the entry in Vim using my bash alias to edit an entry and the option '-t', 'de -t 1327962286'. It opens Vim with the specified entry and I make the necessary changes. 
+
+
+Scenario 7 - Wordcount
+I have just finished writing a particularly long entry. "I've just written loads." I think. I start to wonder how many words I've actually written in my diary. I use the wordcount command to find out how many words I've written, 'dr wc'. "Wow! That's a lot of words." I think, "I wonder how many words I've written in the last month." I then type 'dr wc -m' to see a more detailed overview. 
+
+
+
+
+** 'diary' script
+
+The diary script is the central script from which all other features must be accessed.
+
+The diary script is used with the following syntax:
+
+    diary command [option]... [argument]...
+
+
+'command' may be any of the following:
+- edit
+- help (or -h or --help)
+- ls (or list)
+- new (or new-entry)
+- search
+- wc (or wordcount)
+
+The following commands may also be used although they will probably not be of much use to the user:
+- format
+- range
+- settings
+
+Each of these commands will have their own section describing their behaviour. 
+
+
+When no arguments are given or an invalid command or option is given the following usage message will be printed:
+
+usage: diary command [option]... [argument]...
+
+basic commands:
+
+ edit       edit the most recent entry or older entries
+ list       display the most recent entries or a given range of entries
+ new        start a new diary entry in the default editor
+ search     search diary entries for words or tags
+ wordcount  print wordcount information
+
+use "diary help" for the full list of commands
+
+
+[Technical note]
+The code for the different commands is stored in separate scripts. All of these scripts should exist in the same directory as the main diary script. When the diary script executes one of the commands, all further calls to any other command should redirect to the script in the same directory as the original diary script. For example, if '/home/david/space/diary/diary' is executed then any further diary commands executed should correspond to the script stored in '/home/david/space/diary/'.
+
+
+
+
+** 'diary new'
+
+usage: diary new
+
+This is likely to be the most frequently executed command. It should launch the default editor (as specified by 'diary_new_entry_default_editor' in 'diary settings', see the 'diary settings' section) on a new, empty file. 
+
+[Technical note]
+The file name and path should not be relevant to the user. However the filename should follow the format: 'diary-<timestamp>-<device-name>.txt'. The file should be located in a directory with the format: 'YYYY-MM', where 'YYYY' is the year and 'MM' is the month, e.g. '2012-02/diary-1328959725-david-netbook.txt'. The year-month directories should be located in the directory specified by 'dir_entries' in 'diary settings'. 
+
+
+The directory where the entries are stored should be synchronised between devices. Currently the diary scripts do not have the ability to do this so an external program must be used. Dropbox or SpiderOak are two examples of programs that could be used. 
+
+
+
+
+** 'diary search'
+
+usage: diary search [-a|--all] [-m NUM|--max-matches=NUM] [-n NUM|--number=NUM]
+                    [-p|--print] [-r RAN|--range=RAN] [-t|--tags] [-w|--words]
+                    search_term_1 [search_term_2]...
+
+Description of options:
+
+    -a, --all
+        set range to ':' and max-matches to '' (no limit)
+
+    -m, --max-matches=NUM
+        display no more than NUM entries, if empty then there is no limit
+
+    -n, -number=NUM
+        set range to '-NUM::-1' (i.e. display the last NUM entries)
+
+    -p, --print
+        print entries to standard output instead of displaying with less
+
+    -r, --range=RAN
+        use RAN as the range to search over (see the 'diary range' section)
+
+    -t, --tags
+        treat search terms as tags (that is, words prefixed with hashes, '#')
+
+    -w, --words
+        treat serch terms as literal strings (ignoring case)
+
+
+
+
+
+
+** Non Goals
+
+- diary-checklist
+- diary-settings allowing changing of settings
+- diary-wordcount showing more than it currently does
+- diary-range accepting date ranges/mixed ranges/single entries
+- wpm counter
+- Lazy search result evaluation/lazy list displaying
+- Protected tag/macro
+- Ability to remove diary entries
+
+
+
+
+
+
