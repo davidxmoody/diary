@@ -13,7 +13,7 @@ search_words() {
     search_string="\($1\)"
     shift
     for word in "$@"; do 
-    	search_string=$search_string"\|\($word\)"
+    	search_string="$search_string\|\($word\)"
     done
 
     do_search "$search_string"
