@@ -7,5 +7,3 @@ entry_filename=$(diary-range --new)
 # Get default editor and use it on $entry_filename.
 editor=$(diary-settings get diary_new_entry_default_editor)
 eval "$editor $entry_filename"
-
-# TODO back up with hg
