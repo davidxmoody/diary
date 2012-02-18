@@ -55,7 +55,7 @@ do_search() {
 
 # Process command line args.
 print=
-range="-200::-1"
+range="-500::-1"
 max_matches=40
 mode=tags
 while true; do
