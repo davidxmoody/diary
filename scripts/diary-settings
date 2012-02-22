@@ -8,6 +8,8 @@ dir_diary="$HOME/.diary"
 dir_data="$dir_diary/data"
 dir_entries="$dir_data/entries"
 dir_checklists="$dir_data/checklists"
+dir_cache="$dir_diary/cache"
+dir_wordcounts="$dir_cache/wordcounts"
 
 
 
