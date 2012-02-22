@@ -8,23 +8,19 @@ ability to create new entries with older than current dates
 fix two entries in one, not getting split up properly
 print a version number with --version (or whatever the current syntax is)
 show differences in time between the displayed search result and the current date when searching/show differences in time between the displayed search result and the previous or next search result (or could display the number of entries in between the two)
-cache wordcount information and put it in the header
 allow dairy wordcount to accept ranges of entries
 let scripts use the compressed option notation (-n -a becomes -na, -n 1 becomes -n1)
 allow diary-edit to accept search results, e.g. "edit the last entry that contained the exercise tag"
 search for entries in a specific date range/reference date ranges of entries
 automated tests
 notifications when I pass certain milestones (in words written, etc.)
-cache to reduce time needed to generate wordcount info and stuff
 autocompletion of diary commands when entered from the command line
 make diary format use fmt/par instead of fold
 decide on definitive referencing notation, should be able to mix different types of identifier, have search results/be dynamic, reference single entries or ranges or lists of ranges, etc.
 make the wordcount work over specific ranges
-include wordcount info in the entry headers
 automatically add word boundaries to search terms (but not tags)
 ability to create new diary entries which don't use the current date but instead use the given date
 limit searches/list by date ranges
-word counts in entry headers
 show how long ago an entry was written (in terms of months, weeks and days)
 time since the last entry/time to the next entry in entry headers
 
@@ -74,6 +70,7 @@ edit history and the ability to view a snapshot of a document at any point in hi
 
 
 LaTeX/formatting:
+cache html for entries
 edit files in rich text format and have the ability to make thing bold/coloured?, do this as well as using LaTeX?
 how to have tags in LaTeX?
 could try to use hashes although I don't know whether it would work or not

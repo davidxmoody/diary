@@ -8,7 +8,6 @@ search_tags() {
 }
 
 search_words() {
-
     # Build search string.
     search_string="\($1\)"
     shift
@@ -33,7 +32,8 @@ do_search() {
             # Print the entry using diary-format.
             diary-format -m --search="$search_string" "$entry"
             
-            # Keep track of the number of matches found so far.
+            # Keep track of the number of matches found so far
+            # and stop if the maximum search depth has been reached.
             let 'num_matches++'
             if [[ "$max_matches" ]] && (( num_matches >= max_matches )); then 
                 echo "$num_matches entries found, max search depth reached."
@@ -113,37 +113,31 @@ while true; do
     esac
 done
 
-# If mode has not been set then use tags.
-[[ -z "$mode" ]] && mode=tags
-
-# If no arguments then search for all tags.
+# If no more arguments then search for all tags.
 if [[ "$mode" != list && $# == 0 ]]; then 
     search_words '#\S*' | less -R
     # TODO change to only search for specific character set.
     exit
 fi
 
-# What is the user searching for?
-case "$mode" in
-    list)
-        if [[ "$print" ]]; then
+casemode() {
+    # Select the appropriate function depending on the mode.
+    case "$mode" in
+        list)
             do_search
-        else
-            do_search | less -R
-        fi
-    ;;
-    tags)
-        if [[ "$print" ]]; then
+        ;;
+        tags)
             search_tags "$@"
-        else
-            search_tags "$@" | less -R
-        fi
-    ;;
-    words)
-        if [[ "$print" ]]; then
+        ;;
+        words)
             search_words "$@"
-        else
-            search_words "$@" | less -R
-        fi
-    ;;
-esac
+        ;;
+    esac
+}
+
+# Do the search, either printing or displaying with less.
+if [[ "$print" ]]; then 
+    casemode "$@"
+else
+    casemode "$@" | less -R
+fi
