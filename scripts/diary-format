@@ -43,7 +43,11 @@ print_metadata() {
     entry=${entry#*-}
     device=${entry%.*}
 
-    # If there was an error in extracting the information then skip this.
+    # Get wordcount data.
+    wordcount_data=$(diary-wordcount -s "$1")
+
+
+    # Only continue if information was extracted properly.
     if [[ $timestamp && $device ]]; then 
 
         # Metadata string currently consists of just the date. 
@@ -52,8 +56,8 @@ print_metadata() {
 
         # Make sure there is the right amount of padding on either side.
         # Also insert aditional information into the padding.
-        start_padding="=$device"
-        end_padding="$timestamp="
+        start_padding="$pad_char$wordcount_data-words"
+        end_padding="$device$pad_char$timestamp$pad_char"
 
         while (( ${#start_padding} > ${#end_padding} )); do
             end_padding=$pad_char$end_padding
@@ -79,6 +83,12 @@ print_metadata() {
         end_padding=$pad_colour$end_padding$end_colour
         metadata_string=$metadata_colour$metadata_string$end_colour
         echo -e $start_padding$metadata_string$end_padding
+
+    else
+        # There was an error in extracting information so print 
+        # the filename instead.
+        echo "$1"
+
     fi
 }
 
