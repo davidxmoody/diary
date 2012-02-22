@@ -56,26 +56,18 @@ print_metadata() {
 
         # Make sure there is the right amount of padding on either side.
         # Also insert aditional information into the padding.
-        start_padding="$pad_char$wordcount_data-words"
-        end_padding="$device$pad_char$timestamp$pad_char"
+        start_padding="$pad_char$wordcount_data words$pad_char"
+        end_padding="$pad_char$timestamp$pad_char"
 
-        while (( ${#start_padding} > ${#end_padding} )); do
-            end_padding=$pad_char$end_padding
-        done
-
-        while (( ${#end_padding} > ${#start_padding} )); do
-            start_padding=$start_padding$pad_char
-        done
-
-        if (( (width - ${#metadata_string} - ${#end_padding} - \
-               ${#start_padding}) % 2 == 1 )); then 
-            end_padding=$pad_char$end_padding
-        fi
-
+        # While complete metadata string is less than the width, add one more 
+        # character of padding and try to make both sides as even as possible.
         while (( ${#metadata_string} + ${#start_padding} + \
                  ${#end_padding} < $width )); do 
-            start_padding=$start_padding$pad_char
-            end_padding=$pad_char$end_padding
+            if (( ${#start_padding} < ${#end_padding} )); then
+                start_padding=$start_padding$pad_char
+            else
+                end_padding=$pad_char$end_padding
+            fi
         done
         
         # Print it, with colours. 
