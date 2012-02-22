@@ -2,340 +2,49 @@ This list will contain all of the possible features I could add to my diary proj
 
 I'm just going to dump everything that I have already written here and then I'll sort through it later. 
 
-
-rules/strategies to get myself to complete tasks/do the things that I want myself to do
-
-the ability to enter: plain text, tagged text, images(?), reminders, tasks, other stats
-
-rules and rewards (kindle books, etc.)
-point system
-
-summary of an entry for quick viewing later, either written manually or automatically generated
-summary of groups of entries/periods of time
-
-write about vague memories from the past without having to specify a specific time
-
-syntax highlighting (use LaTeX?)
-
-decent syncing
-
-define functions within the text of an entry
-
-separate storage/syncing from viewing and input
-
-take picture of myself while writing an entry (automatically or deliberately) to see how appearance changes over time and to get an idea of my moods
-
-hash for tag, backslash for macro
-
-define new tags explicitly?
-
-tags refer to specific sections of a diary entry, how to talk about tag scope?
-
-track time with diary commands, e.g. starting on a project, stopping on a project, going to bed, etc.
-
-entries as xml files
-
-originally edited file is used to generate the actual entry
-
-track purchases/reciepts to see what I bought/ate
-
-reminders to write about a certain topic/idea/event in full later on
-
-view an entry/group of entries in different ways, show snippets from each one, first paragraph, tags, etc.
-
-keep track of arbitrary statistics, e.g. have counters and other variables which can be changed from within diary entries
-
-persistent files that can be edited whenever I want similarly to draft emails
-
-integration with Google Tasks or other task lists
-
-a way to summarise topics and have multiple different layers of summary, e.g. lowest level is to show all entries verbatim, next level is to show a summary of each entry, next level is to show a summary of each day, next level is to show a summary of each week then each month then each year, etc.
-
-better searching (with stemming and stop words and caching/indexing, etc.)
-
-text formatting, lists
-
-encryption/private sections
-
-typing speed tracker/typing error tracker
-
-automatic replacement of text macros while I type
-
-perform web searches while I type/play music while I type/integration with other programs and stuff
-
-built in dictionary (use Vim?)
-
-track fitness goals/weight, try to automate as much as possible
-
-write an entry every day
-
-plan time for playing games/other leisure activities
-
-set a minimum number of goals per week?
-
-use a database package that is available on all platforms
-
-regular expression diary macros
-
-track time spend doing unaproved activities
-
-read it later like service to save articles for offline reading/archiving
-
-show how long ago an entry was written (in terms of months, weeks and days)
-
-update based, actual representation of data should be platform specific, makes it easy to change format
-
-paper based diary using QR codes, have part of the QR code fillable in to change it's meaning, scan it back into the computer, how to fold the paper
-
-abstract document class (or nodes instead), they can be edited after creation, have metadata
-
-edit history and the ability to view a snapshot of a document at any point in history
-
-remind self to write dairy entries if last entry was a while ago (not needed?)
-
-remind self to review old entries (and maybe to write summaries of them)
-
-time since the last entry/time to the next entry in entry headers
-
-Star Trek style beeps to acknowledge when an action has been performed
-
-support for audio diary entries (and transcriptions)
-
-taskbar integration for diary app (notifications for syncing, etc.)
-
-backup, incremental and full, schedule weekly?
-
-add external files to dairy, add emails, integrate with planned archiving system
-
-word of the day game: present self with a new word (plus definition) every time I write a new entry (or once a day) then I must use that word somewhere in the entry and the next word only appears if I do use the given word
-alternatively I could present myself with words that I might not know the meaning of and try to define it when I see it, I could then compare my definitions with the actual definitions, it could help to increase my vocabulary
-I could only show myself the definition in the next entry to try to increase my long term retention of the data
-
-learning game, show a Vim shortcut or bash command or something and find out what it does, would help in learning Vim/bash/others
-
-word counts in entry headers
-
-decide on the best list format, maybe use the LaTeX format or make it compatably with LaTeX
-
-ability to delete entries
-
-graphs, make them look pretty and display useful statistics, make them exportable
-
-splash screen with asci graphics or proper graphics when using GUI
-
-dynamic preloading ability (that is, learn from previous searches how many results are likely to be needed to be preloaded)
-
-rewards/points system
-random rewards, multiple teirs of rewards with different probability distributions, purchasing a film directly costs more than getting a random one
-different types of points/money for different categories, can change between types for a fee
-repeatably achievements
-gamble with points/deposit points and get a larger amount back but only if I complete a certain task (e.g. spend 1000 points now to get 1100 points when I complete an important task, lose the original 1000 points if I never complete the task or don't complete it within the specified constraints)
-
-limit searches/list by date ranges
-
-sunrise/sunset times easily viewable
-
-hash tag, use a more formal syntax/decide exactly what characters I want to allow in tags
-tag scope
-other special tags (like '##')
-automatic tagging of entries
-tag aliases, tag stemming
-searching for one tag also returns results for another but not the other way around
-
-diary list displays new entries as they are written/search results automatically add new entries as they become available
-
-indexing, both for tags and for words, I think it would really help speed up everything
-I could either go with each entry having an index and searching looks through each entry in turn or I could go for having one central index which points to the relevant entries
-
-statistics about what times I write entries in and how much I write at what times of day and so on 
-
-diaryrc file in home folder, use rc and dotfiles to store it like others, load it with diary, also accessible by diary-settings, 'diary settings' launches Vim on file?
-
-store settings in an automated mercurial repository, have the ability to view the current settings at any point in time, treat settings like any other persistent document?
-
-ability to create new diary entries which don't use the current date but instead use the given date
-
-change history of diary entries, all previous versions are viewable/searchable
-
-write reminders to self in entries and a reminder service to remind self, maybe integrate with a calendar app
-
-section/break command to split up long entries into parts, not needed for new entries (I can just use multiple files) but it would be very useful for splitting up old long entries
-make search results only show the relevant section that the tag appears in
-
-automatically add word boundaries to search terms (but not tags)
-
+Features to implement right now:
+automatically trim white space at start and end of entries
+ability to create new entries with older than current dates
+fix two entries in one, not getting split up properly
+print a version number with --version (or whatever the current syntax is)
+show differences in time between the displayed search result and the current date when searching/show differences in time between the displayed search result and the previous or next search result (or could display the number of entries in between the two)
+cache wordcount information and put it in the header
+allow dairy wordcount to accept ranges of entries
+let scripts use the compressed option notation (-n -a becomes -na, -n 1 becomes -n1)
+allow diary-edit to accept search results, e.g. "edit the last entry that contained the exercise tag"
+search for entries in a specific date range/reference date ranges of entries
+automated tests
+notifications when I pass certain milestones (in words written, etc.)
+cache to reduce time needed to generate wordcount info and stuff
+autocompletion of diary commands when entered from the command line
+make diary format use fmt/par instead of fold
+decide on definitive referencing notation, should be able to mix different types of identifier, have search results/be dynamic, reference single entries or ranges or lists of ranges, etc.
 make the wordcount work over specific ranges
 include wordcount info in the entry headers
-
-markers within entries, reference other entries or other markers
-
-embed figures/diagrams/graphs within entries, have them autoupdate
-
-images/photos/links to online photos
-have photos taken by myself exist as standalone entries or be associated/embedded with other entries
-
-emphasize text
-
-recognise dates/times and format/highlight them appropriately
-
-writing verbatim (i.e. ignore macros/tags/all special characters temporarily)
-
-comments
-
-give titles to entries
-
-define new commands within entry text
-
-quote other entries in line and have the quoted parts automatically update when the original entry is updated
-
-attach/quote arbitrary files
-
-decide on definitive referencing notation, should be able to mix different types of identifier, have search results/be dynamic, reference single entries or ranges or lists of ranges, etc.
-
-custom dictionaries?
-
-ability to execute a single diary command using the given settings instead of the default ones
-
-start lines with "DR: " to signify that that line was inserted by a script, use it for reminders, word games, date of current entry, etc. 
-don't print lines with "DR: " when displaying but allow it with an option
-
-diary reminder system that works with an existing task list (e.g. google tasks)
-scope of reminders, one line, one entry?
-
-make diary format use fmt/par instead of fold
-
-proper integration with LaTeX
-
-style guidelines with syntax highlighting
-
-proper referencing 
-
-simple and quick to use diagram making system, make diagrams out of node structures?
-
-bold/coloured text to make it stand out?
-
-footnotes?
-
-shortcut to repeat the last command, each command can set the value of the next special command?
-do this in Vim?
-
-number of new lines significant, or just use section commands instead and use existing LaTeX style of handling new lines
-
-\pounds{num} command and related commands (for displaying the correct symbols and for converting to other currencies and doing other special things like searching for all posts that mention an amount of money)
-
-how to handle lists? just use the LaTeX style of \item?
-
-\calc{expr} command to calculate simple arethmetic stuff in line, do it in Vim?
-
-\date{date} command for talking about and formatting dates and times
-
-how to handle old entries, treat them as plain text or convert them to LaTeX and treat them as LaTeX, I could just verbatim the whole entry and then treat it as LaTeX
-
-private command/environmental variable to make stuff hidden unless a password is entered
-
-autocompletion of diary commands when entered from the command line
-
-how to write about different "eras" of my life, how to write about smaller times in my life
-how to reference them
-
-how to split up long entries when only part of the entry is relevant for the search result, allow multiple views of the same entry, each one widening the scope until the whole entry is visible
-
-counters, could increment with ++, decrement with --, could use other symbols (+=, -=, =, *=, etc.), counters could be initialised to 0 on first reference, could be lists and could add records to the list, could be dictionaries or other python objects
-counters could be accessed using command line app as well as within entry
-
-reference date ranges of entries
-
-reading lists, can add a topic (or article) to a specified reading list, each reading list has a name, maybe limit the number of reading lists, maybe have one per letter of the alphabet (at most) and add thing to the list with +<letter> or something similar
-favourite articles 
-
-voice activated diary, the ability to start recording entries using only my voice, integrate with a home server and many microphones around the room
-
-have named pipes or lists to collect data from diary entries with the '+<letter> line' syntax, could act as a basic reminder system
-
-ability to use diary-settings interactively/to use it to change the settings as well as just print them, removes the requirement to have a .diaryrc file
-allow commands to temporarily be executed using a different .diaryrc file
-
-persistent documents with version control, ability to search any version of the document
-
-marker for incomplete diary entries
-
-truecrypt to store diary entries/encrypt all diary entries by default
-
-write diary entries using only a keyboard with no screen
-use Star Trek style tones to notify when I've made a mistake or started a new entry or something
-
-checklist
-add items whenever I want, they can stick on it every day, only some days, only once, etc.
-easy and quick to view, open by default/on welcome screen?
-can check items off once done that day
-have one template and copy the template every day, then use Vim to delete off items as I complete them
-
-cache to reduce time needed to generate wordcount info and stuff
-
-combine all different scripts into one application
-
-make Vim highlight tags
-
-notifications when I pass certain milestones (in words written, etc.)
-
-ability to take note of a completed task/goal without having to write about it explicitly
-
-scan in handwritten diary entries
-
-real time syncronization/backup with outside web server, syncs every keypress/word to reduce backup time
-
-continuous model, just start writing without having to worry about entry boundaries, paragraphs are grouped by closeness in time
-
-automated tests
-
-take quotes from long diary entries and print them in a large font in the middle of the page to break up the wall of text
-
-track changes in a file every time it is saved
-alternatively I could track every single keystroke
-
-ad-hoc syncing between devices when no internet connection is available
-allow syncing between devices with no central server, i.e. make it distributed
-
-updates are given ids based on their device name and a sequence number, numbers cannot be missed out unless the next update specifically says that the previous numbers were skipped
-how to deal with anonymous devices, devices pre-"the new system" and temporary devices like web browsers from new computers
-
-node based viewing structure
-links correspond to similarities between entries, typing could filter the links and pressing space could select the top one
-
-need to be able to differentiate between really important entries and every day sort of stuff entries
-
-track view counts and search counts and other information to help with this
-don't have to bother implementing everything straight away, just make a note every time a search is made or an entry is viewed, then I'll have a dataset for when I am ready to start analysing it all
-
-search for entries in a specific date range
-
-recipe browser, with photos and instructions and ingredient lists, choose what I want for the week and get a complete shopping list, can be easily adapted for different numbers of people eating and for different numbers of people doing the cooking, include my own ratings, variations on the same meals, construct complete meals from separate parts, have Gantt and PERT charts to show what needs to be done
-
-Gantt and PERT charts for general planning, evidence based planning
-
-track my progress towards certain goals, show key points like when I started playing the piano, how often I played, when I reached certain milestones, etc.
-
-track alertness/happiness over time, display in graphs, use to help determine what makes me happy/alert and what makes me upset/sleepy
-
-allow diary-edit to accept search results, e.g. "edit the last entry that contained the exercise tag"
-
-how to format programming terms or things that I want to be printed in a monospaced font?
-
-some way to automatically notice and analyse trends in my entries, for example do I write about certain topics more often now?
-
-write about certain periods of time and events that happened a long time ago
-
-when browsing through previous entries have a way to skip over the ones not related to that time period
-
-add a MB count to my diary wordcount script, add MB counts to other types of data like pictures
-
-let scripts use the compressed option notation (-n -a becomes -na, -n 1 becomes -n1)
-
-allow dairy wordcount to accept ranges of entries
-
-cache wordcount information and put it in the header
-
-nodes:
+automatically add word boundaries to search terms (but not tags)
+ability to create new diary entries which don't use the current date but instead use the given date
+limit searches/list by date ranges
+word counts in entry headers
+show how long ago an entry was written (in terms of months, weeks and days)
+time since the last entry/time to the next entry in entry headers
+
+
+
+Nodes/data storage:
+sync current session/viewing stack (current search results, current position in them, half completed entires, etc.)
+ids incorporate a date for referencing specific versions of an entry
+bookmarks to reference commonly used entries, use bookmarks as dynamic ids
+viewing stack
+opening a new node from the current node adds the new node to the current stack, going back down goes to the previous node and loses the current one
+alternatively make it so that opening a node from the current node goes 'sideways' in the current stack and opening an unrelated node goes up
+alternatively make it so that zooming in to view nodes embedded in another node adds another item to the stack and just viewing a related node goes sideways
+have multiple stacks, switch between them with Ctrl-Tab
+versatile system with multiple ways to reference entries
+can reference specific existing entries or can have dynamic ids which refer to different entries depending on current state of database
+have dynamic ids that can get locked into a current specification with a timestamp
+ability to resolve dynamic ids and have them become specific ids
+one id can reference multiple entries or have separate system for referencing multiple entries?
+subranges of other ranges, how to make it efficient?, do certain parts first, e.g. limit ranges first and then do searches
 there are real nodes and virtual nodes, real nodes correspond to a real database entry (possibly a diary entry)
 there are real edges and virtual edges, real edges exist in a database, virtual edges are generated when necessary
 alternatively have edges existing inside other nodes and only be one way (probably not though)
@@ -346,59 +55,26 @@ embed nodes within other nodes, can zoom in to see  a close up view of the nodes
 lazy generation/loading of nodes
 paramaterized nodes (real and virtual) to give additional information like search terms and current date, etc. 
 reference already existing virtual nodes 
+track view counts and search counts and other information to help with this
+don't have to bother implementing everything straight away, just make a note every time a search is made or an entry is viewed, then I'll have a dataset for when I am ready to start analysing it all
+links correspond to similarities between entries, typing could filter the links and pressing space could select the top one
+updates are given ids based on their device name and a sequence number, numbers cannot be missed out unless the next update specifically says that the previous numbers were skipped
+how to deal with anonymous devices, devices pre-"the new system" and temporary devices like web browsers from new computers
+ad-hoc syncing between devices when no internet connection is available, allow syncing between devices with no central server, i.e. make it distributed
+track changes in a file every time it is saved, alternatively I could track every single keystroke
+change history of diary entries, all previous versions are viewable/searchable
+entries as xml files
+use a database package that is available on all platforms
+update based, actual representation of data should be platform specific, makes it easy to change format
+diary list displays new entries as they are written/search results automatically add new entries as they become available
+dynamic preloading ability (that is, learn from previous searches how many results are likely to be needed to be preloaded)
+abstract document class (or nodes instead), they can be edited after creation, have metadata
+edit history and the ability to view a snapshot of a document at any point in history
 
-node id system
-versatile system with multiple ways to reference entries
-can reference specific existing entries or can have dynamic ids which refer to different entries depending on current state of database
-have dynamic ids that can get locked into a current specification with a timestamp
-ability to resolve dynamic ids and have them become specific ids
-one id can reference multiple entries or have separate system for referencing multiple entries?
-subranges of other ranges, how to make it efficient?, do certain parts first, e.g. limit ranges first and then do searches
 
-viewing stack
-opening a new node from the current node adds the new node to the current stack, going back down goes to the previous node and loses the current one
-alternatively make it so that opening a node from the current node goes 'sideways' in the current stack and opening an unrelated node goes up
-alternatively make it so that zooming in to view nodes embedded in another node adds another item to the stack and just viewing a related node goes sideways
-have multiple stacks, switch between them with Ctrl-Tab
 
-diary checklist or simple list of things that I want a constant reminder of, integrate with the splash screen?
-
-show differences in time between the displayed search result and the current date when searching
-show differences in time between the displayed search result and the previous or next search result (or could display the number of entries in between the two)
-
-bookmarks to reference commonly used entries
-use bookmarks as dynamic ids
-
-ids incorporate a date for referencing specific versions of an entry
-
-print a version number with --version (or whatever the current syntax is)
-
-track goals and view summaries of progress
-
-automatic summary generation?
-
-don't break the chain method integration
-
-evedence based planning integration
-
-Anki integration
-
-sync current session/viewing stack (current search results, current position in them, half completed entires, etc.)
-
-fix two entries in one, not getting split up properly
-
-ability to create new entries with older than current dates
-ability to mark an entry as occuring on a different date
-
-specify the range of dates that an entry applies to
-
-automatically trim white space at start and end of entries
-
-impose formatting restrictions, automatic or self enforced, use syntax highlighting to let self know when broken
-meaning of double and single quotes?
-
-allow python code in LaTeX entries with the python extension (what other extensions to allow)
-
+LaTeX/formatting:
+edit files in rich text format and have the ability to make thing bold/coloured?, do this as well as using LaTeX?
 how to have tags in LaTeX?
 could try to use hashes although I don't know whether it would work or not
 could just use backslashes although that means I can't make any word a tag, might not be a bad thing
@@ -408,12 +84,167 @@ could have tag scope, could end tags with \e<tagname>, end anon tag with \et
 could have any word as a tag with \tag{tagname} without having to define one specifically
 \newtag{tagname} could be an alias for making a new LaTeX command if I can do that, need to find a way to make all tags persistent
 tags can carry other data, e.g. \film{name_of_film}, could act as a way to give a title to an entry
+allow python code in LaTeX entries with the python extension (what other extensions to allow)
+impose formatting restrictions, automatic or self enforced, use syntax highlighting to let self know when broken
+meaning of double and single quotes?
+when browsing through previous entries have a way to skip over the ones not related to that time period
+how to format programming terms or things that I want to be printed in a monospaced font?
+need to be able to differentiate between really important entries and every day sort of stuff entries
+take quotes from long diary entries and print them in a large font in the middle of the page to break up the wall of text
+marker for incomplete diary entries
+how to split up long entries when only part of the entry is relevant for the search result, allow multiple views of the same entry, each one widening the scope until the whole entry is visible
+private command/environmental variable to make stuff hidden unless a password is entered
+how to handle old entries, treat them as plain text or convert them to LaTeX and treat them as LaTeX, I could just verbatim the whole entry and then treat it as LaTeX
+\date{date} command for talking about and formatting dates and times
+\calc{expr} command to calculate simple arethmetic stuff in line, do it in Vim?
+how to handle lists? just use the LaTeX style of \item?
+\pounds{num} command and related commands (for displaying the correct symbols and for converting to other currencies and doing other special things like searching for all posts that mention an amount of money)
+number of new lines significant, or just use section commands instead and use existing LaTeX style of handling new lines
+footnotes?
+bold/coloured text to make it stand out?
+style guidelines with syntax highlighting
+start lines with "DR: " to signify that that line was inserted by a script, use it for reminders, word games, date of current entry, etc. 
+don't print lines with "DR: " when displaying but allow it with an option
+attach/quote arbitrary files
+quote other entries in line and have the quoted parts automatically update when the original entry is updated
+define new commands within entry text
+give titles to entries
+comments
+writing verbatim (i.e. ignore macros/tags/all special characters temporarily)
+recognise dates/times and format/highlight them appropriately
+emphasize text
+images/photos/links to online photos
+have photos taken by myself exist as standalone entries or be associated/embedded with other entries
+embed figures/diagrams/graphs within entries, have them autoupdate
+markers within entries, reference other entries or other markers
+section/break command to split up long entries into parts, not needed for new entries (I can just use multiple files) but it would be very useful for splitting up old long entries
+make search results only show the relevant section that the tag appears in
+decide on the best list format, maybe use the LaTeX format or make it compatably with LaTeX
+regular expression diary macros
+support for plain text, LaTeX, html, others?
+text formatting, lists
+automatic replacement of text macros while I type
+define functions within the text of an entry
+syntax highlighting (use LaTeX?)
 
-edit files in rich text format and have the ability to make thing bold/coloured?, do this as well as using LaTeX?
 
-date ranges in search results
 
-give entries taglines, or simple summaries of the entry, automatically generate from tags and tag scope, could also use wordcounts
+Tags:
+hash tag, use a more formal syntax/decide exactly what characters I want to allow in tags
+tag scope
+other special tags (like '##')
+automatic tagging of entries
+tag aliases, tag stemming
+searching for one tag also returns results for another but not the other way around
+tags refer to specific sections of a diary entry, how to talk about tag scope?
+hash for tag, backslash for macro
 
+
+
+
+Achievements:
+rewards/points system
+random rewards, multiple teirs of rewards with different probability distributions, purchasing a film directly costs more than getting a random one
+different types of points/money for different categories, can change between types for a fee
+repeatably achievements
+gamble with points/deposit points and get a larger amount back but only if I complete a certain task (e.g. spend 1000 points now to get 1100 points when I complete an important task, lose the original 1000 points if I never complete the task or don't complete it within the specified constraints)
+set a minimum number of goals per week or set one goal per day
+rules/strategies to get myself to complete tasks/do the things that I want myself to do
+rules and rewards (kindle books, etc.)
+point system
+
+
+Other:
 status board/splash screen that shows quick summary of goals and entries
 show how many days certain goals have been completed in a row for/show simple calendars with red X's or V's for vacations or S's for sick days
+use don't break the chain for writing entries as well
+give entries taglines, or simple summaries of the entry, automatically generate from tags and tag scope, could also use wordcounts
+specify the range of dates that an entry applies to
+ability to mark an entry as occuring on a different date
+Anki integration
+evedence based planning integration
+don't break the chain method integration
+automatic summary generation?
+track goals and view summaries of progress
+diary checklist or simple list of things that I want a constant reminder of, integrate with the splash screen?
+add a MB count to my diary wordcount script, add MB counts to other types of data like pictures
+write about certain periods of time and events that happened a long time ago
+some way to automatically notice and analyse trends in my entries, for example do I write about certain topics more often now?
+track alertness/happiness over time, display in graphs, use to help determine what makes me happy/alert and what makes me upset/sleepy
+track my progress towards certain goals, show key points like when I started playing the piano, how often I played, when I reached certain milestones, etc.
+Gantt and PERT charts for general planning, evidence based planning
+recipe browser, with photos and instructions and ingredient lists, choose what I want for the week and get a complete shopping list, can be easily adapted for different numbers of people eating and for different numbers of people doing the cooking, include my own ratings, variations on the same meals, construct complete meals from separate parts, have Gantt and PERT charts to show what needs to be done
+continuous model, just start writing without having to worry about entry boundaries, paragraphs are grouped by closeness in time
+real time syncronization/backup with outside web server, syncs every keypress/word to reduce backup time
+scan in handwritten diary entries
+ability to take note of a completed task/goal without having to write about it explicitly
+combine all different scripts into one application
+checklist
+add items whenever I want, they can stick on it every day, only some days, only once, etc.
+easy and quick to view, open by default/on welcome screen?
+can check items off once done that day
+have one template and copy the template every day, then use Vim to delete off items as I complete them
+write diary entries using only a keyboard with no screen
+use Star Trek style tones to notify when I've made a mistake or started a new entry or something
+truecrypt to store diary entries/encrypt all diary entries by default
+persistent documents with version control, ability to search any version of the document, integration with mercurial and file system?
+ability to use diary-settings interactively/to use it to change the settings as well as just print them, removes the requirement to have a .diaryrc file
+allow commands to temporarily be executed using a different .diaryrc file/different specified settings
+have named pipes or lists to collect data from diary entries with the '+<letter> line' syntax, could act as a basic reminder system
+voice activated diary, the ability to start recording entries using only my voice, integrate with a home server and many microphones around the room
+reading lists, can add a topic (or article) to a specified reading list, each reading list has a name, maybe limit the number of reading lists, maybe have one per letter of the alphabet (at most) and add thing to the list with +<letter> or something similar
+favourite articles 
+counters, could increment with ++, decrement with --, could use other symbols (+=, -=, =, *=, etc.), counters could be initialised to 0 on first reference, could be lists and could add records to the list, could be dictionaries or other python objects
+counters could be accessed using command line app as well as within entry
+how to write about different "eras" of my life, how to write about smaller times in my life
+how to reference them
+shortcut to repeat the last command, each command can set the value of the next special command? do this in Vim?
+simple and quick to use diagram making system, make diagrams out of node structures?
+diary reminder system that works with an existing task list (e.g. google tasks)
+scope of reminders, one line, one entry?
+custom dictionaries?
+write reminders to self in entries and a reminder service to remind self, maybe integrate with a calendar app
+store settings in an automated mercurial repository, have the ability to view the current settings at any point in time, treat settings like any other persistent document?
+diaryrc file in home folder, use rc and dotfiles to store it like others, load it with diary, also accessible by diary-settings, 'diary settings' launches Vim on file?
+statistics about what times I write entries in and how much I write at what times of day and so on 
+indexing, both for tags and for words, I think it would really help speed up everything
+I could either go with each entry having an index and searching looks through each entry in turn or I could go for having one central index which points to the relevant entries
+sunrise/sunset times easily viewable
+splash screen with asci graphics or proper graphics when using GUI
+graphs, make them look pretty and display useful statistics, make them exportable
+ability to delete entries/have a rubbish bin for deleted entries
+learning game, show a Vim shortcut or bash command or something and find out what it does, would help in learning Vim/bash/others
+word of the day game: present self with a new word (plus definition) every time I write a new entry (or once a day) then I must use that word somewhere in the entry and the next word only appears if I do use the given word
+alternatively I could present myself with words that I might not know the meaning of and try to define it when I see it, I could then compare my definitions with the actual definitions, it could help to increase my vocabulary
+I could only show myself the definition in the next entry to try to increase my long term retention of the data
+add external files to dairy, add emails, integrate with planned archiving system
+backup, incremental and full, schedule weekly?
+restore from backup
+taskbar integration for diary app (notifications for syncing, etc.)
+support for audio diary entries (and transcriptions)
+Star Trek style beeps to acknowledge when an action has been performed
+remind self to review old entries (and maybe to write summaries of them)
+paper based diary using QR codes, have part of the QR code fillable in to change it's meaning, scan it back into the computer, how to fold the paper
+read it later like service to save articles for offline reading/archiving
+track time spend doing unaproved activities
+plan time for playing games/other leisure activities
+track fitness goals/weight, try to automate as much as possible
+better searching (with stemming and stop words and caching/indexing, etc.)
+a way to summarise topics and have multiple different layers of summary, e.g. lowest level is to show all entries verbatim, next level is to show a summary of each entry, next level is to show a summary of each day, next level is to show a summary of each week then each month then each year, etc.
+keep track of arbitrary statistics, e.g. have counters and other variables which can be changed from within diary entries
+view an entry/group of entries in different ways, show snippets from each one, first paragraph, tags, etc.
+built in dictionary (use Vim?)
+perform web searches while I type/play music while I type/integration with other programs and stuff
+typing speed tracker/typing error tracker
+integration with Google Tasks or other task lists
+persistent files that can be edited whenever I want similarly to draft emails
+reminders to write about a certain topic/idea/event in full later on
+track purchases/reciepts to see what I bought/ate
+originally edited file is used to generate the actual entry
+track time with diary commands, e.g. starting on a project, stopping on a project, going to bed, etc.
+take picture of myself while writing an entry (automatically or deliberately) to see how appearance changes over time and to get an idea of my moods
+write about vague memories from the past without having to specify a specific time
+summary of an entry for quick viewing later, either written manually or automatically generated
+summary of groups of entries/periods of time
+the ability to enter: plain text, tagged text, images(?), reminders, tasks, other stats
+separate storage/syncing from viewing and input
