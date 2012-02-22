@@ -1,8 +1,8 @@
-This list will contain all of the possible features I could add to my diary project. 
+This list will contain all of the possible features I could add to my diary project. I'm just going to dump everything that I have already written here and then I'll sort through it later. 
 
-I'm just going to dump everything that I have already written here and then I'll sort through it later. 
 
 Features to implement right now:
+'diary cd' to quickly go to certain key diary directories
 automatically trim white space at start and end of entries
 ability to create new entries with older than current dates
 fix two entries in one, not getting split up properly
