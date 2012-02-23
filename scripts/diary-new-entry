@@ -4,6 +4,5 @@
 # Get the file path for a new entry.
 entry_filename=$(diary-range --new)
 
-# Get default editor and use it on $entry_filename.
-editor=$(diary-settings get diary_new_entry_default_editor)
-eval "$editor $entry_filename"
+# Use default editor on the filename.
+eval "$diary_new_entry_default_editor \"$entry_filename\""
