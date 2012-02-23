@@ -1,16 +1,11 @@
 #!/bin/bash
 # Calculates total number of words written in all diary entries. 
 
-diary_dir="${HOME}/.diary/data/entries"
-cd "$diary_dir"
-
-# TODO: implement a .diaryrc file and put all settings like this in it.
-dir_wordcounts="$HOME/.diary/cache/wordcounts"
-dir_entries="$HOME/.diary/data/entries"
-
 bold_colour="\e[1;37m"  # Bold White.
 end_colour="\e[0m"
 
+# cd to the entries directory.
+cd "$dir_entries"
 
 # Process command line options.
 time_period=total
