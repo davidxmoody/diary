@@ -12,3 +12,12 @@ export dir_wordcounts="$dir_cache/wordcounts"
 export diary_edit_default_editor="vim '+set spell' '+syntax off'"
 export diary_new_entry_default_editor="vim '+set spell' '+syntax off' '+startinsert'"
 
+# Formatting settings when printing entries.
+export header_minimum_width=10
+export long_date_format="%A %d %B %Y %I:%M%p"
+export short_date_format="%A %d %B %I:%M%p"
+export very_short_date_format="%I:%M%p"
+export pad_char='='
+export metadata_colour="\e[1;34m"  # Bold blue.
+export pad_colour="\e[0;34m"       # Blue.
+export end_colour="\e[0m"
