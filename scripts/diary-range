@@ -1,10 +1,5 @@
 #!/bin/bash
-# Script for finding the filenames of diary entries, 
-# supports simple slice notation (no steps). 
-
-entries_dir="$HOME/.diary/data/entries"
-cd "$entries_dir"
-
+# Script for finding the filenames of diary entries.
 
 new_entry() {
     # Determine file name.
@@ -14,12 +9,10 @@ new_entry() {
 
     # Determine file path.
     month=$(date '+%Y-%m')
-    file_path="$entries_dir/$month/$file_name"
+    file_path="$dir_entries/$month/$file_name"
 
-    # If the month folder does not already exist then create it.
-    if [[ ! -e "$entries_dir/$month" ]]; then
-        mkdir -p "$entries_dir/$month"
-    fi
+    # Create the month folder (if it does not already exist).
+    mkdir -p "$dir_entries/$month"
 
     # Echo it.
     echo "$file_path"
@@ -57,7 +50,7 @@ get_entries() {
             
             # Only consider entries past the start index. 
             if (( entry_counter >= start_index )); then
-                echo "$entries_dir/$month/$entry"
+                echo "$dir_entries/$month/$entry"
             fi
 
             # Increment the entry counter. 
@@ -103,6 +96,8 @@ while true; do
     esac
 done
 
+# cd to the entries directory.
+cd "$dir_entries"
 
 # Handle timestamp requests first.
 # TODO move this to a separate method and enable ranges of dates.
@@ -110,7 +105,7 @@ if [[ "$timestamp" ]]; then
     month="$(date '+%Y-%m' -d @$timestamp)"
     for entry in $month/diary-$timestamp-*.txt; do
         if [[ -f "$entry" ]]; then
-            echo "$entries_dir/$entry"
+            echo "$dir_entries/$entry"
         fi
     done
     exit
