@@ -3,8 +3,7 @@
 
 date_format="%F"
 
-checklist_dir="${HOME}/.diary/data/checklists"
-cd "$checklist_dir"
+cd "$dir_checklists"
 
 
 use_vim() {
