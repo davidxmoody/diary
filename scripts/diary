@@ -105,6 +105,9 @@ case "$command" in
     settings)
         diary-settings "$@"
     ;;
+    --version)
+        echo "No version number is currently available."
+    ;;
     wordcount | wc)
         diary-wordcount "$@"
     ;;
