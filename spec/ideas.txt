@@ -2,6 +2,7 @@ This list will contain all of the possible features I could add to my diary proj
 
 
 Features to implement right now:
+in diary search, search for entries containing any of the searchterms or all of the search terms
 'diary cd' to quickly go to certain key diary directories
 automatically trim white space at start and end of entries
 ability to create new entries with older than current dates

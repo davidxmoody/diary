@@ -4,16 +4,16 @@
 # If no arguments then use the last entry, otherwise use the given arguments 
 # as arguments to diary-range and edit the first entry that it returns.
 if [[ "$#" == 0 ]]; then 
-    entry_filename=$(diary-range "--range=-1::-1")
+    entry=$(diary-range '--range=-1::-1')
 else
-    entry_filename=$(diary-range "$@" | head -q --lines=1)
+    entry=$(diary-range "$@" | head -q --lines=1)
 fi
 
 # Check that the file exists.
-if [[ ! -f "$entry_filename" ]]; then 
-    echo "$(basename $0): file does not exist: \"$entry_filename\"" >&2
+if [[ ! -f "$entry" ]]; then 
+    echo "$(basename $0): file does not exist: \"$entry\"" >&2
     exit 1
 fi
 
 # Launch the default editor on it.
-eval "$diary_edit_default_editor \"$entry_filename\""
+eval "$diary_edit_default_editor \"$entry\""
