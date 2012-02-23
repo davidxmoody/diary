@@ -52,6 +52,25 @@ export -f diary-settings
 export -f diary-wordcount
 
 
+# Source the default settings file and then source the user's settings file. 
+source "$real_path/../config/diaryrc-default"
+
+# The user's diaryrc file is looked for in the following locations and the 
+# first existing file is used.
+paths=( "$real_path/../config/diaryrc"   \
+        "$real_path/../config/.diaryrc"  \
+        "$HOME/diaryrc"                  \
+        "$HOME/.diaryrc"                 )
+
+for path in "${paths[@]}"; do
+    if [[ -f "$path" ]]; then 
+        source "$path"
+        break
+    fi
+done
+
+
+
 # Check for command.
 command="$1"
 shift

@@ -1,20 +1,6 @@
 #!/bin/bash
 # Script to view and modify user settings.
 
-diary_edit_default_editor="vim '+set spell' '+syntax off'"
-diary_new_entry_default_editor="vim '+set spell' '+syntax off' '+startinsert'"
-
-dir_diary="$HOME/.diary"
-dir_data="$dir_diary/data"
-dir_entries="$dir_data/entries"
-dir_checklists="$dir_data/checklists"
-dir_cache="$dir_diary/cache"
-dir_wordcounts="$dir_cache/wordcounts"
-
-
-
-
-
 # Process arguments, first one is always a command.
 command="$1"
 shift
