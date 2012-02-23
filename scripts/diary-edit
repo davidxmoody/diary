@@ -9,6 +9,11 @@ else
     entry_filename=$(diary-range "$@" | head -q --lines=1)
 fi
 
-# Get default editor and launch it on the filename. 
-editor="$(diary-settings get diary_edit_default_editor)"
-eval "$editor $entry_filename"
+# Check that the file exists.
+if [[ ! -f "$entry_filename" ]]; then 
+    echo "$(basename $0): file does not exist: \"$entry_filename\"" >&2
+    exit 1
+fi
+
+# Launch the default editor on it.
+eval "$diary_edit_default_editor \"$entry_filename\""
