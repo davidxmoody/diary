@@ -21,3 +21,8 @@ export pad_char='='
 export metadata_colour="\e[1;34m"  # Bold blue.
 export pad_colour="\e[0;34m"       # Blue.
 export end_colour="\e[0m"
+
+# Default search paramaters.
+export search_print_entries=
+export search_default_range="-500::-1"
+export search_default_max_matches=40
