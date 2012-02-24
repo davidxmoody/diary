@@ -2,28 +2,21 @@ This list will contain all of the possible features I could add to my diary proj
 
 
 Features to implement right now:
-in diary search, search for entries containing any of the searchterms or all of the search terms
-'diary cd' to quickly go to certain key diary directories
-automatically trim white space at start and end of entries
-ability to create new entries with older than current dates
-fix two entries in one, not getting split up properly
-print a version number with --version (or whatever the current syntax is)
-show differences in time between the displayed search result and the current date when searching/show differences in time between the displayed search result and the previous or next search result (or could display the number of entries in between the two)
-allow dairy wordcount to accept ranges of entries
-let scripts use the compressed option notation (-n -a becomes -na, -n 1 becomes -n1)
-allow diary-edit to accept search results, e.g. "edit the last entry that contained the exercise tag"
-search for entries in a specific date range/reference date ranges of entries
-automated tests
-notifications when I pass certain milestones (in words written, etc.)
-autocompletion of diary commands when entered from the command line
-make diary format use fmt/par instead of fold
-decide on definitive referencing notation, should be able to mix different types of identifier, have search results/be dynamic, reference single entries or ranges or lists of ranges, etc.
-make the wordcount work over specific ranges
-automatically add word boundaries to search terms (but not tags)
-ability to create new diary entries which don't use the current date but instead use the given date
-limit searches/list by date ranges
-show how long ago an entry was written (in terms of months, weeks and days)
-time since the last entry/time to the next entry in entry headers
+- Search term logging
+- Searching for both tags and words at the same time
+- Tag aliases
+- Create set of entries for testing so I don't risk breaking my current entries
+- Get diary range to support date ranges
+- Make scripts use the compressed option notation (-n -a becomes -na, -n 1 becomes -n1)
+- Toggle between searching for all or any search terms
+- 'diary cd' to quickly go to certain key diary directories
+- Automaticaly trim white space at start and end of entries
+- Fix two entries in one, not getting split up properly
+- Print a version number with --version
+- Make dairy wordcount accept ranges of entries and use it's cache for them
+- Autocompletion of diary commands
+- Create new entries with old dates
+- Decide on definitive referencing notation, should be able to mix different types of identifier, have search results/be dynamic, reference single entries or ranges or lists of ranges, etc.
 
 
 
@@ -153,6 +146,11 @@ point system
 
 
 Other:
+Print how long ago an entry was written in header
+notifications when I pass certain milestones (in words written, etc.)
+Make diary-edit accept search results, e.g. "edit the last entry that contained the exercise tag"
+show time differences between subsequent search results
+automated tests
 status board/splash screen that shows quick summary of goals and entries
 show how many days certain goals have been completed in a row for/show simple calendars with red X's or V's for vacations or S's for sick days
 use don't break the chain for writing entries as well
