@@ -1,26 +1,15 @@
 #!/bin/bash
 # Script to search diary entries for tags or text. 
 
-search_tags() {
-    # Re-use search_words by prefixing each argument with a '#'.
-    search_words $(for tag in $@; do echo "#$tag\S*"; done)
-    # TODO change so that it stops the highlight at certain chars.
-}
-
-search_words() {
+do_search() {
+    
     # Build search string.
-    search_string="\($1\)"
-    shift
-    for word in "$@"; do 
-    	search_string="$search_string\|\($word\)"
+    search_string="\($prefix$1$suffix\)"; shift
+    for term in "$@"; do
+        search_string="$search_string\|\($prefix$term$suffix\)"
     done
 
-    do_search "$search_string"
-}
 
-do_search() {
-
-    search_string="$1"
     local -i num_matches=0
 
     for entry in $(diary-range -r "$range"); do
@@ -54,6 +43,7 @@ do_search() {
 
 
 # Process command line args.
+#TODO: put defaults in diaryrc-default
 print=
 range="-500::-1"
 max_matches=40
@@ -113,31 +103,25 @@ while true; do
     esac
 done
 
-# If no more arguments then search for all tags.
-if [[ "$mode" != list && $# == 0 ]]; then 
-    search_words '#\S*' | less -R
-    # TODO change to only search for specific character set.
-    exit
-fi
-
-casemode() {
-    # Select the appropriate function depending on the mode.
-    case "$mode" in
-        list)
-            do_search
-        ;;
-        tags)
-            search_tags "$@"
-        ;;
-        words)
-            search_words "$@"
-        ;;
-    esac
-}
+# Set the prefixes and suffixes to surround each search term.
+case "$mode" in
+    list)
+        prefix=
+        suffix=
+    ;;
+    tags)
+        prefix='#'
+        suffix='\S*\>'
+    ;;
+    words)
+        prefix='\b'
+        suffix='\b'
+    ;;
+esac
 
 # Do the search, either printing or displaying with less.
 if [[ "$print" ]]; then 
-    casemode "$@"
+    do_search "$@"
 else
-    casemode "$@" | less -R
+    do_search "$@" | less -R
 fi
