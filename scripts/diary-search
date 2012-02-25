@@ -52,8 +52,8 @@ do_search() {
 print="$search_print_entries"
 range="$search_default_range"
 max_matches="$search_default_max_matches"
-prefix=
-suffix=
+prefix='#'
+suffix='\S*\>'
 for arg in "$@"; do
     case "$arg" in 
         #TODO: move the all range to the diary range script.
@@ -110,6 +110,8 @@ for arg in "$@"; do
         ;;
     esac
 done
+
+# TODO: reintroduce the case statement on the mode.
 
 # Do the search, either printing or displaying with less.
 if [[ "$print" ]]; then 
