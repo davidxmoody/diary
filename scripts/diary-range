@@ -18,15 +18,6 @@ new_entry() {
     echo "$file_path"
 }
 
-# Method is not used.
-extract_timestamp() {
-    # Extract the timestamp from any correctly formatted diary entry filename.
-    # Filename can be relative or absolute.
-    timestamp="${1##*diary-}"
-    timestamp="${timestamp%%-*}"
-    echo "$timestamp"
-}
-    
 get_entries() {
     # $1 is -r if reverse order is required empty otherwise, 
     # $2 is start index (inclusive) may be empty for no start,
@@ -38,7 +29,6 @@ get_entries() {
     end_index=$3
 
     # If start_index or end_index are negative then return.
-    # TODO make it so that I don't have to do this. 
     (( start_index < 0 )) && return
     (( end_index < 0 )) && return
 
@@ -71,9 +61,6 @@ while true; do
             new_entry "$@"
             exit
         ;;
-        # TODO add options for referencing by fixed id, etc.
-        # TODO add support for multiple ranges
-        # TODO add support for reversing the order of entries
         -r)
             range="$2"
             shift; shift
@@ -100,7 +87,6 @@ done
 cd "$dir_entries"
 
 # Handle timestamp requests first.
-# TODO move this to a separate method and enable ranges of dates.
 if [[ "$timestamp" ]]; then
     month="$(date '+%Y-%m' -d @$timestamp)"
     for entry in $month/diary-$timestamp-*.txt; do
