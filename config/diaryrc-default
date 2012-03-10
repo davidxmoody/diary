@@ -9,8 +9,8 @@ export dir_cache="$dir_diary/cache"
 export dir_wordcounts="$dir_cache/wordcounts"
 
 # Editors to be used by different scripts.
-export diary_edit_default_editor="vim '+set spell' '+syntax off'"
-export diary_new_entry_default_editor="vim '+set spell' '+syntax off' '+startinsert'"
+export diary_edit_default_editor='vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
+export diary_new_entry_default_editor=$diary_edit_default_editor' "+startinsert"'
 
 # Formatting settings when printing entries.
 export header_minimum_width=10
