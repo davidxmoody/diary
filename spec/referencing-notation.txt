@@ -1,0 +1,27 @@
+Here I am going to write down and organise my thoughts for the referencing of entries/nodes.
+
+I want to have a way to "resolve a reference". That is, to transform a general reference into a specific reference. The general one can contain stuff like search results and '&&' symbols but the specific reference must refer to one node or one set of nodes that have been confirmed to exist.
+
+So, I need:
+- References for single nodes
+- References for multiple nodes (can be nested)
+- References for specific unchanging nodes
+- References for dynamically changing nodes that must be resolved
+- An algorithm for resolving a dynamic node reference into a static node reference
+- A null node for dynamic references that cannot be resolved
+- The ability to filter groups of nodes (by any information contained in the nodes)
+- A formal syntax for doing it all
+
+- Referencing already existing dynamically generated nodes
+- Supply one node and if it doesn't exist then use the next one (e.g. node_1 && node_2 goes to node_1 if node_1 exists and node_2 otherwise)
+
+There are two types of reference: single references and sets of references. 
+
+What type of collection would be best for groups of single references.
+
+Groups of references need:
+- Order? Yes, it is required.
+- No duplicates? No, not allowing duplicates would serve no purpose.
+- Anything else? Can't think of anything.
+
+So I think I should use lists for groups of references. 

@@ -236,7 +236,7 @@ Other:
 - Integration with Google Tasks or other task lists
 - Persistent files that can be edited whenever I want similarly to draft emails
 - Reminders to write about a certain topic/idea/event in full later on
-- Track purchases/reciepts to see what I bought/ate
+- Track purchases/reciepts to see what I bought/ate, take photos of reciepts to automatically log them
 - Originally edited file is used to generate the actual entry
 - Track time with diary commands, e.g. starting on a project, stopping on a project, going to bed, etc.
 - Take picture of myself while writing an entry (automatically or deliberately) to see how appearance changes over time and to get an idea of my moods
