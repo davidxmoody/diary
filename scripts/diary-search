@@ -5,15 +5,20 @@ set -u
 
 do_search() {
     
-    # Build search string.
     if [[ "$#" -gt 0 ]]; then
+        # Build search string.
         search_string="\($prefix$1$suffix\)"; shift
         for term in "$@"; do
             search_string="$search_string\|\($prefix$term$suffix\)"
         done
+
+        # Log the search term for future reference.
+        mkdir -p "$dir_logs"
+        echo "$search_string" >> "$dir_logs/search-terms-$(date '+%Y-%m')-$device_name"
     else
         search_string=
     fi
+
 
 
     local -i num_matches=0

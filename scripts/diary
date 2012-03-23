@@ -76,6 +76,7 @@ export dir_entries="$dir_data/entries"
 export dir_checklists="$dir_data/checklists"
 export dir_cache="$dir_diary/cache"
 export dir_wordcounts="$dir_cache/wordcounts"
+export dir_logs="$dir_data/logs"
 
 # Export other relevant data.
 export device_name
