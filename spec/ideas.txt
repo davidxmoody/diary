@@ -1,11 +1,7 @@
-This list will contain all of the possible features I could add to my diary project. I'm just going to dump everything that I have already written here and then I'll sort through it later. 
-
-
 Features to implement right now:
-- Search term logging
+- Tag aliases
 - Searching for both tags and words at the same time (e.g. diary search -w word1 word2 -t tag1 tag2 -w word3)
 - Toggle between searching for all or any search terms
-- Tag aliases
 
 - Get diary range to support date ranges
 - Make dairy wordcount accept ranges of entries and use it's cache for them
