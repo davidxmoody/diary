@@ -3,7 +3,8 @@
 
 new_entry() {
     # Determine file name.
-    device_name="$(hostname)"
+    # device_name is now in diaryrc, only set it if it is empty.
+    [[ -z "$device_name" ]] && device_name="$(hostname)"  
     timestamp="$(date +%s)"
     file_name="diary-$timestamp-$device_name.txt"
 
