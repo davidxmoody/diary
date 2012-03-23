@@ -15,9 +15,7 @@ So, I need:
 - Referencing already existing dynamically generated nodes
 - Supply one node and if it doesn't exist then use the next one (e.g. node_1 && node_2 goes to node_1 if node_1 exists and node_2 otherwise)
 
-There are two types of reference: single references and sets of references. 
-
-What type of collection would be best for groups of single references.
+There are two types of reference: single references and lists of references. 
 
 Groups of references need:
 - Order? Yes, it is required.
@@ -25,3 +23,28 @@ Groups of references need:
 - Anything else? Can't think of anything.
 
 So I think I should use lists for groups of references. 
+
+
+I could use the python notation and syntax for referencing. 
+
+e.g. 'search(search_term, since("Jan 1"))' would return all entries since January 1 which contain the search term. I could also have search functions that change the ordering depending on relevance of particular entries. 
+
+I could build up long strings of function calls like this. I could also include one function or variable for the null node. I could reference temporary nodes with something like temp(...) and I could reference nodes by id with id(...) and I could reference them by position with range(...) and so on and so forth. I'll have to make sure I don't have any collisions with existing python functions though. 
+
+I think this is a really good idea and it will help me to learn the python language too. 
+
+
+I am going to have one class called NodeRef (or similar). It is created with a string containing something like: 'search(search_term, since("Jan 1"))'. It will have a method called resolve() which uses the initial creation string to generate a list of nodes. The list can have zero or more nodes in it. I don't think I need to limit myself to having a NodeRef class for single references. I can easily add the functionality into the one main NodeRef class. For example I could have another method called extract_single(). It would simply return the head of the list or null if the list is empty. 
+
+
+I'm going to write down all the ways in which I might want to populate the initial list (before filtering and stuff). Also, I could use python list comprehension as well. 
+- id()
+- timestamp()
+- date_range()
+- range() (the slice notation that I'm currently using)
+- last_entry()
+- first_entry_containing() (the first entry containing the search term or tag)
+- tmp() (for referencing dynamically generated nodes that have already been generated)
+
+
+I think I would like some of these methods to be able to give additional information to the nodes they are activated on. For example the search function could give the search string to the nodes it accepts so that they can highlight it.
