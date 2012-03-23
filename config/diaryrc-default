@@ -1,31 +1,26 @@
 # Default settings to be used by diary scripts. 
 
 # The directories used by the diary scripts.
-export dir_diary="$HOME/.diary"
-export dir_data="$dir_diary/data"
-export dir_entries="$dir_data/entries"
-export dir_checklists="$dir_data/checklists"
-export dir_cache="$dir_diary/cache"
-export dir_wordcounts="$dir_cache/wordcounts"
-
-# Editors to be used by different scripts.
-export diary_edit_default_editor='vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
-export diary_new_entry_default_editor=$diary_edit_default_editor' "+startinsert"'
-
-# Formatting settings when printing entries.
-export header_minimum_width=10
-export long_date_format="%A %d %B %Y %I:%M%p"
-export short_date_format="%A %d %B %I:%M%p"
-export very_short_date_format="%I:%M%p"
-export pad_char='='
-export metadata_colour="\e[1;34m"  # Bold blue.
-export pad_colour="\e[0;34m"       # Blue.
-export end_colour="\e[0m"
-
-# Default search paramaters.
-export search_print_entries=
-export search_default_range="-500::-1"
-export search_default_max_matches=40
+dir_diary="$HOME/.diary"
 
 # Default device name.
-export device_name="$HOSTNAME"
+device_name="$HOSTNAME"
+
+# Editors to be used by different scripts.
+diary_edit_default_editor='vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
+diary_new_entry_default_editor=$diary_edit_default_editor' "+startinsert"'
+
+# Formatting settings when printing entries.
+header_minimum_width=10
+long_date_format="%A %d %B %Y %I:%M%p"
+short_date_format="%A %d %B %I:%M%p"
+very_short_date_format="%I:%M%p"
+pad_char='='
+metadata_colour="\e[1;34m"  # Bold blue.
+pad_colour="\e[0;34m"       # Blue.
+end_colour="\e[0m"
+
+# Default search paramaters.
+search_print_entries=
+search_default_range="-500::-1"
+search_default_max_matches=40

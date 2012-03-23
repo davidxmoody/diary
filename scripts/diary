@@ -69,6 +69,32 @@ for path in "${paths[@]}"; do
     fi
 done
 
+# Export the diary subdirectories.
+export dir_diary
+export dir_data="$dir_diary/data"
+export dir_entries="$dir_data/entries"
+export dir_checklists="$dir_data/checklists"
+export dir_cache="$dir_diary/cache"
+export dir_wordcounts="$dir_cache/wordcounts"
+
+# Export other relevant data.
+export device_name
+
+export diary_edit_default_editor
+export diary_new_entry_default_editor
+
+export header_minimum_width
+export long_date_format
+export short_date_format
+export very_short_date_format
+export pad_char
+export metadata_colour
+export pad_colour
+export end_colour
+
+export search_print_entries
+export search_default_range
+export search_default_max_matches
 
 
 # Check for command.
