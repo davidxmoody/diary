@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# Simple test script to view entries.
+
+import curses
+from time import sleep
+import subprocess
+
+# Initialise window.
+stdscr = curses.initscr()
+curses.start_color()
+curses.noecho()
+curses.cbreak()
+stdscr.keypad(1)
+
+# Attempt to call a diary script.
+#it = subprocess.check_output(['bash', '-c', '. hello; hi'])
+
+it = subprocess.check_output(['bash', '-c', '. diary-dev list -p -r -1::-1'])
+
+stdscr.addstr(it)
+
+
+
+
+
+# Refresh and wait.
+stdscr.refresh()
+sleep(1)
+
+
+
+# Exit curses mode.
+curses.nocbreak()
+stdscr.keypad(0)
+curses.echo()
+curses.endwin()
