@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# Script for finding the names of diary entries.
+
+import os
+import math
+import datetime
+import time
+
+dir_entries = os.environ['dir_entries']
+
+def new_entry_filename(created_on=None, device_name=None):
+    if created_on==None: created_on = datetime.datetime.now()
+    if device_name==None: device_name = os.environ['device_name']
+
+    timestamp = int(math.floor(time.mktime(created_on.timetuple())))
+
+    filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
+    month = '{}-{}'.format(created_on.year, created_on.month)
+    path = os.path.realpath(os.path.join(dir_entries, month, filename))
+
+    return path
+
+# TODO: function to get entries from entry(s) "descriptor".
+
+# TODO: process all command line arguments, make compatible with previous 
+#       bash version of the script. 
+
+
+print(new_entry_filename())

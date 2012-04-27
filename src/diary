@@ -41,6 +41,8 @@ eval "diary-search()    { '$real_path/diary-search'        \"\$@\"; }"
 eval "diary-settings()  { '$real_path/diary-settings'      \"\$@\"; }"
 eval "diary-wordcount() { '$real_path/diary-wordcount'     \"\$@\"; }"
 
+eval "diarypy-range() { '$real_path/diarypy-range'     \"\$@\"; }"
+
 export -f diary-checklist
 export -f diary-edit
 export -f diary-format
@@ -50,6 +52,8 @@ export -f diary-range
 export -f diary-search
 export -f diary-settings
 export -f diary-wordcount
+
+export -f diarypy-range
 
 
 # Source the default settings file and then source the user's settings file. 
@@ -120,6 +124,9 @@ case "$command" in
     ;;
     new-entry | new)
         diary-new-entry "$@" 
+    ;;
+    pyrange)
+        diarypy-range "$@"
     ;;
     range)
         diary-range "$@"

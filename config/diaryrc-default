@@ -1,7 +1,7 @@
 # Default settings to be used by diary scripts. 
 
 # The directories used by the diary scripts.
-dir_diary="$HOME/.diary"
+dir_diary="$HOME/.diary-unknown"
 
 # Default device name.
 device_name="$HOSTNAME"
