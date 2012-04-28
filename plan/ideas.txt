@@ -150,13 +150,17 @@ Achievements:
 
 
 Other:
+- Built in recipe organiser (or maybe make that a separate project).
+- Tag analyser that can scan through all entries and provide a summary of what tags are used and how often they are used. 
+- Have a look at existing task list services/journalling services to get some ideas. Maybe provide the ability to import/export from/to them.
+- Mind map editing style. Build it on the node based way of doing things. 
 - Print how long ago an entry was written in header
 - Notifications when I pass certain milestones (in words written, etc.)
 - Make diary-edit accept search results, e.g. "edit the last entry that contained the exercise tag"
 - Show time differences between subsequent search results
 - Automated tests
 - Status board/splash screen that shows quick summary of goals and entries
-- Show how many days certain goals have been completed in a row for/show simple calendars with red X's or V's for vacations or S's for sick days
+- Show how many days certain goals have been completed in a row for/show simple calendars with red X's or V's for vacations or S's for sick days (aka don't break the chain integration).
 - Diary checklist or simple list of things that I want a constant reminder of, integrate with the splash screen?
 - Use don't break the chain for writing entries as well
 - Give entries tag lines, or simple summaries of the entry, automatically generate from tags and tag scope, could also use wordcounts
@@ -167,6 +171,7 @@ Other:
 - Don't break the chain method integration
 - Automatic summary generation?
 - Track goals and view summaries of progress
+- Focus more on getting the user to writing summaries of entries. Have a two dimensional viewing method where time is one dimension and "level of summary" is another. Maybe add a third dimension for tags. 
 - Add a MB count to my diary wordcount script, add MB counts to other types of data like pictures
 - Write about certain periods of time and events that happened a long time ago
 - Some way to automatically notice and analyse trends in my entries, for example do I write about certain topics more often now?
