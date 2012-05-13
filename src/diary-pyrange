@@ -11,12 +11,14 @@ import time
 import argparse
 
 # Load constants that have previously been sourced and exported in bash.
-# TODO: change this so that it uses a better way to store and load them. 
+# TODO: change this to use a better way to store and load them. 
 dir_entries = os.environ['dir_entries']
 device_name = os.environ['device_name']
 
 def new_entry_filename(created_on=None, device_name=device_name):
-    """Return the full path of a new (not currently existing) entry."""
+    '''Return the full path of a new (not currently existing) entry.
+    
+    Note that the directory structure may not exist.'''
 
     if created_on==None: created_on = datetime.datetime.now()
     timestamp = int(math.floor(time.mktime(created_on.timetuple())))
@@ -25,9 +27,10 @@ def new_entry_filename(created_on=None, device_name=device_name):
     month = '{}-{}'.format(created_on.year, created_on.month)
     path = os.path.realpath(os.path.join(dir_entries, month, filename))
 
-    # TODO: create month directory if it does not exist. 
-
     return path
+
+def find_by_timestamp(timestamp):
+    
 
 
 # TODO: function to get entries from entry(s) "descriptor".
@@ -36,26 +39,31 @@ def new_entry_filename(created_on=None, device_name=device_name):
 #       bash version of the script. 
 
 
+class QueueAction(argparse.Action):
+    '''Appends (dest, arguments) pairs to 'queue' in the returned Namespace.'''
+    def __call__(self, parser, namespace, value, option_string=None):
+        if not hasattr(namespace, 'queue'): 
+            namespace.queue = []
+        namespace.queue.append( (self.dest, value) )
 
 parser = argparse.ArgumentParser(description='Get entry filenames.')
-#parser.add_argument('-t', '--timestamp', metavar='timestamp', type=int, 
-#                    action='append',
-#                    help='timestamp to use when creating a new entry')
-#parser.add_argument('-r', '--range', type=int, action='append',
-#                    help='range is awesome')
-#parser.add_argument('-b', '--bool', action='store_true')
-#parser.add_argument('--version', action='version', 
-#                    version='first version evar!')
-#args = parser.parse_args()
 
-parser.add_argument('-n', '--new', nargs='?', type=int, action='append',
-                    default=argparse.SUPPRESS,
-                    help='')
+parser.add_argument('-n', '--new', nargs='?', type=int, 
+                    dest='new', help='', 
+                    action=QueueAction, default=argparse.SUPPRESS)
 
-parser.add_argument
-
+# TODO add custom type to check it is a correct range
+parser.add_argument('-r', '--range', 
+                    dest='range', help='',
+                    action=QueueAction, default=argparse.SUPPRESS)
+                    
+parser.add_argument('-t', '--timestamp', type=int,
+                    dest='timestamp', help='',
+                    action=QueueAction, default=argparse.SUPPRESS)
 
 args = parser.parse_args()
 
 print(args)
-print('new' in args)
+
+for func_name, value in args.queue:
+    print(func_name, value)
