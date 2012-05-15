@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+# Command line args:
+# - Maybe specify only one tag to display.
+# - Maybe change format of displayed text.
+# - Enable/disable colour.
+# - Add or remove tags to the list of monitored tags.
+# - Rebuild cache.
+
+# Algorithm for calculating chains:
+# - Scan through all diary entries (or all entries modified since last scan).
+# - For each one if it has any tag in it, write a log entry with the entry's .
+#   timestamp and that tag (in the case of more than one tag in an entry, 
+#   write multiple log entries).
+# - Sort by timestamp (or assume it's already sorted).
+# - Starting with the most recent timestamp, work backwards and make a note
+#   every time a tag is encountered. Tag aliases or some form of regular 
+#   expressions may be needed.
+# - Every time a tag is encountered check to see if the last time that tag was
+#   encountered was the previous day. If it was then increment the 
+#   corresponding counter. If it wasn't then the corresponding counter is left
+#   with the length of the longest chain (so stop considering that tag).
+
+from subprocess import check_output
+import os
+import re
+
+timestamp_re = re.compile(r'.*diary-(\d+)-.*')
+
+def extract_timestamp(filename):
+    return timestamp_re.match(filename).group(1)
+
+real_path = os.environ['real_path']
+
+all_entries = check_output('{}/diary range -r -10::-1'.format(real_path), 
+                           shell=True, universal_newlines=True)
+
+for entry in all_entries.split('\n')[:-1]:
+    command = r'grep -o "#\S\+\b" {} || true'.format(entry)
+    match = check_output(command, shell=True, universal_newlines=True)
+    match = match.lstrip('#').rstrip()
+    if len(match)>0: 
+        print(extract_timestamp(entry), match)

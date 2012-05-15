@@ -40,6 +40,7 @@ eval "diary-range()     { '$real_path/diary-range'         \"\$@\"; }"
 eval "diary-search()    { '$real_path/diary-search'        \"\$@\"; }"
 eval "diary-settings()  { '$real_path/diary-settings'      \"\$@\"; }"
 eval "diary-wordcount() { '$real_path/diary-wordcount'     \"\$@\"; }"
+eval "diary-chain()     { '$real_path/diary-chain'         \"\$@\"; }"
 
 export -f diary-checklist
 export -f diary-edit
@@ -50,6 +51,9 @@ export -f diary-range
 export -f diary-search
 export -f diary-settings
 export -f diary-wordcount
+export -f diary-chain
+
+export real_path
 
 
 # Source the default settings file and then source the user's settings file. 
@@ -103,6 +107,9 @@ command="$1"
 shift
 
 case "$command" in
+    chain)
+        diary-chain "$@"
+    ;;
     checklist)
         diary-checklist "$@"
     ;;
