@@ -24,6 +24,22 @@
 from subprocess import check_output
 import os
 import re
+from datetime import datetime, timedelta
+from time import localtime, mktime
+
+tags_to_watch = { 'exercise'   : re.compile(r'exer.*'), 
+                  'piano'      : re.compile(r'piano'), 
+                  'meditation' : re.compile(r'medi.*'), 
+                  'programming': re.compile(r'prog.*'), 
+                  'writing'    : re.compile(r'writ.*|wrot.*'),
+                  'driving'    : re.compile(r'driv.*|drov.*'),
+                  'cooking'    : re.compile(r'cook.*'),
+                  'remainder'  : re.compile(r'.*') }
+
+tags_found = { tag_name: [] for tag_name in tags_to_watch.keys() }
+
+tag_chain_lengths = { tag_name: 0 for tag_name in tags_to_watch.keys() }
+
 
 timestamp_re = re.compile(r'.*diary-(\d+)-.*')
 
@@ -32,12 +48,56 @@ def extract_timestamp(filename):
 
 real_path = os.environ['real_path']
 
-all_entries = check_output('{}/diary range -r -10::-1'.format(real_path), 
+# Get a list of the filenames for all entries (in reverse order).
+all_entries = check_output('{}/diary range -r ::-1'.format(real_path), 
                            shell=True, universal_newlines=True)
 
 for entry in all_entries.split('\n')[:-1]:
+    # For each entry search for all tags.
     command = r'grep -o "#\S\+\b" {} || true'.format(entry)
-    match = check_output(command, shell=True, universal_newlines=True)
-    match = match.lstrip('#').rstrip()
-    if len(match)>0: 
-        print(extract_timestamp(entry), match)
+    matches = check_output(command, shell=True, universal_newlines=True)
+
+    # Clean up output.
+    for match in matches.split('\n'):
+        match = match.lstrip('#').rstrip()
+        if len(match)==0: continue
+
+        # Find appropriate place to put timestamp of tag.
+        for tag_name, tag_re in tags_to_watch.items():
+            if tag_re.match(match):
+                tags_found[tag_name].append(extract_timestamp(entry))
+
+def same_day(*dates):
+    YD_pairs = [ (date.tm_year, date.tm_yday) for date in dates ]
+    return YD_pairs.count(YD_pairs[0]) == len(YD_pairs)
+
+# Calculate chain length from tags_found.
+for tag, timestamps in tags_found.items():
+    occurred_today = False
+    chain_length = 0
+
+    today = localtime()
+    last_day = localtime()
+
+    for timestamp in timestamps:
+        day = localtime(float(timestamp))
+
+        if same_day(day, today):
+            occurred_today = True
+        elif same_day(day, last_day):
+            pass  # Do nothing because already counted this day once.
+        else:
+            last_day = localtime(mktime(last_day) - 24*60*60)
+            if same_day(day, last_day):
+                chain_length += 1
+            else:
+                break
+
+    if occurred_today:
+        occurred_today = 'yes'
+    else:
+        occurred_today = ' no'
+
+    if tag == 'remainder': continue
+
+    print('{:<12} {} {:>3}'.format(tag, occurred_today, chain_length))
