@@ -38,22 +38,22 @@ tags_to_watch = { 'exercise'   : re.compile(r'exer.*'),
 
 tags_found = { tag_name: [] for tag_name in tags_to_watch.keys() }
 
-tag_chain_lengths = { tag_name: 0 for tag_name in tags_to_watch.keys() }
 
-
-timestamp_re = re.compile(r'.*diary-(\d+)-.*')
-
-def extract_timestamp(filename):
+def extract_timestamp(filename, timestamp_re=re.compile(r'.*diary-(\d+)-.*')):
     return timestamp_re.match(filename).group(1)
 
+# Find out the path of the other diary scripts. 
 real_path = os.environ['real_path']
+diary_script = real_path + '/diary'
 
 # Get a list of the filenames for all entries (in reverse order).
-all_entries = check_output('{}/diary range -r ::-1'.format(real_path), 
+# TODO change back to full range
+#all_entries = check_output(diary_script + ' range -r -60::-1', 
+all_entries = check_output(diary_script + ' range -r ::-1', 
                            shell=True, universal_newlines=True)
 
+# For each entry search for all tags.
 for entry in all_entries.split('\n')[:-1]:
-    # For each entry search for all tags.
     command = r'grep -o "#\S\+\b" {} || true'.format(entry)
     matches = check_output(command, shell=True, universal_newlines=True)
 
@@ -67,12 +67,25 @@ for entry in all_entries.split('\n')[:-1]:
             if tag_re.match(match):
                 tags_found[tag_name].append(extract_timestamp(entry))
 
+
+# Calculate whether or not the given struct_time objects occur on the same day.
 def same_day(*dates):
     YD_pairs = [ (date.tm_year, date.tm_yday) for date in dates ]
     return YD_pairs.count(YD_pairs[0]) == len(YD_pairs)
 
+# Return a string presenting the tag and chain length to the user (with color).
+def format_details(tag, occurred_today, chain_length, *, no_color='\033[0m',
+                   if_occurred='\033[1;32m', if_not_occurred='\033[1;31m'):
+    color = if_occurred if occurred_today else if_not_occurred
+    return '{:>12} {}{:>3}{}'.format(tag, color, chain_length, no_color)
+
+
 # Calculate chain length from tags_found.
 for tag, timestamps in tags_found.items():
+
+    # The remainder tag is for anything not in the list of tags to watch.
+    if tag == 'remainder': continue
+
     occurred_today = False
     chain_length = 0
 
@@ -93,11 +106,4 @@ for tag, timestamps in tags_found.items():
             else:
                 break
 
-    if occurred_today:
-        occurred_today = 'yes'
-    else:
-        occurred_today = ' no'
-
-    if tag == 'remainder': continue
-
-    print('{:<12} {} {:>3}'.format(tag, occurred_today, chain_length))
+    print(format_details(tag, occurred_today, chain_length))
