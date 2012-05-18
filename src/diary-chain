@@ -27,29 +27,28 @@ import re
 from datetime import datetime, timedelta
 from time import localtime, mktime
 
-tags_to_watch = { 'exercise'   : re.compile(r'exer.*'), 
-                  'piano'      : re.compile(r'piano'), 
-                  'meditation' : re.compile(r'medi.*'), 
-                  'programming': re.compile(r'prog.*'), 
-                  'writing'    : re.compile(r'writ.*|wrot.*'),
-                  'driving'    : re.compile(r'driv.*|drov.*'),
-                  'cooking'    : re.compile(r'cook.*'),
-                  'remainder'  : re.compile(r'.*') }
+tags_to_watch = [ ('exercise',    re.compile(r'exer.*')        ),
+                  ('piano',       re.compile(r'piano')         ),
+                  ('meditation',  re.compile(r'medi.*')        ),
+                  ('programming', re.compile(r'prog.*')        ),
+                  ('writing',     re.compile(r'writ.*|wrot.*') ),
+                  ('driving',     re.compile(r'driv.*|drov.*') ),
+                  ('cooking',     re.compile(r'cook.*')        ),
+                  ('remainder',   re.compile(r'.*')            ) ]
 
-tags_found = { tag_name: [] for tag_name in tags_to_watch.keys() }
+tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
 
 
 def extract_timestamp(filename, timestamp_re=re.compile(r'.*diary-(\d+)-.*')):
     return timestamp_re.match(filename).group(1)
 
-# Find out the path of the other diary scripts. 
-real_path = os.environ['real_path']
-diary_script = real_path + '/diary'
+# Find out the path of the main diary script.
+diary_script = os.environ['real_path'] + '/diary'
 
 # Get a list of the filenames for all entries (in reverse order).
 # TODO change back to full range
-#all_entries = check_output(diary_script + ' range -r -60::-1', 
-all_entries = check_output(diary_script + ' range -r ::-1', 
+all_entries = check_output(diary_script + ' range -r -60::-1', 
+#all_entries = check_output(diary_script + ' range -r ::-1', 
                            shell=True, universal_newlines=True)
 
 # For each entry search for all tags.
@@ -57,15 +56,19 @@ for entry in all_entries.split('\n')[:-1]:
     command = r'grep -o "#\S\+\b" {} || true'.format(entry)
     matches = check_output(command, shell=True, universal_newlines=True)
 
-    # Clean up output.
     for match in matches.split('\n'):
+        # Clean up output.
         match = match.lstrip('#').rstrip()
         if len(match)==0: continue
 
         # Find appropriate place to put timestamp of tag.
-        for tag_name, tag_re in tags_to_watch.items():
+        for tag_name, tag_re in tags_to_watch:
             if tag_re.match(match):
                 tags_found[tag_name].append(extract_timestamp(entry))
+
+# Ignore the 'remainder' tag.
+del tags_found['remainder']
+# TODO do I need the remainder tag at all?
 
 
 # Calculate whether or not the given struct_time objects occur on the same day.
@@ -77,33 +80,34 @@ def same_day(*dates):
 def format_details(tag, occurred_today, chain_length, *, no_color='\033[0m',
                    if_occurred='\033[1;32m', if_not_occurred='\033[1;31m'):
     color = if_occurred if occurred_today else if_not_occurred
-    return '{:>12} {}{:>3}{}'.format(tag, color, chain_length, no_color)
+    return '{}{:>5}{} {}'.format(color, chain_length, no_color, tag)
 
-
-# Calculate chain length from tags_found.
-for tag, timestamps in tags_found.items():
-
-    # The remainder tag is for anything not in the list of tags to watch.
-    if tag == 'remainder': continue
-
+# Return a tuple containing whether or not a timestamp has occurred today and 
+# the length of the longest chain that can be made starting today. 
+def get_details(timestamps):
     occurred_today = False
     chain_length = 0
-
     today = localtime()
-    last_day = localtime()
+    last_day = today
 
     for timestamp in timestamps:
         day = localtime(float(timestamp))
 
         if same_day(day, today):
             occurred_today = True
+            chain_length = 1
         elif same_day(day, last_day):
             pass  # Do nothing because already counted this day once.
         else:
+            # Set last_day to the day before.
             last_day = localtime(mktime(last_day) - 24*60*60)
             if same_day(day, last_day):
                 chain_length += 1
             else:
                 break
 
-    print(format_details(tag, occurred_today, chain_length))
+    return (occurred_today, chain_length)
+
+# Calculate chain length from tags_found.
+for tag, timestamps in tags_found.items():
+    print(format_details(tag, *get_details(timestamps)))
