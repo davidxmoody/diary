@@ -164,11 +164,28 @@ def get_details(timestamps):
     return (occurred_today, chain_length)
 
 # Calculate chain length from tags_found.
+results = []
 for tag, timestamps in tags_found.items():
-    print(format_details(tag, *get_details(timestamps)))
+    results.append( (tag,) + get_details(timestamps) )
 
-# Make a note of the current time.
+def sorter(details):
+    position = 0
+    if details[1]:
+        # Put lower in the list.
+        # TODO Find a better way to do this.
+        position += 1000
+    else:
+        # Put higher in the list.
+        pass
+    position -= details[2]
+    return position
+
+
+results = sorted(results, key=sorter)
+
+for result in results:
+    print(format_details(*result))
+
+# Update last_scan, close the shelf.
 cache_shelf['last_scan'] = time()
-
-# Close the shelf at the end, syncing the changes. 
 cache_shelf.close()
