@@ -106,7 +106,7 @@ tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
 
 for entry in get_entries(cache_shelf['last_scan']):
 
-    print(entry)
+    #print(entry)
     
     # Extract the timestamp.
     timestamp = extract_timestamp(entry)
