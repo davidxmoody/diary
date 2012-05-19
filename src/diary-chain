@@ -67,6 +67,9 @@ if rebuild_cache or os.path.getmtime(tags_file) > \
             tag_entry = (line[0], re.compile(line[1]))
             cache_shelf['tags_to_watch'].append(tag_entry)
 
+    # Record tags_last_loaded time.
+    cache_shelf['tags_last_loaded'] = time()
+
     # Rebuild the rest of the cache.
     rebuild_cache = True
 
@@ -92,13 +95,6 @@ def same_day(*dates):
     YD_pairs = [ (date.tm_year, date.tm_yday) for date in dates ]
     return YD_pairs.count(YD_pairs[0]) == len(YD_pairs)
 
-## Get all entries specified by the given range argument (using diary-range).
-#def get_entries(range_args='-r ::-1',
-#                diary_script=os.environ['real_path']+'/diary'):
-#    all_entries = check_output(diary_script + ' range ' + range_args,
-#                               shell=True, universal_newlines=True)
-#    return all_entries.split('\n')[:-1]
-
 # Get all entries modified since last_scan.
 def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
     command = 'find "{}" -type f -newermt @{}'.format(dir_entries, last_scan)
@@ -110,7 +106,7 @@ tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
 
 for entry in get_entries(cache_shelf['last_scan']):
 
-    #print(entry)
+    print(entry)
     
     # Extract the timestamp.
     timestamp = extract_timestamp(entry)
