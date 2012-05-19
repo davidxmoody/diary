@@ -54,6 +54,7 @@ export -f diary-wordcount
 export -f diary-chain
 
 export real_path
+export tags_file
 
 
 # Source the default settings file and then source the user's settings file. 

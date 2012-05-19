@@ -38,20 +38,9 @@ from time import localtime, mktime, time
 import shelve
 
 
-# TODO put this in the shelf too
-tags_to_watch = [ ('exercise',    re.compile(r'exer.*')        ),
-                  ('piano',       re.compile(r'piano')         ),
-                  ('meditation',  re.compile(r'medi.*')        ),
-                  ('programming', re.compile(r'prog.*')        ),
-                  ('writing',     re.compile(r'writ.*|wrot.*') ),
-                  ('driving',     re.compile(r'driv.*|drov.*') ),
-                  ('cooking',     re.compile(r'cook.*')        ) ]
-
-tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
-
-
 # TODO make this settable from command line. 
 rebuild_cache = False
+
 
 # Open shelf for caching timestamp to tags mappings.
 cache_path = os.environ['dir_chain']
@@ -59,7 +48,31 @@ if not os.path.exists(cache_path):
     os.makedirs(cache_path)
 cache_shelf = shelve.open(cache_path + '/chain-cache', writeback=True)
 
-# Set default values if this is the first run. 
+# Set default values if this is the first run or if the tags file has changed.
+
+if rebuild_cache or 'tags_last_loaded' not in cache_shelf:
+    cache_shelf['tags_last_loaded'] = 0
+
+tags_file = os.environ['tags_file']
+if not os.path.isfile(tags_file):
+    raise Exception('tags file not found: "{}"'.format(tags_file))
+
+if rebuild_cache or os.path.getmtime(tags_file) > \
+                    cache_shelf['tags_last_loaded']:
+    # Rebuild tags_to_watch.
+    cache_shelf['tags_to_watch'] = []
+    with open(tags_file) as f:
+        for line in f:
+            line = line.rstrip().split(' ', 1)
+            tag_entry = (line[0], re.compile(line[1]))
+            cache_shelf['tags_to_watch'].append(tag_entry)
+
+    # Rebuild the rest of the cache.
+    rebuild_cache = True
+
+tags_to_watch = cache_shelf['tags_to_watch']
+    
+
 if rebuild_cache or 'timestamp2tags' not in cache_shelf:
     cache_shelf['timestamp2tags'] = {}
 timestamp2tags = cache_shelf['timestamp2tags']
@@ -67,9 +80,6 @@ timestamp2tags = cache_shelf['timestamp2tags']
 if rebuild_cache or 'last_scan' not in cache_shelf:
     cache_shelf['last_scan'] = 0
 
-
-#print(cache_shelf['last_scan'])
-#print(cache_shelf['timestamp2tags'])
 
 
 # Given a filename of the format '/some/path/diary-XXXXXXXXXX-device-name.txt', 
@@ -95,6 +105,8 @@ def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
     all_entries = check_output(command, shell=True, universal_newlines=True)
     return all_entries.split('\n')[:-1]
 
+
+tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
 
 for entry in get_entries(cache_shelf['last_scan']):
 

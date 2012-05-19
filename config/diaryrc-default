@@ -6,6 +6,9 @@ dir_diary="$HOME/.diary"
 # Default device name.
 device_name="$HOSTNAME"
 
+# Set default file for tags to watch out for in diary-chain.
+tags_file="$HOME/.diary-tags"
+
 # Editors to be used by different scripts.
 diary_edit_default_editor='vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 diary_new_entry_default_editor=$diary_edit_default_editor' "+startinsert"'
