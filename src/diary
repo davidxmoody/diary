@@ -81,6 +81,7 @@ export dir_checklists="$dir_data/checklists"
 export dir_cache="$dir_diary/cache"
 export dir_wordcounts="$dir_cache/wordcounts"
 export dir_logs="$dir_data/logs"
+export dir_chain="$dir_cache/chain"
 
 # Export other relevant data.
 export device_name

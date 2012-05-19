@@ -34,8 +34,11 @@
 from subprocess import check_output
 import os
 import re
-from time import localtime, mktime
+from time import localtime, mktime, time
+import shelve
 
+
+# TODO put this in the shelf too
 tags_to_watch = [ ('exercise',    re.compile(r'exer.*')        ),
                   ('piano',       re.compile(r'piano')         ),
                   ('meditation',  re.compile(r'medi.*')        ),
@@ -46,27 +49,28 @@ tags_to_watch = [ ('exercise',    re.compile(r'exer.*')        ),
 
 tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
 
-# TODO implement this and move tags to separate file
-def load_tags():
-    pass
 
-# TODO
-def load_timestamps():
-    pass
+# TODO make this settable from command line. 
+rebuild_cache = False
 
-# TODO
-def save_timestamps():
-    pass
+# Open shelf for caching timestamp to tags mappings.
+cache_path = os.environ['dir_chain']
+if not os.path.exists(cache_path):
+    os.makedirs(cache_path)
+cache_shelf = shelve.open(cache_path + '/chain-cache', writeback=True)
 
-# TODO
-def load_last_scan():
-    pass
+# Set default values if this is the first run. 
+if rebuild_cache or 'timestamp2tags' not in cache_shelf:
+    cache_shelf['timestamp2tags'] = {}
+timestamp2tags = cache_shelf['timestamp2tags']
 
-#tags_to_watch = load_tags()
-#timestamp2tags = load_timestamps()
-#last_scan = load_last_scan()
+if rebuild_cache or 'last_scan' not in cache_shelf:
+    cache_shelf['last_scan'] = 0
 
-timestamp2tags = {}
+
+#print(cache_shelf['last_scan'])
+#print(cache_shelf['timestamp2tags'])
+
 
 # Given a filename of the format '/some/path/diary-XXXXXXXXXX-device-name.txt', 
 # return the timestamp (XXXXXXXXXX).
@@ -92,20 +96,26 @@ def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
     return all_entries.split('\n')[:-1]
 
 
-for entry in get_entries():
+for entry in get_entries(cache_shelf['last_scan']):
 
+    print(entry)
+    
     # Extract the timestamp.
     timestamp = extract_timestamp(entry)
 
     # Search for all tags within each entry. 
     # TODO do this in python.
-    command = r'grep -o "#\S\+\b" {} || true'.format(entry)
+    command = r'grep -o "#\S\+\b" "{}" || true'.format(entry)
     matches = check_output(command, shell=True, universal_newlines=True)
 
     # Clean up output.
     matches = matches.split('\n')
     matches = [ match.lstrip('#').rstrip() for match in matches ]
     matches = [ match for match in matches if len(match)>0 ]
+
+    # First erase old cache data for this entry.
+    if timestamp in timestamp2tags:
+        del timestamp2tags[timestamp]
 
     # For each match, find out if it corresponds to a tag in tags_to_watch, if
     # it does then add the tag to the list of tags in the current entry. 
@@ -156,3 +166,9 @@ def get_details(timestamps):
 # Calculate chain length from tags_found.
 for tag, timestamps in tags_found.items():
     print(format_details(tag, *get_details(timestamps)))
+
+# Make a note of the current time.
+cache_shelf['last_scan'] = time()
+
+# Close the shelf at the end, syncing the changes. 
+cache_shelf.close()
