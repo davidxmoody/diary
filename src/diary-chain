@@ -98,7 +98,7 @@ def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
 
 for entry in get_entries(cache_shelf['last_scan']):
 
-    print(entry)
+    #print(entry)
     
     # Extract the timestamp.
     timestamp = extract_timestamp(entry)
