@@ -10,6 +10,7 @@ import datetime
 import time
 import argparse
 import re
+from subprocess import check_output
 
 # Load constants that have previously been sourced and exported in bash.
 # TODO: change this to use a better way to store and load them. 
@@ -28,12 +29,13 @@ def new_entry_filename(created_on=None, device_name=device_name):
     month = '{}-{}'.format(created_on.year, created_on.month)
     path = os.path.realpath(os.path.join(dir_entries, month, filename))
 
-    return path
+    return [path]
 
-
-# TODO
 def find_by_timestamp(timestamp):
-    pass
+    '''Finds any entries with the given timestamp.'''
+    command = 'find "{}" -iname "*-{}-*"'.format(dir_entries, timestamp)
+    results = check_output(command, shell=True, universal_newlines=True)
+    return [result for result in results.strip().split('\n') if len(result)>0]
 
 # TODO
 def changed_since(timestamp):
@@ -48,14 +50,11 @@ class RangeObject():
     range_re = re.compile(
         r'^(?P<start>[+-]?\d+)?:(?P<stop>[+-]?\d+)?(?::(?P<step>[+-]?\d+))?$')
 
-    def __init__(self, original_string):
-        self.original_string = original_string
-        
-        # Process original_string to get the correct range arguments.
-        match = self.range_re.match(original_string)
+    def __init__(self, string):
+        match = self.range_re.match(string)
         if not match: raise argparse.ArgumentTypeError('invalid range')
-        start, stop, step = match.groups()
 
+        start, stop, step = match.groups()
         start = None if start is None else int(start)
         stop = None if stop is None else int(stop)
         step = None if step is None else int(step)
@@ -75,23 +74,27 @@ class QueueAction(argparse.Action):
 parser = argparse.ArgumentParser(description='Get entry filenames.')
 
 parser.add_argument('-n', '--new', nargs='?', type=int, 
-                    dest='new', help='', 
+                    dest='new_entry_filename', help='', 
                     action=QueueAction, default=argparse.SUPPRESS)
 
-# TODO add custom type to check it is a correct range
 parser.add_argument('-r', '--range', type=RangeObject,
                     dest='range', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
                     
 parser.add_argument('-t', '--timestamp', type=int,
-                    dest='timestamp', help='',
+                    dest='find_by_timestamp', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
 
 args = parser.parse_args()
 
-print(args)
+filenames = []
 
 # Process tasks in the queue. 
 if hasattr(args, 'queue'):
     for func_name, value in args.queue:
-        print(func_name, value)
+        filenames.extend(globals()[func_name](value))
+
+# Print out all filenames in the order specified, separated by newlines to be
+# consistent with older version. 
+for filename in filenames:
+    print(filename)
