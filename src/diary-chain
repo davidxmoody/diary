@@ -37,6 +37,8 @@ import re
 from time import localtime, mktime, time
 import shelve
 
+# Make note of time now to avoid race conditions later. 
+script_init_time = time()
 
 # TODO make this settable from command line. 
 rebuild_cache = False
@@ -102,12 +104,8 @@ def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
     return all_entries.split('\n')[:-1]
 
 
-tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
-
 for entry in get_entries(cache_shelf['last_scan']):
 
-    #print(entry)
-    
     # Extract the timestamp.
     timestamp = extract_timestamp(entry)
 
@@ -134,10 +132,14 @@ for entry in get_entries(cache_shelf['last_scan']):
                     timestamp2tags[timestamp] = []
                 timestamp2tags[timestamp].append(tag_name)
 
+
 # Generate tags_found from timestamp2tags.
+tags_found = { tag_name: [] for tag_name, tag_re in tags_to_watch }
+
 for timestamp in sorted(timestamp2tags, reverse=True):
     for tag in timestamp2tags[timestamp]:
         tags_found[tag].append(timestamp)
+
 
 # Return a string presenting the tag and chain length to the user (with color).
 def format_details(tag, occurred_today, chain_length, *, no_color='\033[0m',
@@ -176,24 +178,21 @@ results = []
 for tag, timestamps in tags_found.items():
     results.append( (tag,) + get_details(timestamps) )
 
+# Sort by occurred_today status. Subsort by chain length.
 def sorter(details):
     position = 0
     if details[1]:
-        # Put lower in the list.
-        # TODO Find a better way to do this.
-        position += 1000
+        # Put lower in the list (this is a hack).
+        position += 1000000
     else:
         # Put higher in the list.
         pass
     position -= details[2]
     return position
 
-
-results = sorted(results, key=sorter)
-
-for result in results:
+for result in sorted(results, key=sorter):
     print(format_details(*result))
 
 # Update last_scan, close the shelf.
-cache_shelf['last_scan'] = time()
+cache_shelf['last_scan'] = script_init_time
 cache_shelf.close()
