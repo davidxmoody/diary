@@ -40,6 +40,7 @@ eval "diary-range()     { '$real_path/diary-range'         \"\$@\"; }"
 eval "diary-search()    { '$real_path/diary-search'        \"\$@\"; }"
 eval "diary-settings()  { '$real_path/diary-settings'      \"\$@\"; }"
 eval "diary-wordcount() { '$real_path/diary-wordcount'     \"\$@\"; }"
+eval "diary-chain()     { '$real_path/diary-chain'         \"\$@\"; }"
 
 eval "diary-pyrange() { '$real_path/diary-pyrange'     \"\$@\"; }"
 
@@ -52,8 +53,12 @@ export -f diary-range
 export -f diary-search
 export -f diary-settings
 export -f diary-wordcount
-
+export -f diary-chain
 export -f diary-pyrange
+
+export real_path
+export tags_file
+
 
 
 # Source the default settings file and then source the user's settings file. 
@@ -81,6 +86,7 @@ export dir_checklists="$dir_data/checklists"
 export dir_cache="$dir_diary/cache"
 export dir_wordcounts="$dir_cache/wordcounts"
 export dir_logs="$dir_data/logs"
+export dir_chain="$dir_cache/chain"
 
 # Export other relevant data.
 export device_name
@@ -107,6 +113,9 @@ command="$1"
 shift
 
 case "$command" in
+    chain)
+        diary-chain "$@"
+    ;;
     checklist)
         diary-checklist "$@"
     ;;
