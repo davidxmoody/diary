@@ -30,7 +30,7 @@ def new_entry_filename(created_on=None, device_name=device_name):
     return path
 
 def find_by_timestamp(timestamp):
-    
+    pass
 
 
 # TODO: function to get entries from entry(s) "descriptor".
