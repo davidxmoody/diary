@@ -9,6 +9,7 @@ import math
 import datetime
 import time
 import argparse
+import re
 
 # Load constants that have previously been sourced and exported in bash.
 # TODO: change this to use a better way to store and load them. 
@@ -29,14 +30,39 @@ def new_entry_filename(created_on=None, device_name=device_name):
 
     return path
 
+
+# TODO
 def find_by_timestamp(timestamp):
     pass
 
+# TODO
+def changed_since(timestamp):
+    pass
 
 # TODO: function to get entries from entry(s) "descriptor".
 
 # TODO: process all command line arguments, make compatible with previous 
 #       bash version of the script. 
+
+class RangeObject():
+    range_re = re.compile(
+        r'^(?P<start>[+-]?\d+)?:(?P<stop>[+-]?\d+)?(?::(?P<step>[+-]?\d+))?$')
+
+    def __init__(self, original_string):
+        self.original_string = original_string
+        
+        # Process original_string to get the correct range arguments.
+        match = self.range_re.match(original_string)
+        if not match: raise argparse.ArgumentTypeError('invalid range')
+        start, stop, step = match.groups()
+
+        start = None if start is None else int(start)
+        stop = None if stop is None else int(stop)
+        step = None if step is None else int(step)
+
+        self.slice = slice(start, stop, step)
+
+        
 
 
 class QueueAction(argparse.Action):
@@ -53,7 +79,7 @@ parser.add_argument('-n', '--new', nargs='?', type=int,
                     action=QueueAction, default=argparse.SUPPRESS)
 
 # TODO add custom type to check it is a correct range
-parser.add_argument('-r', '--range', 
+parser.add_argument('-r', '--range', type=RangeObject,
                     dest='range', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
                     
@@ -65,5 +91,7 @@ args = parser.parse_args()
 
 print(args)
 
-for func_name, value in args.queue:
-    print(func_name, value)
+# Process tasks in the queue. 
+if hasattr(args, 'queue'):
+    for func_name, value in args.queue:
+        print(func_name, value)
