@@ -12,6 +12,8 @@ import time
 import argparse
 import re
 from subprocess import check_output
+from itertools import islice
+import sys
 
 # Load constants that have previously been sourced and exported in bash.
 # TODO: change this to use a better way to store and load them. 
@@ -48,14 +50,34 @@ def walk_all_entries(reverse=False):
     for month in sorted(os.listdir(dir_entries), reverse=reverse):
         for filename in sorted(os.listdir(join(dir_entries, month)), 
                                reverse=reverse):
+            # TODO return just the tuple and join later
             yield realpath(join(dir_entries, month, filename))
 
 def range_of_entries(slice_args):
     '''Returns all entries in the given range.'''
-    # Note that this is not particularly efficient.
-    slice_object = slice(*slice_args)
-    all_entries = list(walk_all_entries())
-    return all_entries[slice_object]
+
+    start, stop, step = slice_args
+
+    # If start, stop and step are all positive (or None) then use islice.
+    if (step is None or step > 0) and \
+       (start is None or start >= 0) and \
+       (stop is None or stop >=0):
+        return islice(walk_all_entries(), start, stop, step)
+
+    # If start, stop and step are all negative (or None) then use islice.
+    elif (step is not None and step < 0) and \
+         (start is None or start < 0) and \
+         (stop is None or stop < 0):
+        start = None if start is None else -1*start
+        stop = None if stop is None else -1*stop
+        step = None if step is None else -1*step
+        return islice(walk_all_entries(reverse=True), start, stop, step)
+
+    # If there is a mixture of positives and negatives then use regular slice.
+    else:
+        return list(walk_all_entries())[start:stop:step]
+
+
 
 # TODO
 def single_entry(index):
