@@ -51,10 +51,12 @@ def walk_all_entries(reverse=False):
             #yield os.path.realpath(os.path.join(dir_entries, month, filename))
             yield os.path.join(dir_entries, month, filename)
 
-def range_of_entries(slice_object):
+def range_of_entries(slice_args):
     '''Returns all entries in the given range.'''
     # Note that this is not particularly efficient.
-    return list(walk_all_entries())[slice_object]
+    slice_object = slice(*slice_args)
+    all_entries = list(walk_all_entries())
+    return all_entries[slice_object]
 
 
 
@@ -63,17 +65,18 @@ def range_of_entries(slice_object):
 def single_entry(index):
     pass
 
+
 def range_type(string, range_re=re.compile(
-       r'^(?P<start>[+-]?\d+)?:(?P<stop>[+-]?\d+)?(?::(?P<step>[+-]?\d+))?$')):
+       r'^(?P<start>[+-_]?\d+)?:(?P<stop>[+-_]?\d+)?(?::(?P<step>[+-_]?\d+))?$')):
     match = range_re.match(string)
     if not match: raise argparse.ArgumentTypeError('invalid range')
     
     start, stop, step = match.groups()
-    start = None if start is None else int(start)
-    stop = None if stop is None else int(stop)
-    step = None if step is None else int(step)
+    start = None if start is None else int(start.replace('_', '-'))
+    stop = None if stop is None else int(stop.replace('_', '-'))
+    step = None if step is None else int(step.replace('_', '-'))
 
-    return slice(start, stop, step)
+    return (start, stop, step)
 
 
 class QueueAction(argparse.Action):
@@ -85,6 +88,8 @@ class QueueAction(argparse.Action):
 
 parser = argparse.ArgumentParser(description='Get entry filenames.')
 
+# TODO add help args
+
 parser.add_argument('-n', '--new', nargs='?', type=int, 
                     dest='new_entry_filename', help='', 
                     action=QueueAction, default=argparse.SUPPRESS)
@@ -92,6 +97,10 @@ parser.add_argument('-n', '--new', nargs='?', type=int,
 parser.add_argument('-r', '--range', type=range_type,
                     dest='range_of_entries', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
+
+#parser.add_argument('--step-range', type=int, nargs=3,
+#                    dest='range_of_entries', help='',
+#                    action=QueueAction, default=argparse.SUPPRESS)
                     
 parser.add_argument('-t', '--timestamp', type=int,
                     dest='find_by_timestamp', help='',
@@ -110,7 +119,6 @@ if hasattr(args, 'queue'):
     for func_name, value in args.queue:
         filenames.extend(globals()[func_name](value))
 
-# Print out all filenames in the order specified, separated by newlines to be
-# consistent with older version. 
+# Print out all filenames in the order specified, separated by newlines.
 for filename in filenames:
     print(filename)
