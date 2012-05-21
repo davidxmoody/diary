@@ -25,7 +25,6 @@ def new_entry_filename(timestamp=None, device_name=device_name):
     
     Note that the directory structure may not exist.'''
 
-    # Timestamps can be negative, does this matter?
     timestamp = int(time.time()) if timestamp is None else int(timestamp)
     month = time.strftime('%Y-%m', time.localtime(timestamp))
     filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
@@ -34,7 +33,6 @@ def new_entry_filename(timestamp=None, device_name=device_name):
 
 def find_by_timestamp(timestamp):
     '''Returns any entries with the given timestamp.'''
-    # Could speed up if the timestamp was used to get the month dir first.
     command = 'find "{}" -iname "*-{}-*"'.format(dir_entries, timestamp)
     results = check_output(command, shell=True, universal_newlines=True)
     return [result for result in results.strip().split('\n') if len(result)>0]
@@ -50,7 +48,6 @@ def walk_all_entries(reverse=False):
     for month in sorted(os.listdir(dir_entries), reverse=reverse):
         for filename in sorted(os.listdir(join(dir_entries, month)), 
                                reverse=reverse):
-            # TODO return just the tuple and join later
             yield realpath(join(dir_entries, month, filename))
 
 def range_of_entries(slice_args):
@@ -77,11 +74,12 @@ def range_of_entries(slice_args):
     else:
         return list(walk_all_entries())[start:stop:step]
 
-
-
-# TODO
 def single_entry(index):
-    pass
+    '''Return a single entry at the given index.'''
+    if index >= 0:
+        return range_of_entries((index, index+1, 1))
+    else:
+        return range_of_entries((None if index==-1 else index+1, index, -1))
 
 
 def range_type(string, range_re=re.compile(
@@ -113,6 +111,10 @@ parser.add_argument('-n', '--new', nargs='?', type=int,
 
 parser.add_argument('-r', '--range', type=range_type,
                     dest='range_of_entries', help='',
+                    action=QueueAction, default=argparse.SUPPRESS)
+                    
+parser.add_argument('-i', '--index', type=int,
+                    dest='single_entry', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
                     
 parser.add_argument('-t', '--timestamp', type=int,
