@@ -3,7 +3,7 @@
 # or a single timestamp used as the timestamp for the new entry.
 
 # Get the file path for a new entry.
-entry_filename=$(diary-range --new "$1")
+entry_filename=$(diary-range --new $1)
 
 # Create directory(s) if necessary.
 entry_directory="${entry_filename%/*}"

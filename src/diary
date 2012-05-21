@@ -36,7 +36,6 @@ eval "diary-edit()      { '$real_path/diary-edit'          \"\$@\"; }"
 eval "diary-format()    { '$real_path/diary-format'        \"\$@\"; }"
 eval "diary-list()      { '$real_path/diary-search' --list \"\$@\"; }"
 eval "diary-new-entry() { '$real_path/diary-new-entry'     \"\$@\"; }"
-eval "diary-pyrange()   { '$real_path/diary-pyrange'       \"\$@\"; }"
 eval "diary-range()     { '$real_path/diary-range'         \"\$@\"; }"
 eval "diary-search()    { '$real_path/diary-search'        \"\$@\"; }"
 eval "diary-wordcount() { '$real_path/diary-wordcount'     \"\$@\"; }"
@@ -46,7 +45,6 @@ export -f diary-edit
 export -f diary-format
 export -f diary-list
 export -f diary-new-entry
-export -f diary-pyrange
 export -f diary-range
 export -f diary-search
 export -f diary-wordcount
@@ -124,9 +122,6 @@ case "$command" in
     ;;
     new-entry | new)
         diary-new-entry "$@" 
-    ;;
-    pyrange)
-        diary-pyrange "$@"
     ;;
     range)
         diary-range "$@"

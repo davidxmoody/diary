@@ -4,7 +4,7 @@
 # If no arguments then use the last entry, otherwise use the given arguments 
 # as arguments to diary-range and edit the first entry that it returns.
 if [[ "$#" == 0 ]]; then 
-    entry=$(diary-range '--range=-1::-1')
+    entry=$(diary-range '--range=-1:')
 else
     entry=$(diary-range "$@" | head -q --lines=1)
 fi

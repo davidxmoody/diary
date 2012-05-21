@@ -25,5 +25,5 @@ end_colour="\e[0m"
 
 # Default search paramaters.
 search_print_entries=
-search_default_range="-500::-1"
+search_default_range=":-500:-1"
 search_default_max_matches=40
