@@ -31,34 +31,28 @@ usage_and_exit() {
 real_path=$(readlink -f $0)
 real_path=${real_path%/*}
 
-eval "diary-checklist() { '$real_path/diary-checklist'     \"\$@\"; }"
+eval "diary-chain()     { '$real_path/diary-chain'         \"\$@\"; }"
 eval "diary-edit()      { '$real_path/diary-edit'          \"\$@\"; }"
 eval "diary-format()    { '$real_path/diary-format'        \"\$@\"; }"
 eval "diary-list()      { '$real_path/diary-search' --list \"\$@\"; }"
 eval "diary-new-entry() { '$real_path/diary-new-entry'     \"\$@\"; }"
+eval "diary-pyrange()   { '$real_path/diary-pyrange'       \"\$@\"; }"
 eval "diary-range()     { '$real_path/diary-range'         \"\$@\"; }"
 eval "diary-search()    { '$real_path/diary-search'        \"\$@\"; }"
-eval "diary-settings()  { '$real_path/diary-settings'      \"\$@\"; }"
 eval "diary-wordcount() { '$real_path/diary-wordcount'     \"\$@\"; }"
-eval "diary-chain()     { '$real_path/diary-chain'         \"\$@\"; }"
 
-eval "diary-pyrange() { '$real_path/diary-pyrange'     \"\$@\"; }"
-
-export -f diary-checklist
+export -f diary-chain
 export -f diary-edit
 export -f diary-format
 export -f diary-list
 export -f diary-new-entry
+export -f diary-pyrange
 export -f diary-range
 export -f diary-search
-export -f diary-settings
 export -f diary-wordcount
-export -f diary-chain
-export -f diary-pyrange
 
 export real_path
 export tags_file
-
 
 
 # Source the default settings file and then source the user's settings file. 
@@ -116,9 +110,6 @@ case "$command" in
     chain)
         diary-chain "$@"
     ;;
-    checklist)
-        diary-checklist "$@"
-    ;;
     edit)
         diary-edit "$@" 
     ;;
@@ -142,9 +133,6 @@ case "$command" in
     ;;
     search)
         diary-search "$@" 
-    ;;
-    settings)
-        diary-settings "$@"
     ;;
     --version)
         echo "No version number is currently available."
