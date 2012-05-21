@@ -57,9 +57,6 @@ def range_of_entries(slice_args):
     all_entries = list(walk_all_entries())
     return all_entries[slice_object]
 
-
-
-
 # TODO
 def single_entry(index):
     pass
@@ -77,7 +74,6 @@ def range_type(string, range_re=re.compile(
 
     return (start, stop, step)
 
-
 class QueueAction(argparse.Action):
     '''Appends (dest, arguments) pairs to 'queue' in the returned Namespace.'''
     def __call__(self, parser, namespace, value, option_string=None):
@@ -87,7 +83,7 @@ class QueueAction(argparse.Action):
 
 parser = argparse.ArgumentParser(description='Get entry filenames.')
 
-# TODO add help args
+# TODO add help and metavar arguments.
 
 parser.add_argument('-n', '--new', nargs='?', type=int, 
                     dest='new_entry_filename', help='', 
@@ -96,10 +92,6 @@ parser.add_argument('-n', '--new', nargs='?', type=int,
 parser.add_argument('-r', '--range', type=range_type,
                     dest='range_of_entries', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
-
-#parser.add_argument('--step-range', type=int, nargs=3,
-#                    dest='range_of_entries', help='',
-#                    action=QueueAction, default=argparse.SUPPRESS)
                     
 parser.add_argument('-t', '--timestamp', type=int,
                     dest='find_by_timestamp', help='',
