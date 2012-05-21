@@ -5,6 +5,7 @@
 # ranges of entries, single entries and new entries (with a given date). 
 
 import os
+from os.path import realpath, join
 import math
 import datetime
 import time
@@ -17,22 +18,21 @@ from subprocess import check_output
 dir_entries = os.environ['dir_entries']
 device_name = os.environ['device_name']
 
-def new_entry_filename(created_on=None, device_name=device_name):
+def new_entry_filename(timestamp=None, device_name=device_name):
     '''Return the full path of a new (not currently existing) entry.
     
     Note that the directory structure may not exist.'''
 
-    if created_on==None: created_on = datetime.datetime.now()
-    timestamp = int(math.floor(time.mktime(created_on.timetuple())))
-
+    # Timestamps can be negative, does this matter?
+    timestamp = int(time.time()) if timestamp is None else int(timestamp)
+    month = time.strftime('%Y-%m', time.localtime(timestamp))
     filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
-    month = '{}-{}'.format(created_on.year, created_on.month)
-    path = os.path.realpath(os.path.join(dir_entries, month, filename))
 
-    return [path]
+    return [realpath(join(dir_entries, month, filename))]
 
 def find_by_timestamp(timestamp):
     '''Returns any entries with the given timestamp.'''
+    # Could speed up if the timestamp was used to get the month dir first.
     command = 'find "{}" -iname "*-{}-*"'.format(dir_entries, timestamp)
     results = check_output(command, shell=True, universal_newlines=True)
     return [result for result in results.strip().split('\n') if len(result)>0]
@@ -46,10 +46,9 @@ def modified_since(timestamp=0):
 def walk_all_entries(reverse=False):
     '''Iterates over all entries.'''
     for month in sorted(os.listdir(dir_entries), reverse=reverse):
-        for filename in sorted(os.listdir(os.path.join(dir_entries, month)), 
+        for filename in sorted(os.listdir(join(dir_entries, month)), 
                                reverse=reverse):
-            #yield os.path.realpath(os.path.join(dir_entries, month, filename))
-            yield os.path.join(dir_entries, month, filename)
+            yield realpath(join(dir_entries, month, filename))
 
 def range_of_entries(slice_args):
     '''Returns all entries in the given range.'''
