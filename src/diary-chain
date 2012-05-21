@@ -98,6 +98,7 @@ def same_day(*dates):
     return YD_pairs.count(YD_pairs[0]) == len(YD_pairs)
 
 # Get all entries modified since last_scan.
+# TODO use the equivalent code in diary-pyrange
 def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
     command = 'find "{}" -type f -newermt @{}'.format(dir_entries, last_scan)
     all_entries = check_output(command, shell=True, universal_newlines=True)
