@@ -32,37 +32,48 @@ def new_entry_filename(created_on=None, device_name=device_name):
     return [path]
 
 def find_by_timestamp(timestamp):
-    '''Finds any entries with the given timestamp.'''
+    '''Returns any entries with the given timestamp.'''
     command = 'find "{}" -iname "*-{}-*"'.format(dir_entries, timestamp)
     results = check_output(command, shell=True, universal_newlines=True)
     return [result for result in results.strip().split('\n') if len(result)>0]
 
 def modified_since(timestamp=0):
+    '''Returns all entries last modified after the given timestamp.'''
     command = 'find "{}" -type f -newermt @{}'.format(dir_entries, timestamp)
     all_entries = check_output(command, shell=True, universal_newlines=True)
     return all_entries.split('\n')[:-1]
 
-# TODO: function to get entries from entry(s) "descriptor".
+def walk_all_entries(reverse=False):
+    '''Iterates over all entries.'''
+    for month in sorted(os.listdir(dir_entries), reverse=reverse):
+        for filename in sorted(os.listdir(os.path.join(dir_entries, month)), 
+                               reverse=reverse):
+            #yield os.path.realpath(os.path.join(dir_entries, month, filename))
+            yield os.path.join(dir_entries, month, filename)
 
-# TODO: process all command line arguments, make compatible with previous 
-#       bash version of the script. 
+def range_of_entries(slice_object):
+    '''Returns all entries in the given range.'''
+    # Note that this is not particularly efficient.
+    return list(walk_all_entries())[slice_object]
 
-class RangeObject():
-    range_re = re.compile(
-        r'^(?P<start>[+-]?\d+)?:(?P<stop>[+-]?\d+)?(?::(?P<step>[+-]?\d+))?$')
 
-    def __init__(self, string):
-        match = self.range_re.match(string)
-        if not match: raise argparse.ArgumentTypeError('invalid range')
 
-        start, stop, step = match.groups()
-        start = None if start is None else int(start)
-        stop = None if stop is None else int(stop)
-        step = None if step is None else int(step)
 
-        self.slice = slice(start, stop, step)
+# TODO
+def single_entry(index):
+    pass
 
-        
+def range_type(string, range_re=re.compile(
+       r'^(?P<start>[+-]?\d+)?:(?P<stop>[+-]?\d+)?(?::(?P<step>[+-]?\d+))?$')):
+    match = range_re.match(string)
+    if not match: raise argparse.ArgumentTypeError('invalid range')
+    
+    start, stop, step = match.groups()
+    start = None if start is None else int(start)
+    stop = None if stop is None else int(stop)
+    step = None if step is None else int(step)
+
+    return slice(start, stop, step)
 
 
 class QueueAction(argparse.Action):
@@ -78,8 +89,8 @@ parser.add_argument('-n', '--new', nargs='?', type=int,
                     dest='new_entry_filename', help='', 
                     action=QueueAction, default=argparse.SUPPRESS)
 
-parser.add_argument('-r', '--range', type=RangeObject,
-                    dest='range', help='',
+parser.add_argument('-r', '--range', type=range_type,
+                    dest='range_of_entries', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
                     
 parser.add_argument('-t', '--timestamp', type=int,
