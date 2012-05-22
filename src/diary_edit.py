@@ -6,7 +6,9 @@ import sys
 from subprocess import call
 import diary_range
 
-def edit_entry(filename, editor=os.environ['diary_edit_default_editor']):
+def edit_entry(filename, 
+               editor_existing=os.environ['diary_edit_default_editor'],
+               editor_new=os.environ['diary_new_entry_default_editor']):
     '''Execute editor on filename.
     
     Also creates the required directory structure if it does not exist.'''
@@ -14,6 +16,8 @@ def edit_entry(filename, editor=os.environ['diary_edit_default_editor']):
     directory = os.path.dirname(filename)
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+    editor = editor_existing if os.path.exists(filename) else editor_new
 
     call('{} "{}"'.format(editor, filename), shell=True)
 
