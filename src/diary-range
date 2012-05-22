@@ -11,7 +11,7 @@ import datetime
 import time
 import argparse
 import re
-from subprocess import check_output
+from subprocess import check_output, call
 from itertools import islice
 import sys
 
@@ -81,6 +81,20 @@ def single_entry(index):
     else:
         return range_of_entries((None if index==-1 else index+1, index, -1))
 
+def filter_entries(search_string, entries=None):
+    '''Filter entries by presence of the (regular expression) search string.
+
+    If entries is None then search all entries in reverse order.'''
+
+    if entries is None: entries = walk_all_entries(reverse=True)
+
+    for entry in entries:
+        # If entry contains search_string then yield entry, otherwise skip.
+        command = 'grep -qi "{}" "{}"'.format(search_string, entry)
+        return_code = call(command, shell=True)
+        if return_code == 0:
+            yield entry
+
 
 def range_type(string, range_re=re.compile(
        r'^(?P<start>[+-_]?\d+)?:(?P<stop>[+-_]?\d+)?(?::(?P<step>[+-_]?\d+))?$')):
@@ -123,6 +137,10 @@ parser.add_argument('-t', '--timestamp', type=int,
 
 parser.add_argument('-m', '--modified', type=int,
                     dest='modified_since', help='',
+                    action=QueueAction, default=argparse.SUPPRESS)
+
+parser.add_argument('-s', '--search', type=str,
+                    dest='filter_entries', help='',
                     action=QueueAction, default=argparse.SUPPRESS)
 
 args = parser.parse_args()
