@@ -7,8 +7,16 @@ from subprocess import call
 import diary_range
 
 def edit_entry(filename, editor=os.environ['diary_edit_default_editor']):
-    '''Execute editor on filename.'''
+    '''Execute editor on filename.
+    
+    Also creates the required directory structure if it does not exist.'''
+
+    directory = os.path.dirname(filename)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
     call('{} "{}"'.format(editor, filename), shell=True)
+
 
 if len(sys.argv) <= 1:
     # Edit last entry.
