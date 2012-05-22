@@ -31,7 +31,7 @@ usage_and_exit() {
 real_path=$(readlink -f $0)
 real_path=${real_path%/*}
 
-eval "diary-chain()     { '$real_path/diary-chain'         \"\$@\"; }"
+eval "diary-chain()     { '$real_path/diary_chain.py'      \"\$@\"; }"
 eval "diary-edit()      { '$real_path/diary_edit.py'       \"\$@\"; }"
 eval "diary-format()    { '$real_path/diary-format'        \"\$@\"; }"
 eval "diary-list()      { '$real_path/diary-search' --list \"\$@\"; }"
