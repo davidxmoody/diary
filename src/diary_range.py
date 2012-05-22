@@ -96,64 +96,64 @@ def filter_entries(search_string, entries=None):
             yield entry
 
 
-if __name__ == '__main__':
+def range_type(string, range_re=re.compile(
+        r'^(?P<start>[+-_]?\d+)?:(?P<stop>[+-_]?\d+)?(?::(?P<step>[+-_]?\d+))?$')):
+    '''Returns (start, stop, step) for the given slice.'''
+    match = range_re.match(string)
+    if not match: raise argparse.ArgumentTypeError('invalid range')
+    
+    start, stop, step = match.groups()
+    start = None if start is None else int(start.replace('_', '-'))
+    stop = None if stop is None else int(stop.replace('_', '-'))
+    step = None if step is None else int(step.replace('_', '-'))
 
-    def range_type(string, range_re=re.compile(
-            r'^(?P<start>[+-_]?\d+)?:(?P<stop>[+-_]?\d+)?(?::(?P<step>[+-_]?\d+))?$')):
-        '''Returns (start, stop, step) for the given slice.'''
-        match = range_re.match(string)
-        if not match: raise argparse.ArgumentTypeError('invalid range')
-        
-        start, stop, step = match.groups()
-        start = None if start is None else int(start.replace('_', '-'))
-        stop = None if stop is None else int(stop.replace('_', '-'))
-        step = None if step is None else int(step.replace('_', '-'))
+    return (start, stop, step)
 
-        return (start, stop, step)
-
-    class QueueAction(argparse.Action):
-        '''Appends (dest, args) pairs to 'queue' in the returned Namespace.'''
-        def __call__(self, parser, namespace, value, option_string=None):
-            if not hasattr(namespace, 'queue'): 
-                namespace.queue = []
-            namespace.queue.append( (self.dest, value) )
+class QueueAction(argparse.Action):
+    '''Appends (dest, args) pairs to 'queue' in the returned Namespace.'''
+    def __call__(self, parser, namespace, value, option_string=None):
+        if not hasattr(namespace, 'queue'): 
+            namespace.queue = []
+        namespace.queue.append( (self.dest, value) )
 
 
-    parser = argparse.ArgumentParser(
-        description='Get entry filenames.')
+parser = argparse.ArgumentParser(description='Get entry filenames.')
 
-    parser.add_argument('-n', '--new', nargs='?', type=int, 
-                        dest='new_entry_filename', metavar='NEW',
-                        help='new entry with given timestamp', 
-                        action=QueueAction, default=argparse.SUPPRESS)
+parser.add_argument('-n', '--new', nargs='?', type=int, 
+                    dest='new_entry_filename', metavar='NEW',
+                    help='new entry with given timestamp', 
+                    action=QueueAction, default=argparse.SUPPRESS)
 
-    parser.add_argument('-r', '--range', type=range_type,
-                        dest='range_of_entries', metavar='SLICE',
-                        help='range of entries',
-                        action=QueueAction, default=argparse.SUPPRESS)
-                        
-    parser.add_argument('-i', '--index', type=int,
-                        dest='single_entry', metavar='INDEX',
-                        help='single entry at INDEX',
-                        action=QueueAction, default=argparse.SUPPRESS)
-                        
-    parser.add_argument('-t', '--timestamp', type=int,
-                        dest='find_by_timestamp', metavar='TIMESTAMP',
-                        help='all entries created on TIMESTAMP',
-                        action=QueueAction, default=argparse.SUPPRESS)
+parser.add_argument('-r', '--range', type=range_type,
+                    dest='range_of_entries', metavar='SLICE',
+                    help='range of entries',
+                    action=QueueAction, default=argparse.SUPPRESS)
+                    
+parser.add_argument('-i', '--index', type=int,
+                    dest='single_entry', metavar='INDEX',
+                    help='single entry at INDEX',
+                    action=QueueAction, default=argparse.SUPPRESS)
+                    
+parser.add_argument('-t', '--timestamp', type=int,
+                    dest='find_by_timestamp', metavar='TIMESTAMP',
+                    help='all entries created on TIMESTAMP',
+                    action=QueueAction, default=argparse.SUPPRESS)
 
-    parser.add_argument('-m', '--modified', type=int,
-                        dest='modified_since', metavar='MODIFIED',
-                        help='all entries modified since MODIFIED',
-                        action=QueueAction, default=argparse.SUPPRESS)
+parser.add_argument('-m', '--modified', type=int,
+                    dest='modified_since', metavar='MODIFIED',
+                    help='all entries modified since MODIFIED',
+                    action=QueueAction, default=argparse.SUPPRESS)
 
-    parser.add_argument('-s', '--search', type=str,
-                        dest='filter_entries', metavar='SEARCH',
-                        help='all entries containing SEARCH',
-                        action=QueueAction, default=argparse.SUPPRESS)
+parser.add_argument('-s', '--search', type=str,
+                    dest='filter_entries', metavar='SEARCH',
+                    help='all entries containing SEARCH',
+                    action=QueueAction, default=argparse.SUPPRESS)
+
+
+def process_args(function):
+    '''Process command line arguments and execute function on all results.'''
 
     args = parser.parse_args()
-
     filenames = []
 
     # Process tasks in the queue. 
@@ -163,4 +163,8 @@ if __name__ == '__main__':
 
     # Print out all filenames in the order specified, separated by newlines.
     for filename in filenames:
-        print(filename)
+        function(filename)
+
+# If running as script then print all entries. 
+if __name__ == '__main__':
+    process_args(print)

@@ -32,7 +32,7 @@ real_path=$(readlink -f $0)
 real_path=${real_path%/*}
 
 eval "diary-chain()     { '$real_path/diary-chain'         \"\$@\"; }"
-eval "diary-edit()      { '$real_path/diary-edit'          \"\$@\"; }"
+eval "diary-edit()      { '$real_path/diary_edit.py'       \"\$@\"; }"
 eval "diary-format()    { '$real_path/diary-format'        \"\$@\"; }"
 eval "diary-list()      { '$real_path/diary-search' --list \"\$@\"; }"
 eval "diary-new-entry() { '$real_path/diary-new-entry'     \"\$@\"; }"
