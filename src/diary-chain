@@ -36,6 +36,7 @@ import os
 import re
 from time import localtime, mktime, time
 import shelve
+from diary_range import modified_since
 
 # Make note of time now to avoid race conditions later. 
 script_init_time = time()
@@ -97,15 +98,8 @@ def same_day(*dates):
     YD_pairs = [ (date.tm_year, date.tm_yday) for date in dates ]
     return YD_pairs.count(YD_pairs[0]) == len(YD_pairs)
 
-# Get all entries modified since last_scan.
-# TODO use the equivalent code in diary-pyrange
-def get_entries(last_scan=0, dir_entries=os.environ['dir_entries']):
-    command = 'find "{}" -type f -newermt @{}'.format(dir_entries, last_scan)
-    all_entries = check_output(command, shell=True, universal_newlines=True)
-    return all_entries.split('\n')[:-1]
 
-
-for entry in get_entries(cache_shelf['last_scan']):
+for entry in modified_since(cache_shelf['last_scan']):
 
     # Extract the timestamp.
     timestamp = extract_timestamp(entry)
