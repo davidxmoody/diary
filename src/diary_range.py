@@ -15,13 +15,36 @@ from subprocess import check_output, call
 from itertools import islice
 import sys
 
+class Entry():
+    '''Encapsulates entry manipulation functionality.'''
+
+    def __init__(self, *path_components):
+        self.pathname = realpath(join(*path_components))
+
+    def mkdir(self):
+        '''Create the entry's base directory (if it does not exist).'''
+        directory = os.path.dirname(self.pathname)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    def exists(self):
+        '''Return True if the entry exists.'''
+        return os.path.exists(self.pathname)
+
+    def contains(self, search_string):
+        '''Return True if the entry contains the given search string.'''
+        command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
+        return call(command, shell=True) == 0
+
+
 # Load constants that have previously been sourced and exported in bash.
 # TODO: change this to use a better way to store and load them. 
 dir_entries = os.environ['dir_entries']
 device_name = os.environ['device_name']
 
-def new_entry_filename(timestamp=None, device_name=device_name):
-    '''Return the full path of a new (not currently existing) entry.
+# TODO move this to the Entry class definition. 
+def new_entry(timestamp=None, device_name=device_name):
+    '''Return a new (not currently existing) entry.
     
     Note that the directory structure may not exist.'''
 
@@ -29,26 +52,28 @@ def new_entry_filename(timestamp=None, device_name=device_name):
     month = time.strftime('%Y-%m', time.localtime(timestamp))
     filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
 
-    return [realpath(join(dir_entries, month, filename))]
+    return [Entry(dir_entries, month, filename)]
+
+def _find_with_command(command):
+    results = check_output(command, shell=True, universal_newlines=True)
+    return [ Entry(result) for result in results.split('\n') if len(result)>0 ]
 
 def find_by_timestamp(timestamp):
     '''Returns any entries with the given timestamp.'''
     command = 'find "{}" -iname "*-{}-*"'.format(dir_entries, timestamp)
-    results = check_output(command, shell=True, universal_newlines=True)
-    return [result for result in results.strip().split('\n') if len(result)>0]
+    return _find_with_command(command)
 
 def modified_since(timestamp=0):
     '''Returns all entries last modified after the given timestamp.'''
     command = 'find "{}" -type f -newermt @{}'.format(dir_entries, timestamp)
-    all_entries = check_output(command, shell=True, universal_newlines=True)
-    return all_entries.split('\n')[:-1]
+    return _find_with_command(command)
 
 def walk_all_entries(reverse=False):
     '''Iterates over all entries.'''
     for month in sorted(os.listdir(dir_entries), reverse=reverse):
         for filename in sorted(os.listdir(join(dir_entries, month)), 
                                reverse=reverse):
-            yield realpath(join(dir_entries, month, filename))
+            yield Entry(dir_entries, month, filename)
 
 def range_of_entries(slice_args):
     '''Returns all entries in the given range.'''
@@ -86,21 +111,21 @@ def filter_entries(search_string, entries=None):
 
     If entries is None then search all entries in reverse order.'''
 
-    if entries is None: entries = walk_all_entries(reverse=True)
+    if entries is None: 
+        entries = walk_all_entries(reverse=True)
 
     for entry in entries:
-        # If entry contains search_string then yield entry, otherwise skip.
-        command = 'grep -qi "{}" "{}"'.format(search_string, entry)
-        return_code = call(command, shell=True)
-        if return_code == 0:
+        if entry.contains(search_string):
             yield entry
 
 
 def range_type(string, range_re=re.compile(
-        r'^(?P<start>[+-_]?\d+)?:(?P<stop>[+-_]?\d+)?(?::(?P<step>[+-_]?\d+))?$')):
+            r'^([+_-]?[0-9]+)?:([+_-]?[0-9]+)?(?::([+_-]?[0-9]+))?$')):
+
     '''Returns (start, stop, step) for the given slice.'''
     match = range_re.match(string)
-    if not match: raise argparse.ArgumentTypeError('invalid range')
+    if not match: 
+        raise argparse.ArgumentTypeError('invalid range')
     
     start, stop, step = match.groups()
     start = None if start is None else int(start.replace('_', '-'))
@@ -120,7 +145,7 @@ class QueueAction(argparse.Action):
 parser = argparse.ArgumentParser(description='Get entry filenames.')
 
 parser.add_argument('-n', '--new', nargs='?', type=int, 
-                    dest='new_entry_filename', metavar='NEW',
+                    dest='new_entry', metavar='NEW',
                     help='new entry with given timestamp', 
                     action=QueueAction, default=argparse.SUPPRESS)
 
@@ -150,21 +175,19 @@ parser.add_argument('-s', '--search', type=str,
                     action=QueueAction, default=argparse.SUPPRESS)
 
 
-def process_args(function):
-    '''Process command line arguments and execute function on all results.'''
+def process_args():
+    '''Return a list of all entries specified by the command line args.'''
 
     args = parser.parse_args()
-    filenames = []
 
-    # Process tasks in the queue. 
     if hasattr(args, 'queue'):
         for func_name, value in args.queue:
-            filenames.extend(globals()[func_name](value))
+            for entry in globals()[func_name](value):
+                yield entry
 
-    # Print out all filenames in the order specified, separated by newlines.
-    for filename in filenames:
-        function(filename)
 
-# If running as script then print all entries. 
+# If running as script then print the filenames of all entries. 
 if __name__ == '__main__':
-    process_args(print)
+
+    for entry in process_args():
+        print(entry.pathname)
