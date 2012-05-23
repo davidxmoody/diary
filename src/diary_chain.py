@@ -88,11 +88,6 @@ if rebuild_cache or 'last_scan' not in cache_shelf:
 
 
 
-# Given a filename of the format '/some/path/diary-XXXXXXXXXX-device-name.txt', 
-# return the timestamp (XXXXXXXXXX).
-def extract_timestamp(filename, timestamp_re=re.compile(r'.*diary-(\d+)-.*')):
-    return timestamp_re.match(filename).group(1)
-
 # Calculate whether or not the given struct_time objects occur on the same day.
 def same_day(*dates):
     YD_pairs = [ (date.tm_year, date.tm_yday) for date in dates ]
@@ -101,31 +96,18 @@ def same_day(*dates):
 
 for entry in modified_since(cache_shelf['last_scan']):
 
-    # Extract the timestamp.
-    timestamp = extract_timestamp(entry)
-
-    # Search for all tags within each entry. 
-    # TODO do this in python.
-    command = r'grep -o "#\S\+\b" "{}" || true'.format(entry)
-    matches = check_output(command, shell=True, universal_newlines=True)
-
-    # Clean up output.
-    matches = matches.split('\n')
-    matches = [ match.lstrip('#').rstrip() for match in matches ]
-    matches = [ match for match in matches if len(match)>0 ]
-
     # First erase old cache data for this entry.
-    if timestamp in timestamp2tags:
-        del timestamp2tags[timestamp]
+    if entry.timestamp in timestamp2tags:
+        del timestamp2tags[entry.timestamp]
 
     # For each match, find out if it corresponds to a tag in tags_to_watch, if
     # it does then add the tag to the list of tags in the current entry. 
-    for match in matches:
+    for tag in entry.tags():
         for tag_name, tag_re in tags_to_watch:
-            if tag_re.match(match):
-                if timestamp not in timestamp2tags:
-                    timestamp2tags[timestamp] = []
-                timestamp2tags[timestamp].append(tag_name)
+            if tag_re.match(tag):
+                if entry.timestamp not in timestamp2tags:
+                    timestamp2tags[entry.timestamp] = []
+                timestamp2tags[entry.timestamp].append(tag_name)
 
 
 # Generate tags_found from timestamp2tags.

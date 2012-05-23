@@ -5,7 +5,7 @@
 # ranges of entries, single entries and new entries (with a given date). 
 
 import os
-from os.path import realpath, join
+from os.path import realpath, join, basename, dirname, exists
 import math
 import datetime
 import time
@@ -14,27 +14,55 @@ import re
 from subprocess import check_output, call
 from itertools import islice
 import sys
+import shelve
 
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
 
+    _filename_re = re.compile(
+            r'^diary-(-?[0-9]+)-([a-zA-Z0-9_][a-zA-Z0-9_-]*)\.([a-z]+)$')
+
     def __init__(self, *path_components):
         self.pathname = realpath(join(*path_components))
+        match = Entry._filename_re.match(basename(self.pathname))
+        self.timestamp, self.device_name, self.extension = match.groups()
 
     def mkdir(self):
         '''Create the entry's base directory (if it does not exist).'''
-        directory = os.path.dirname(self.pathname)
-        if not os.path.exists(directory):
+        directory = dirname(self.pathname)
+        if not exists(directory):
             os.makedirs(directory)
 
     def exists(self):
         '''Return True if the entry exists.'''
-        return os.path.exists(self.pathname)
+        return exists(self.pathname)
 
     def contains(self, search_string):
         '''Return True if the entry contains the given search string.'''
         command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
         return call(command, shell=True) == 0
+
+    def tags(self):
+        '''Return a list of all tags occurring in the entry text.'''
+        # TODO add caching, maybe have a subclass, make subclass check every 
+        # time it accesses any data that the cache hasn't changed. 
+
+        command = r'grep -o "#\S\+\b" "{}" || true'.format(self.pathname)
+        matches = check_output(command, shell=True, universal_newlines=True)
+
+        matches = matches.split('\n')
+        matches = [ match.lstrip('#').rstrip() for match in matches ]
+        matches = [ match for match in matches if len(match)>0 ]
+
+        return matches
+
+
+class CachedEntry(Entry):
+    '''An Entry that will cache commonly accessed attributes.'''
+    def tags(self):
+        # TODO check cache
+        return super().tags()
+
 
 
 # Load constants that have previously been sourced and exported in bash.
