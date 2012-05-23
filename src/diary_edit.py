@@ -6,20 +6,18 @@ import sys
 from subprocess import call
 import diary_range
 
-def edit_entry(filename, 
+def edit_entry(entry, 
                editor_existing=os.environ['diary_edit_default_editor'],
                editor_new=os.environ['diary_new_entry_default_editor']):
     '''Execute editor on filename.
     
     Also creates the required directory structure if it does not exist.'''
 
-    directory = os.path.dirname(filename)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    entry.mkdir()
 
-    editor = editor_existing if os.path.exists(filename) else editor_new
+    editor = editor_existing if entry.exists() else editor_new
 
-    call('{} "{}"'.format(editor, filename), shell=True)
+    call('{} "{}"'.format(editor, entry.pathname), shell=True)
 
 
 if len(sys.argv) <= 1:
@@ -27,4 +25,6 @@ if len(sys.argv) <= 1:
     edit_entry(*diary_range.single_entry(-1))
 else:
     # Edit all entries specified with args.
-    diary_range.process_args(edit_entry)
+    # TODO add delay/the ability to cancel editing multiple entries.
+    for entry in diary_range.process_args():
+        edit_entry(entry)
