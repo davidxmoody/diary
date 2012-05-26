@@ -5,7 +5,7 @@
 # ranges of entries, single entries and new entries (with a given date). 
 
 import os
-from os.path import realpath, join, basename, dirname, exists
+from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 import math
 import datetime
 import time
@@ -15,6 +15,35 @@ from subprocess import check_output, call
 from itertools import islice
 import sys
 import shelve
+
+# Open cache shelf.
+cache_path = os.environ['dir_entries_cache']
+if not exists(cache_path):
+    os.makedirs(cache_path)
+cache_shelf = shelve.open(cache_path + '/range-cache', writeback=False)
+
+class CachedEntry():
+    '''Namespace for storing cached entry attributes.'''
+    def __init__(self, entry):
+        self.mtime = entry.getmtime()
+
+def cached(func):
+    '''Cache the results of a function, recalculate when cache is outdated.'''
+
+    def wrapper(self):
+        cached_entry = cache_shelf.get(self.timestamp, None)
+
+        if cached_entry is None or cached_entry.mtime != self.getmtime():
+            cached_entry = CachedEntry(self)
+            
+        if not hasattr(cached_entry, func.__name__):
+            result = func()
+            setattr(cached_entry, func.__name__, result) 
+            cache_shelf[self.timestamp] = cached_entry
+
+        return getattr(cached_entry, func.__name__)
+
+    return wrapper
 
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
@@ -35,17 +64,23 @@ class Entry():
 
     def exists(self):
         '''Return True if the entry exists.'''
-        return exists(self.pathname)
+        return isfile(self.pathname)
 
     def contains(self, search_string):
         '''Return True if the entry contains the given search string.'''
         command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
         return call(command, shell=True) == 0
 
+    def getmtime(self):
+        '''Return the timestamp when the entry was last modified.'''
+        if not self.exists(): 
+            return None
+        if 
+
+
     def tags(self):
         '''Return a list of all tags occurring in the entry text.'''
-        # TODO add caching, maybe have a subclass, make subclass check every 
-        # time it accesses any data that the cache hasn't changed. 
+        # TODO add caching
 
         command = r'grep -o "#\S\+\b" "{}" || true'.format(self.pathname)
         matches = check_output(command, shell=True, universal_newlines=True)
@@ -55,14 +90,6 @@ class Entry():
         matches = [ match for match in matches if len(match)>0 ]
 
         return matches
-
-
-class CachedEntry(Entry):
-    '''An Entry that will cache commonly accessed attributes.'''
-    def tags(self):
-        # TODO check cache
-        return super().tags()
-
 
 
 # Load constants that have previously been sourced and exported in bash.

@@ -79,6 +79,7 @@ export dir_cache="$dir_diary/cache"
 export dir_wordcounts="$dir_cache/wordcounts"
 export dir_logs="$dir_data/logs"
 export dir_chain="$dir_cache/chain"
+export dir_entries_cache="$dir_cache/entries"
 
 # Export other relevant data.
 export device_name
