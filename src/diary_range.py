@@ -96,7 +96,7 @@ class Entry():
         command = 'wc -w < "{}"'.format(self.pathname)
         return int(check_output(command, shell=True).strip())
 
-    def gen_text(self):
+    def _gen_text(self):
         '''Return a generator over the lines of the entry.'''
         with open(self.pathname) as f:
             for line in f:
@@ -126,11 +126,14 @@ class Entry():
 
         wrapper = textwrap.TextWrapper(width=width)
 
-        for line in self.gen_text():
+        for line in self._gen_text():
+            # TODO do this more efficiently?
             if line.strip() == '':
                 yield ''
             for wrapped_line in wrapper.wrap(line):
                 yield wrapped_line
+
+        yield ''
 
     @cached
     def _formatted(self, width, header):
@@ -144,6 +147,7 @@ class Entry():
     def tags(self):
         '''Return a list of all tags occurring in the entry text.'''
 
+        # TODO do this in python using _gen_text()
         command = r'grep -o "#\S\+\b" "{}" || true'.format(self.pathname)
         matches = check_output(command, shell=True, universal_newlines=True)
 
