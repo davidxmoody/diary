@@ -34,7 +34,6 @@ def cached(func):
         if func.__name__ not in cached_attrs:
             cached_attrs[func.__name__] = func(self)
             cache_shelf[self.timestamp] = cached_attrs
-            print('recalculated {} = {}'.format(func.__name__, cached_attrs[func.__name__]))
 
         return cached_attrs[func.__name__]
 
