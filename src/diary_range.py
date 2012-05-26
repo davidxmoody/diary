@@ -22,26 +22,21 @@ if not exists(cache_path):
     os.makedirs(cache_path)
 cache_shelf = shelve.open(cache_path + '/range-cache', writeback=False)
 
-class CachedEntry():
-    '''Namespace for storing cached entry attributes.'''
-    def __init__(self, entry):
-        self.mtime = entry.getmtime()
-
 def cached(func):
     '''Cache the results of a function, recalculate when cache is outdated.'''
 
     def wrapper(self):
-        cached_entry = cache_shelf.get(self.timestamp, None)
+        cached_attrs = cache_shelf.get(self.timestamp, None)
 
-        if cached_entry is None or cached_entry.mtime != self.getmtime():
-            cached_entry = CachedEntry(self)
+        if cached_attrs is None or cached_attrs['mtime'] != self.getmtime():
+            cached_attrs = { 'mtime': self.getmtime() }
             
-        if not hasattr(cached_entry, func.__name__):
-            result = func()
-            setattr(cached_entry, func.__name__, result) 
-            cache_shelf[self.timestamp] = cached_entry
+        if func.__name__ not in cached_attrs:
+            cached_attrs[func.__name__] = func(self)
+            cache_shelf[self.timestamp] = cached_attrs
+            print('recalculated {} = {}'.format(func.__name__, cached_attrs[func.__name__]))
 
-        return getattr(cached_entry, func.__name__)
+        return cached_attrs[func.__name__]
 
     return wrapper
 
@@ -75,12 +70,12 @@ class Entry():
         '''Return the timestamp when the entry was last modified.'''
         if not self.exists(): 
             return None
-        if 
+        else:
+            return getmtime(self.pathname)
 
-
+    @cached
     def tags(self):
         '''Return a list of all tags occurring in the entry text.'''
-        # TODO add caching
 
         command = r'grep -o "#\S\+\b" "{}" || true'.format(self.pathname)
         matches = check_output(command, shell=True, universal_newlines=True)
