@@ -15,6 +15,16 @@ from subprocess import check_output, call
 from itertools import islice
 import sys
 import shelve
+import textwrap
+
+# TODO move these into a settings module
+pad_char = '='
+color_middle = '\033[1;34m'
+color_padding = '\033[0;34m'
+color_end = '\033[0m'
+
+# TODO get terminal width dynamically
+terminal_width = 80
 
 # Open cache shelf.
 cache_path = os.environ['dir_entries_cache']
@@ -25,14 +35,16 @@ cache_shelf = shelve.open(cache_path + '/range-cache', writeback=False)
 def cached(func):
     '''Cache the results of a function, recalculate when cache is outdated.'''
 
-    def wrapper(self):
+    # TODO make work with other args
+    # TODO check that this will work when one cached method calls another
+    def wrapper(self, *args):
         cached_attrs = cache_shelf.get(self.timestamp, None)
 
         if cached_attrs is None or cached_attrs['mtime'] != self.getmtime():
             cached_attrs = { 'mtime': self.getmtime() }
             
         if func.__name__ not in cached_attrs:
-            cached_attrs[func.__name__] = func(self)
+            cached_attrs[func.__name__] = func(self, *args)
             cache_shelf[self.timestamp] = cached_attrs
 
         return cached_attrs[func.__name__]
@@ -71,6 +83,62 @@ class Entry():
             return None
         else:
             return getmtime(self.pathname)
+
+    def get_date_string(self, format='%A %d %B %Y %I:%M%p'):
+        '''Return formatted string representing the entry creation date.'''
+        # TODO add additional information (like today/yesterday/in the future).
+        return time.strftime(format, time.localtime(float(self.timestamp)))
+
+    @cached
+    def wordcount(self):
+        '''Return the number of space separated words in the entry.'''
+        # TODO do wordcount in python
+        command = 'wc -w < "{}"'.format(self.pathname)
+        return int(check_output(command, shell=True).strip())
+
+    def gen_text(self):
+        '''Return a generator over the lines of the entry.'''
+        with open(self.pathname) as f:
+            for line in f:
+                yield line.strip()
+                
+    # TODO add search term highlighting after this stage
+    # TODO skip final lines if they are empty?
+    # TODO add markdown formatting?
+    # TODO put header generation in separate method?
+    #@cached
+    def _gen_formatted(self, width, header):
+
+        if header:
+            left = pad_char + '{} words'.format(self.wordcount())
+            right = str(self.timestamp) + pad_char
+            middle = ' {} '.format(self.get_date_string())
+
+            padding_left = pad_char * int(width/2 - len(left) - len(middle)/2)
+            padding_right = pad_char * (width - len(left) - 
+                                len(padding_left) - len(middle) - len(right))
+
+            header_string = color_padding + left + padding_left + color_end + \
+                            color_middle + middle + color_end + \
+                            color_padding + padding_right + right + color_end
+
+            yield header_string
+
+        wrapper = textwrap.TextWrapper(width=width)
+
+        for line in self.gen_text():
+            if line.strip() == '':
+                yield ''
+            for wrapped_line in wrapper.wrap(line):
+                yield wrapped_line
+
+    @cached
+    def _formatted(self, width, header):
+        return list(self._gen_formatted(width, header))
+
+    def formatted(self, width=terminal_width, header=True):
+        '''Return a list of formatted lines, wrapped to width.'''
+        return self._formatted(width, header)
 
     @cached
     def tags(self):
@@ -239,4 +307,6 @@ def process_args():
 if __name__ == '__main__':
 
     for entry in process_args():
-        print(entry.pathname)
+        #print(entry.pathname)
+        for line in entry.formatted():
+            print(line)
