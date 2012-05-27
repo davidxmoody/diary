@@ -23,8 +23,9 @@ color_middle = '\033[1;34m'
 color_padding = '\033[0;34m'
 color_end = '\033[0m'
 
-# TODO get terminal width dynamically
-terminal_width = 80
+# This might not work on non-Linux OSes. 
+# TODO find a more general solution and move to settings module.
+terminal_width = int(check_output('tput cols', shell=True).strip())
 
 # Open cache shelf.
 cache_path = os.environ['dir_entries_cache']
@@ -35,22 +36,32 @@ cache_shelf = shelve.open(cache_path + '/range-cache', writeback=False)
 def cached(func):
     '''Cache the results of a function, recalculate when cache is outdated.'''
 
-    # TODO make work with other args
-    # TODO check that this will work when one cached method calls another
+    # TODO preserve name and docstring
     def wrapper(self, *args):
-        cached_attrs = cache_shelf.get(self.timestamp, None)
+
+        id = self.timestamp
+        func_tuple = (func.__name__, args)
+
+        cached_attrs = cache_shelf.get(id, None)
 
         if cached_attrs is None or cached_attrs['mtime'] != self.getmtime():
-            cached_attrs = { 'mtime': self.getmtime() }
-            
-        if func.__name__ not in cached_attrs:
-            cached_attrs[func.__name__] = func(self, *args)
-            cache_shelf[self.timestamp] = cached_attrs
+            cache_shelf[id] = { 'mtime': self.getmtime() }
 
-        return cached_attrs[func.__name__]
+        elif func_tuple in cached_attrs:
+            print('cached: {}, {}'.format(func_tuple, cached_attrs))
+            return cached_attrs[func_tuple]
+
+        result = func(self, *args)
+        cached_attrs = cache_shelf[id]
+        cached_attrs[func_tuple] = result
+        cache_shelf[id] = cached_attrs
+        print('regenerated: {}, {}'.format(func_tuple, cached_attrs))
+        return result
 
     return wrapper
 
+# TODO move all formatting related methods to a separate module
+#      only keey the _gen_text() method
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
 
@@ -137,7 +148,7 @@ class Entry():
 
     @cached
     def _formatted(self, width, header):
-        return list(self._gen_formatted(width, header))
+        return '\n'.join(self._gen_formatted(width, header))
 
     def formatted(self, width=terminal_width, header=True):
         '''Return a list of formatted lines, wrapped to width.'''
@@ -312,5 +323,4 @@ if __name__ == '__main__':
 
     for entry in process_args():
         #print(entry.pathname)
-        for line in entry.formatted():
-            print(line)
+        print(entry.formatted())
