@@ -48,14 +48,12 @@ def cached(func):
             cache_shelf[id] = { 'mtime': self.getmtime() }
 
         elif func_tuple in cached_attrs:
-            print('cached: {}, {}'.format(func_tuple, cached_attrs))
             return cached_attrs[func_tuple]
 
         result = func(self, *args)
         cached_attrs = cache_shelf[id]
         cached_attrs[func_tuple] = result
         cache_shelf[id] = cached_attrs
-        print('regenerated: {}, {}'.format(func_tuple, cached_attrs))
         return result
 
     return wrapper
@@ -117,7 +115,6 @@ class Entry():
     # TODO skip final lines if they are empty?
     # TODO add markdown formatting?
     # TODO put header generation in separate method?
-    #@cached
     def _gen_formatted(self, width, header):
 
         if header:
@@ -144,6 +141,7 @@ class Entry():
             for wrapped_line in wrapper.wrap(line):
                 yield wrapped_line
 
+        yield ''
         yield ''
 
     @cached
@@ -230,6 +228,10 @@ def range_of_entries(slice_args):
     # If there is a mixture of positives and negatives then use regular slice.
     else:
         return list(walk_all_entries())[start:stop:step]
+
+def last(num_entries=0):
+    '''Return the most recent entries in decending order.'''
+    return range_of_entries((None, -1*num_entries, -1))
 
 def single_entry(index):
     '''Return a single entry at the given index.'''
@@ -322,5 +324,4 @@ def process_args():
 if __name__ == '__main__':
 
     for entry in process_args():
-        #print(entry.pathname)
-        print(entry.formatted())
+        print(entry.pathname)
