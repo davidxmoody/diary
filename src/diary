@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# TODO cache contains results in entries
 # TODO add settings module, encapsulate all user and systempreferences 
 
 real_path=$(readlink -f $0)

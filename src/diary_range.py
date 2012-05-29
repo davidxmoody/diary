@@ -81,11 +81,6 @@ class Entry():
         '''Return True if the entry exists.'''
         return isfile(self.pathname)
 
-    def contains(self, search_string):
-        '''Return True if the entry contains the given search string.'''
-        command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
-        return call(command, shell=True) == 0
-
     def getmtime(self):
         '''Return the timestamp when the entry was last modified.'''
         if not self.exists(): 
@@ -93,6 +88,13 @@ class Entry():
         else:
             return getmtime(self.pathname)
 
+    @cached
+    def contains(self, search_string):
+        '''Return True if the entry contains the given search string.'''
+        command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
+        return call(command, shell=True) == 0
+
+    @cached
     def get_date_string(self, format='%A %d %B %Y %I:%M%p'):
         '''Return formatted string representing the entry creation date.'''
         # TODO add additional information (like today/yesterday/in the future).
