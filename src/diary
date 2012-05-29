@@ -33,7 +33,6 @@ real_path=${real_path%/*}
 
 eval "diary-chain()     { '$real_path/diary_chain.py'      \"\$@\"; }"
 eval "diary-edit()      { '$real_path/diary_edit.py'       \"\$@\"; }"
-eval "diary-format()    { '$real_path/diary-format'        \"\$@\"; }"
 eval "diary-list()      { '$real_path/diary_list.py'       \"\$@\"; }"
 eval "diary-new-entry() { '$real_path/diary_edit.py' --new \"\$@\"; }"
 eval "diary-range()     { '$real_path/diary_range.py'      \"\$@\"; }"
@@ -42,7 +41,6 @@ eval "diary-wordcount() { '$real_path/diary_wordcount.py'  \"\$@\"; }"
 
 export -f diary-chain
 export -f diary-edit
-export -f diary-format
 export -f diary-list
 export -f diary-new-entry
 export -f diary-range
@@ -111,9 +109,6 @@ case "$command" in
     ;;
     edit)
         diary-edit "$@" 
-    ;;
-    format)
-        diary-format "$@"
     ;;
     help | -h | -help | --help)
         help_and_exit "$@" 
