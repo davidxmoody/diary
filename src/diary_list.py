@@ -18,15 +18,17 @@ def display_entry(entry):
     if less_process.poll() is None:  # Still running
         less_process.stdin.write(bytes(entry.formatted(), 'UTF-8'))
 
+def display_all_entries(entries):
+    for entry in entries:
+        display_entry(entry)
 
-if len(sys.argv) <= 1:
-    # TODO change default range to something better or use lazy evaluation
-    entries = diary_range.last(600)
-else:
-    entries = diary_range.process_args()
+    less_process.stdin.close()
+    less_process.wait()
+    
 
-for entry in entries:
-    display_entry(entry)
-
-less_process.stdin.close()
-less_process.wait()
+if __name__ == '__main__':
+    if len(sys.argv) <= 1:
+        # TODO change default range to something better or use lazy evaluation
+        display_all_entries(diary_range.last(600))
+    else:
+        display_all_entries(diary_range.process_args())

@@ -37,7 +37,7 @@ eval "diary-format()    { '$real_path/diary-format'        \"\$@\"; }"
 eval "diary-list()      { '$real_path/diary_list.py'       \"\$@\"; }"
 eval "diary-new-entry() { '$real_path/diary_edit.py' --new \"\$@\"; }"
 eval "diary-range()     { '$real_path/diary_range.py'      \"\$@\"; }"
-eval "diary-search()    { '$real_path/diary-search'        \"\$@\"; }"
+eval "diary-search()    { '$real_path/diary_search.py'     \"\$@\"; }"
 eval "diary-wordcount() { '$real_path/diary_wordcount.py'  \"\$@\"; }"
 
 export -f diary-chain
