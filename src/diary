@@ -1,55 +1,11 @@
 #!/bin/bash
-# The script that launches all other diary related scripts.
 
-help_and_exit() {
-    # TODO
-    echo "Help not implemented yet."
-    exit 0
-}
+# TODO cache contains results in entries
+# TODO add settings module, encapsulate all user and systempreferences 
 
-usage_and_exit() {
-    echo "usage: $(basename $0) command [option]... [argument]..." >&2
-    echo "" >&2
-    echo "basic commands:" >&2
-    echo "" >&2
-    echo " edit       edit the most recent entry or older entries" >&2
-    echo " list       display the most recent entries or a given range of entries" >&2
-    echo " new        start a new diary entry in the default editor" >&2
-    echo " search     search diary entries for words or tags" >&2
-    echo " wordcount  print wordcount information" >&2
-    echo "" >&2
-    echo "use \"$(basename $0) help\" for the full list of commands" >&2
-    exit 1
-}
-
-# If no arguments then print usage and exit.
-[[ $# == 0 ]] && usage_and_exit
-
-
-# Find out which diary script was actually executed and then use the 
-# corresponding subscripts. 
 real_path=$(readlink -f $0)
 real_path=${real_path%/*}
-
-eval "diary-chain()     { '$real_path/diary_chain.py'      \"\$@\"; }"
-eval "diary-edit()      { '$real_path/diary_edit.py'       \"\$@\"; }"
-eval "diary-list()      { '$real_path/diary_list.py'       \"\$@\"; }"
-eval "diary-new-entry() { '$real_path/diary_edit.py' --new \"\$@\"; }"
-eval "diary-range()     { '$real_path/diary_range.py'      \"\$@\"; }"
-eval "diary-search()    { '$real_path/diary_search.py'     \"\$@\"; }"
-eval "diary-wordcount() { '$real_path/diary_wordcount.py'  \"\$@\"; }"
-
-export -f diary-chain
-export -f diary-edit
-export -f diary-list
-export -f diary-new-entry
-export -f diary-range
-export -f diary-search
-export -f diary-wordcount
-
 export real_path
-export tags_file
-
 
 # Source the default settings file and then source the user's settings file. 
 source "$real_path/../config/diaryrc-default"
@@ -98,6 +54,8 @@ export search_print_entries
 export search_default_range
 export search_default_max_matches
 
+export tags_file
+
 
 # Check for command.
 command="$1"
@@ -105,33 +63,21 @@ shift
 
 case "$command" in
     chain)
-        diary-chain "$@"
+        python3 "$real_path/diary_chain.py" "$@"
     ;;
     edit)
-        diary-edit "$@" 
-    ;;
-    help | -h | -help | --help)
-        help_and_exit "$@" 
+        python3 "$real_path/diary_edit.py" "$@" 
     ;;
     list | ls)
-        diary-list "$@"
+        python3 "$real_path/diary_list.py" "$@"
     ;;
-    new-entry | new)
-        diary-new-entry "$@" 
-    ;;
-    range)
-        diary-range "$@"
+    new)
+        python3 "$real_path/diary_edit.py" --new "$@" 
     ;;
     search)
-        diary-search "$@" 
-    ;;
-    --version)
-        echo "No version number is currently available."
+        python3 "$real_path/diary_search.py" "$@" 
     ;;
     wordcount | wc)
-        diary-wordcount "$@"
-    ;;
-    *)
-        usage_and_exit "$@"
+        python3 "$real_path/diary_wordcount.py" "$@"
     ;;
 esac
