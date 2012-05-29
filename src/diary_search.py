@@ -39,7 +39,7 @@ for search_term in args.search_terms:
     elif args.mode == 'words':
         search_strings.append(search_term)
 
-search_string = '|'.join(search_strings)
+search_string = '\|'.join(search_strings)
 
 entries = diary_range.filter_entries(search_string)
 entries = islice(entries, args.max)

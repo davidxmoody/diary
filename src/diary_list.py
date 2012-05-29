@@ -29,6 +29,6 @@ def display_all_entries(entries):
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
         # TODO change default range to something better or use lazy evaluation
-        display_all_entries(diary_range.last(600))
+        display_all_entries(diary_range.last(100))
     else:
         display_all_entries(diary_range.process_args())
