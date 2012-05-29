@@ -5,10 +5,11 @@ import os
 import sys
 from subprocess import call
 import diary_range
+import config
 
 def edit_entry(entry, 
-               editor_existing=os.environ['diary_edit_default_editor'],
-               editor_new=os.environ['diary_new_entry_default_editor']):
+               editor_existing=config.default_editor_existing,
+               editor_new=config.default_editor_new):
     '''Execute editor on filename.
     
     Also creates the required directory structure if it does not exist.'''
