@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Script to launch the default editor on a specified diary entry.
 
-import os
 import sys
 from subprocess import call
 import diary_range

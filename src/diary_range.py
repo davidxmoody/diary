@@ -4,7 +4,8 @@
 # Should be able to return filenames corresponding to specific timestamps, 
 # ranges of entries, single entries and new entries (with a given date). 
 
-import os
+import config
+from os import makedirs, listdir
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 import math
 import datetime
@@ -28,9 +29,9 @@ color_end = '\033[0m'
 terminal_width = int(check_output('tput cols', shell=True).strip())
 
 # Open cache shelf.
-cache_path = os.environ['dir_entries_cache']
+cache_path = config.dir_entries_cache
 if not exists(cache_path):
-    os.makedirs(cache_path)
+    makedirs(cache_path)
 cache_shelf = shelve.open(cache_path + '/range-cache', writeback=False)
 
 def cached(func):
@@ -75,7 +76,7 @@ class Entry():
         '''Create the entry's base directory (if it does not exist).'''
         directory = dirname(self.pathname)
         if not exists(directory):
-            os.makedirs(directory)
+            makedirs(directory)
 
     def exists(self):
         '''Return True if the entry exists.'''
@@ -169,13 +170,8 @@ class Entry():
         return matches
 
 
-# Load constants that have previously been sourced and exported in bash.
-# TODO: change this to use a better way to store and load them. 
-dir_entries = os.environ['dir_entries']
-device_name = os.environ['device_name']
-
 # TODO move this to the Entry class definition. 
-def new_entry(timestamp=None, device_name=device_name):
+def new_entry(timestamp=None, device_name=config.device_name):
     '''Return a new (not currently existing) entry.
     
     Note that the directory structure may not exist.'''
@@ -184,7 +180,7 @@ def new_entry(timestamp=None, device_name=device_name):
     month = time.strftime('%Y-%m', time.localtime(timestamp))
     filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
 
-    return [Entry(dir_entries, month, filename)]
+    return [Entry(config.dir_entries, month, filename)]
 
 def _find_with_command(command):
     results = check_output(command, shell=True, universal_newlines=True)
@@ -192,20 +188,20 @@ def _find_with_command(command):
 
 def find_by_timestamp(timestamp):
     '''Returns any entries with the given timestamp.'''
-    command = 'find "{}" -iname "*-{}-*"'.format(dir_entries, timestamp)
+    command = 'find "{}" -iname "*-{}-*"'.format(config.dir_entries, timestamp)
     return _find_with_command(command)
 
 def modified_since(timestamp=0):
     '''Returns all entries last modified after the given timestamp.'''
-    command = 'find "{}" -type f -newermt @{}'.format(dir_entries, timestamp)
+    command = 'find "{}" -type f -newermt @{}'.format(config.dir_entries, timestamp)
     return _find_with_command(command)
 
 def walk_all_entries(reverse=False):
     '''Iterates over all entries.'''
-    for month in sorted(os.listdir(dir_entries), reverse=reverse):
-        for filename in sorted(os.listdir(join(dir_entries, month)), 
+    for month in sorted(listdir(config.dir_entries), reverse=reverse):
+        for filename in sorted(listdir(join(config.dir_entries, month)), 
                                reverse=reverse):
-            yield Entry(dir_entries, month, filename)
+            yield Entry(config.dir_entries, month, filename)
 
 def range_of_entries(slice_args):
     '''Returns all entries in the given range.'''

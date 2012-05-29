@@ -31,6 +31,7 @@
 #   and serialize it all again. 
 
 
+import config
 from subprocess import check_output
 import os
 import re
@@ -46,7 +47,7 @@ rebuild_cache = False
 
 
 # Open shelf for caching timestamp to tags mappings.
-cache_path = os.environ['dir_chain']
+cache_path = config.dir_chain
 if not os.path.exists(cache_path):
     os.makedirs(cache_path)
 cache_shelf = shelve.open(cache_path + '/chain-cache', writeback=True)
@@ -56,7 +57,7 @@ cache_shelf = shelve.open(cache_path + '/chain-cache', writeback=True)
 if rebuild_cache or 'tags_last_loaded' not in cache_shelf:
     cache_shelf['tags_last_loaded'] = 0
 
-tags_file = os.environ['tags_file']
+tags_file = config.tags_file
 if not os.path.isfile(tags_file):
     raise Exception('tags file not found: "{}"'.format(tags_file))
 
