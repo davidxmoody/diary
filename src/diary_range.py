@@ -7,14 +7,11 @@
 import config
 from os import makedirs, listdir
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
-import math
-import datetime
 import time
 import argparse
 import re
 from subprocess import check_output, call
 from itertools import islice
-import sys
 import shelve
 import textwrap
 
