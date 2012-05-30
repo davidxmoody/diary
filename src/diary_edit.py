@@ -20,11 +20,11 @@ def edit_entry(entry,
     call('{} "{}"'.format(editor, entry.pathname), shell=True)
 
 
+
+
 if len(sys.argv) <= 1:
-    # Edit last entry.
-    edit_entry(*diary_range.single_entry(-1))
+    entry = diary_range.single_entry(-1).__next__()
 else:
-    # Edit all entries specified with args.
-    # TODO add delay/the ability to cancel editing multiple entries.
-    for entry in diary_range.process_args():
-        edit_entry(entry)
+    entry = diary_range.process_args().__next__()
+
+edit_entry(entry)
