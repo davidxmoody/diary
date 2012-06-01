@@ -115,22 +115,21 @@ class Entry():
     # TODO skip final lines if they are empty?
     # TODO add markdown formatting?
     # TODO put header generation in separate method?
-    def _gen_formatted(self, width, header):
+    def _gen_formatted(self, width):
 
-        if header:
-            left = pad_char + '{} words'.format(self.wordcount())
-            right = str(self.timestamp) + pad_char
-            middle = ' {} '.format(self.get_date_string())
+        left = pad_char + '{} words'.format(self.wordcount())
+        right = str(self.timestamp) + pad_char
+        middle = ' {} '.format(self.get_date_string())
 
-            padding_left = pad_char * int(width/2 - len(left) - len(middle)/2)
-            padding_right = pad_char * (width - len(left) - 
-                                len(padding_left) - len(middle) - len(right))
+        padding_left = pad_char * int(width/2 - len(left) - len(middle)/2)
+        padding_right = pad_char * (width - len(left) - 
+                            len(padding_left) - len(middle) - len(right))
 
-            header_string = color_padding + left + padding_left + color_end + \
-                            color_middle + middle + color_end + \
-                            color_padding + padding_right + right + color_end
+        header_string = color_padding + left + padding_left + color_end + \
+                        color_middle + middle + color_end + \
+                        color_padding + padding_right + right + color_end
 
-            yield header_string
+        yield header_string
 
         wrapper = textwrap.TextWrapper(width=width)
 
@@ -145,12 +144,12 @@ class Entry():
         yield ''
 
     @cached
-    def _formatted(self, width, header):
-        return '\n'.join(self._gen_formatted(width, header))
+    def _formatted(self, width):
+        return '\n'.join(self._gen_formatted(width))
 
-    def formatted(self, width=terminal_width, header=True):
+    def formatted(self, width=terminal_width):
         '''Return a list of formatted lines, wrapped to width.'''
-        return self._formatted(width, header)
+        return self._formatted(width)
 
     @cached
     def tags(self):
