@@ -1,22 +1,15 @@
 Features to implement right now:
-- Make diary-edit accept search results, e.g. "edit the last entry that contained the exercise tag"
-
 - Tag aliases
 - Searching for both tags and words at the same time (e.g. diary search -w word1 word2 -t tag1 tag2 -w word3)
 - Toggle between searching for all or any search terms
 
 - Get diary range to support date ranges
-- Make dairy wordcount accept ranges of entries and use it's cache for them
-
-- Automatically trim white space at start and end of entries
 
 - Print a version number with --version
 
-- Auto-completion of diary commands
-
 - Decide on definitive referencing notation, should be able to mix different types of identifier, have search results/be dynamic, reference single entries or ranges or lists of ranges, etc.
 
-- Have the ability to "compile" my bash scripts, basically a script to copy them to the bin folder. 
+- Installation/build script
 
 - Decide what database package I want to use, make sure it is available on all systems that I plan to deploy on.
 
@@ -149,6 +142,8 @@ Achievements:
 
 
 Other:
+- Auto-completion of diary commands
+- Automatically trim white space at start and end of entries
 - Tag analyser that can scan through all entries and provide a summary of what tags are used and how often they are used. 
 - Have a look at existing task list services/journalling services to get some ideas. Maybe provide the ability to import/export from/to them.
 - Mind map editing style. Build it on the node based way of doing things. 
