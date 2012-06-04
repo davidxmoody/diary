@@ -5,6 +5,7 @@
 # ranges of entries, single entries and new entries (with a given date). 
 
 import config
+from config import pad_char, color_middle, color_padding, color_end
 from os import makedirs, listdir
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 import time
@@ -14,16 +15,6 @@ from subprocess import check_output, call
 from itertools import islice
 import shelve
 import textwrap
-
-# TODO move these into a settings module
-pad_char = '='
-color_middle = '\033[1;34m'
-color_padding = '\033[0;34m'
-color_end = '\033[0m'
-
-# This might not work on non-Linux OSes. 
-# TODO find a more general solution and move to settings module.
-terminal_width = int(check_output('tput cols', shell=True).strip())
 
 # Open cache shelf.
 cache_path = config.dir_entries_cache
@@ -147,7 +138,7 @@ class Entry():
     def _formatted(self, width):
         return '\n'.join(self._gen_formatted(width))
 
-    def formatted(self, width=terminal_width):
+    def formatted(self, width=config.terminal_width):
         '''Return a list of formatted lines, wrapped to width.'''
         return self._formatted(width)
 

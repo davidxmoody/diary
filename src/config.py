@@ -18,8 +18,13 @@ device_name = expandvars('$HOSTNAME')
 
 tags_file = realpath(expanduser(expandvars('~/.diary-tags')))
 
-#diary_edit_default_editor = 'vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
-#diary_new_entry_default_editor = diary_edit_default_editor + ' "+startinsert"'
-
 default_editor_existing = 'vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 default_editor_new = default_editor_existing + ' "+startinsert"'
+
+pad_char = '='
+color_middle = '\033[1;34m'
+color_padding = '\033[0;34m'
+color_end = '\033[0m'
+
+# This might not work on non-Linux devices.
+terminal_width = int(check_output('tput cols', shell=True).strip())
