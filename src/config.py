@@ -3,8 +3,11 @@
 # TODO load these values from a user specified config file using configparser
 
 from os.path import expanduser, expandvars, realpath, join
+from subprocess import check_output
 
-dir_diary = realpath(expanduser(expandvars('~/.diary')))
+# TODO sort out proper separation of real data from testing data again.
+#dir_diary = realpath(expanduser(expandvars('~/.diary')))
+dir_diary = realpath(expanduser(expandvars('~/space/diary/dev/test-entries')))
 dir_data = join(dir_diary, 'data')
 dir_entries = join(dir_data, 'entries')
 dir_cache = join(dir_diary, 'cache')

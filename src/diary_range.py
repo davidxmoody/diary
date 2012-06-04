@@ -5,7 +5,6 @@
 # ranges of entries, single entries and new entries (with a given date). 
 
 import config
-from config import pad_char, color_middle, color_padding, color_end
 from os import makedirs, listdir
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 import time
@@ -14,7 +13,6 @@ import re
 from subprocess import check_output, call
 from itertools import islice
 import shelve
-import textwrap
 
 # Open cache shelf.
 cache_path = config.dir_entries_cache
@@ -48,7 +46,7 @@ def cached(func):
     return wrapper
 
 # TODO move all formatting related methods to a separate module
-#      only keey the _gen_text() method
+#      only keep the _gen_text() method
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
 
@@ -84,12 +82,6 @@ class Entry():
         return call(command, shell=True) == 0
 
     @cached
-    def get_date_string(self, format='%A %d %B %Y %I:%M%p'):
-        '''Return formatted string representing the entry creation date.'''
-        # TODO add additional information (like today/yesterday/in the future).
-        return time.strftime(format, time.localtime(float(self.timestamp)))
-
-    @cached
     def wordcount(self):
         '''Return the number of space separated words in the entry.'''
         # TODO do wordcount in python
@@ -101,46 +93,6 @@ class Entry():
         with open(self.pathname) as f:
             for line in f:
                 yield line.strip()
-                
-    # TODO add search term highlighting after this stage
-    # TODO skip final lines if they are empty?
-    # TODO add markdown formatting?
-    # TODO put header generation in separate method?
-    def _gen_formatted(self, width):
-
-        left = pad_char + '{} words'.format(self.wordcount())
-        right = str(self.timestamp) + pad_char
-        middle = ' {} '.format(self.get_date_string())
-
-        padding_left = pad_char * int(width/2 - len(left) - len(middle)/2)
-        padding_right = pad_char * (width - len(left) - 
-                            len(padding_left) - len(middle) - len(right))
-
-        header_string = color_padding + left + padding_left + color_end + \
-                        color_middle + middle + color_end + \
-                        color_padding + padding_right + right + color_end
-
-        yield header_string
-
-        wrapper = textwrap.TextWrapper(width=width)
-
-        for line in self._gen_text():
-            # TODO do this more efficiently?
-            if line.strip() == '':
-                yield ''
-            for wrapped_line in wrapper.wrap(line):
-                yield wrapped_line
-
-        yield ''
-        yield ''
-
-    @cached
-    def _formatted(self, width):
-        return '\n'.join(self._gen_formatted(width))
-
-    def formatted(self, width=config.terminal_width):
-        '''Return a list of formatted lines, wrapped to width.'''
-        return self._formatted(width)
 
     @cached
     def tags(self):

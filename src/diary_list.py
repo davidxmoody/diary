@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import diary_range
+from diary_tui import formatted
 import sys
 from subprocess import Popen, PIPE
 
@@ -16,7 +17,7 @@ def display_entry(entry):
         less_process = Popen('less -R', stdin=PIPE, shell=True)
 
     if less_process.poll() is None:  # Still running
-        less_process.stdin.write(bytes(entry.formatted(), 'UTF-8'))
+        less_process.stdin.write(bytes(formatted(entry), 'UTF-8'))
 
 def display_all_entries(entries):
     for entry in entries:
