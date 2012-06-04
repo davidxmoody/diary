@@ -34,25 +34,7 @@ export dir_logs="$dir_data/logs"
 export dir_chain="$dir_cache/chain"
 export dir_entries_cache="$dir_cache/entries"
 
-# Export other relevant data.
 export device_name
-
-export diary_edit_default_editor
-export diary_new_entry_default_editor
-
-export header_minimum_width
-export long_date_format
-export short_date_format
-export very_short_date_format
-export pad_char
-export metadata_colour
-export pad_colour
-export end_colour
-
-export search_print_entries
-export search_default_range
-export search_default_max_matches
-
 export tags_file
 
 

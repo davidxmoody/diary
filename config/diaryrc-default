@@ -1,29 +1,3 @@
-# Default settings to be used by diary scripts. 
-
-# The directories used by the diary scripts.
 dir_diary="$HOME/.diary-unknown"
-
-# Default device name.
 device_name="$HOSTNAME"
-
-# Set default file for tags to watch out for in diary-chain.
 tags_file="$HOME/.diary-tags"
-
-# Editors to be used by different scripts.
-diary_edit_default_editor='vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
-diary_new_entry_default_editor=$diary_edit_default_editor' "+startinsert"'
-
-# Formatting settings when printing entries.
-header_minimum_width=10
-long_date_format="%A %d %B %Y %I:%M%p"
-short_date_format="%A %d %B %I:%M%p"
-very_short_date_format="%I:%M%p"
-pad_char='='
-metadata_colour="\e[1;34m"  # Bold blue.
-pad_colour="\e[0;34m"       # Blue.
-end_colour="\e[0m"
-
-# Default search paramaters.
-search_print_entries=
-search_default_range=":-500:-1"
-search_default_max_matches=40
