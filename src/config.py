@@ -10,6 +10,7 @@ from subprocess import check_output
 dir_diary = realpath(expanduser(expandvars('~/space/diary/dev/test-entries')))
 dir_data = join(dir_diary, 'data')
 dir_entries = join(dir_data, 'entries')
+# TODO store cache elsewhere
 dir_cache = join(dir_diary, 'cache')
 dir_wordcounts = join(dir_cache, 'wordcounts')
 dir_logs = join(dir_data, 'logs')

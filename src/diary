@@ -2,39 +2,6 @@
 
 real_path=$(readlink -f $0)
 real_path=${real_path%/*}
-export real_path
-
-# Source the default settings file and then source the user's settings file. 
-source "$real_path/../config/diaryrc-default"
-
-# The user's diaryrc file is looked for in the following locations and the 
-# first existing file is used.
-paths=( "$real_path/../config/diaryrc"   \
-        "$real_path/../config/.diaryrc"  \
-        "$HOME/diaryrc"                  \
-        "$HOME/.diaryrc"                 )
-
-for path in "${paths[@]}"; do
-    if [[ -f "$path" ]]; then 
-        source "$path"
-        break
-    fi
-done
-
-# Export the diary subdirectories.
-export dir_diary
-export dir_data="$dir_diary/data"
-export dir_entries="$dir_data/entries"
-export dir_checklists="$dir_data/checklists"
-export dir_cache="$dir_diary/cache"
-export dir_wordcounts="$dir_cache/wordcounts"
-export dir_logs="$dir_data/logs"
-export dir_chain="$dir_cache/chain"
-export dir_entries_cache="$dir_cache/entries"
-
-export device_name
-export tags_file
-
 
 # Check for command.
 command="$1"
