@@ -1,3 +1,0 @@
-dir_diary="$HOME/.diary-unknown"
-device_name="$HOSTNAME"
-tags_file="$HOME/.diary-tags"

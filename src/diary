@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO add settings module, encapsulate all user and systempreferences 
-
 real_path=$(readlink -f $0)
 real_path=${real_path%/*}
 export real_path

@@ -17,9 +17,15 @@ dir_chain = join(dir_cache, 'chain')
 dir_entries_cache = join(dir_cache, 'entries')
 
 
-device_name = expandvars('$HOSTNAME')
+# TODO change all of these back when installing scripts properly
+# TODO come up with a proper way to separate the testing envorinment from 
+#      the deployment environment
 
-tags_file = realpath(expanduser(expandvars('~/.diary-tags')))
+#device_name = expandvars('$HOSTNAME')
+device_name = expandvars('$HOSTNAME-testing')
+
+#tags_file = realpath(expanduser(expandvars('~/.diary-tags')))
+tags_file = realpath(expanduser(expandvars('~/space/diary/dev/config/diary-tags')))
 
 default_editor_existing = 'vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 default_editor_new = default_editor_existing + ' "+startinsert"'
