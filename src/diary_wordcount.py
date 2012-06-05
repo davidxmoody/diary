@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 import diary_range
+from config import color_bold, color_end
 import time
 
 # TODO Add month summaries/other details.
-
-color_bold = '\033[1;37m'  # Bold white.
-color_end = '\033[0m'
 
 entries = list(diary_range.range_of_entries((None, None, None)))
 
