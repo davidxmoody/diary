@@ -8,9 +8,6 @@ command="$1"
 shift
 
 case "$command" in
-    chain)
-        python3 "$real_path/diary_chain.py" "$@"
-    ;;
     edit)
         python3 "$real_path/diary_edit.py" "$@" 
     ;;
