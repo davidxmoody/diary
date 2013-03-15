@@ -5,9 +5,11 @@
 from os.path import expanduser, expandvars, realpath, join
 from subprocess import check_output
 
+DEFAULT_CONFIG_FILE = realpath(expanduser(expandvars('~/.diaryrc')))
+
 # TODO sort out proper separation of real data from testing data again.
 #dir_diary = realpath(expanduser(expandvars('~/.diary')))
-dir_diary = realpath(expanduser(expandvars('~/space/diary/dev/test-entries')))
+dir_diary = realpath(expanduser(expandvars('~/space/diary/test-entries')))
 dir_data = join(dir_diary, 'data')
 dir_entries = join(dir_data, 'entries')
 # TODO store cache elsewhere
