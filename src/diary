@@ -20,7 +20,4 @@ case "$command" in
     search)
         python3 "$real_path/diary_search.py" "$@" 
     ;;
-    wordcount | wc)
-        python3 "$real_path/diary_wordcount.py" "$@"
-    ;;
 esac
