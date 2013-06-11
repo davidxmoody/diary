@@ -24,7 +24,8 @@ if len(sys.argv) <= 1:
     # Edit last entry.
     edit_entry(*diary_range.single_entry(-1))
 else:
-    # Edit all entries specified with args.
-    # TODO add delay/the ability to cancel editing multiple entries.
-    for entry in diary_range.process_args():
-        edit_entry(entry)
+    # Edit the first entry out of all the entries specified with args.
+    try:
+        edit_entry(diary_range.process_args().__next__())
+    except StopIteration:
+        print('No entries found.')
