@@ -89,9 +89,8 @@ if rebuild_cache or 'last_scan' not in cache_shelf:
 
 
 # Calculate whether or not the given struct_time objects occur on the same day.
-def same_day(*dates):
-    YD_pairs = [ (date.tm_year, date.tm_yday) for date in dates ]
-    return YD_pairs.count(YD_pairs[0]) == len(YD_pairs)
+def same_day(date1, date2):
+    return date1.tm_yday == date2.tm_yday and date1.tm_year == date2.tm_year
 
 
 for entry in modified_since(cache_shelf['last_scan']):
@@ -124,6 +123,12 @@ def format_details(tag, occurred_today, chain_length, *, no_color='\033[0m',
     color = if_occurred if occurred_today else if_not_occurred
     return '{}{:>5}{} {}'.format(color, chain_length, no_color, tag)
 
+# Also prints max chain length
+def format_details2(tag, occurred_today, chain_length, max_length, *, no_color='\033[0m',
+                   if_occurred='\033[1;32m', if_not_occurred='\033[1;31m'):
+    color = if_occurred if occurred_today else if_not_occurred
+    return '{}{:>4}{} ({}) {}'.format(color, chain_length, no_color, max_length, tag)
+
 # Return a tuple containing whether or not a timestamp has occurred today and 
 # the length of the longest chain that can be made starting today. 
 def get_details(timestamps):
@@ -150,10 +155,50 @@ def get_details(timestamps):
 
     return (occurred_today, chain_length)
 
+# Second version of get_details which subtracts 2 from the chain on a missed 
+# day instead of resetting the chain to 0 like before.
+def get_details2(timestamps):
+    timestamps = list(reversed(timestamps))  # TODO: do this earlier
+
+    # First generate a list of all days to consider.
+    def days():
+        current_day = localtime(float(timestamps[0]))
+        today = localtime()
+        while current_day < today and not same_day(current_day, today):
+            yield current_day
+            current_day = localtime(mktime(current_day) + 24*60*60)
+        yield today
+
+    # Generate new list with True or False replacing the day depending on 
+    # whether or not any timestamp occurred on that day.
+    def chain():
+        ts_index = 0
+        for day in days():
+            occurs = False
+            while ts_index < len(timestamps) and same_day(localtime(float(timestamps[ts_index])), day):
+                occurs = True
+                ts_index += 1
+            yield occurs
+
+    # Iterate through the list, calculating chain length.
+    chain_length = 0
+    max_length = 0
+    occurs_today = False
+    for occurs in chain():
+        occurs_today = occurs
+        if occurs:
+            chain_length += 1
+            max_length = max(max_length, chain_length)
+        else:
+            chain_length = max(0, chain_length - 2)
+
+    return (occurs_today, chain_length, max_length)
+
+
 # Calculate chain length from tags_found.
 results = []
 for tag, timestamps in tags_found.items():
-    results.append( (tag,) + get_details(timestamps) )
+    results.append( (tag,) + get_details2(timestamps) )
 
 # Sort by occurred_today status. Subsort by chain length.
 def sorter(details):
@@ -168,7 +213,7 @@ def sorter(details):
     return position
 
 for result in sorted(results, key=sorter):
-    print(format_details(*result))
+    print(format_details2(*result))
 
 # Update last_scan, close the shelf.
 cache_shelf['last_scan'] = script_init_time
