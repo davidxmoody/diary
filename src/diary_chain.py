@@ -160,6 +160,9 @@ def get_details(timestamps):
 def get_details2(timestamps):
     timestamps = list(reversed(timestamps))  # TODO: do this earlier
 
+    # Fixes bug that occurred when the list of timestamps was empty.
+    if len(timestamps)==0: return (False, 0, 0)
+
     # First generate a list of all days to consider.
     def days():
         current_day = localtime(float(timestamps[0]))
