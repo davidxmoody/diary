@@ -190,8 +190,12 @@ def get_details2(timestamps):
             chain_length += 1
             max_length = max(max_length, chain_length)
         else:
+            previous_chain = chain_length
             chain_length = max(0, chain_length - 2)
 
+    # Prevent bug where 2 was subtracted when the chain had not been completed on the current day.
+    if not occurs_today: chain_length = previous_chain  
+    
     return (occurs_today, chain_length, max_length)
 
 
