@@ -5,23 +5,14 @@ from diary_tui import formatted
 import sys
 from subprocess import Popen, PIPE
 
-less_process = None
+def display_entries(entries):
+    '''Open a less pipe to display the given entries to the user.'''
 
-def display_entry(entry):
-    global less_process
+    less_process = Popen('less -R', stdin=PIPE, shell=True)
 
-    if not entry.exists(): 
-        return
-
-    if less_process is None:
-        less_process = Popen('less -R', stdin=PIPE, shell=True)
-
-    if less_process.poll() is None:  # Still running
-        less_process.stdin.write(bytes(formatted(entry), 'UTF-8'))
-
-def display_all_entries(entries):
     for entry in entries:
-        display_entry(entry)
+        if less_process.poll() is None:  # Still running
+            less_process.stdin.write(bytes(formatted(entry), 'UTF-8'))
 
     less_process.stdin.close()
     less_process.wait()
@@ -30,6 +21,6 @@ def display_all_entries(entries):
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
         # TODO change default range to something better or use lazy evaluation
-        display_all_entries(diary_range.last(100))
+        display_entries(diary_range.last(100))
     else:
-        display_all_entries(diary_range.process_args())
+        display_entries(diary_range.process_args())

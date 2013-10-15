@@ -44,4 +44,4 @@ search_string = '\|'.join(search_strings)
 entries = diary_range.filter_entries(search_string)
 entries = islice(entries, args.max)
 
-diary_list.display_all_entries(entries)
+diary_list.display_entries(entries)
