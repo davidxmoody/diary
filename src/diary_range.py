@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# Script for finding the names of diary entries.
-
-# Should be able to return filenames corresponding to specific timestamps, 
-# ranges of entries, single entries and new entries (with a given date). 
-
-import config
 from os import makedirs, listdir
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 from os.path import expandvars, expanduser
@@ -14,11 +7,15 @@ import re
 from subprocess import check_output, call
 from itertools import islice
 
-#TODO change this to be settable from the command line
+#TODO change these to be settable from the command line
 #DIR_DIARY = realpath(expanduser(expandvars('~/.diary')))
 DIR_DIARY = realpath(expanduser(expandvars('~/space/diary/test-entries')))
 DIR_DATA = join(DIR_DIARY, 'data')
 DIR_ENTRIES = join(DIR_DATA, 'entries')
+
+#TODO change back and check that $HOSTNAME actually works (I think it doesn't)
+#DEVICE_NAME = expandvars('$HOSTNAME')
+DEVICE_NAME = expandvars('testing')
 
 
 class Entry():
@@ -28,7 +25,7 @@ class Entry():
             r'^diary-(-?[0-9]+)-([a-zA-Z0-9_][a-zA-Z0-9_-]*)\.([a-z]+)$')
 
     def __init__(self, *path_components):
-        self.pathname = realpath(join(*path_components))
+        self.pathname = join(*path_components)
         match = Entry._filename_re.match(basename(self.pathname))
         self.timestamp, self.device_name, self.extension = match.groups()
 
@@ -56,7 +53,6 @@ class Entry():
 
     def wordcount(self):
         '''Return the number of space separated words in the entry.'''
-        # TODO do wordcount in python
         command = 'wc -w < "{}"'.format(self.pathname)
         return int(check_output(command, shell=True).strip())
 
@@ -69,7 +65,6 @@ class Entry():
     def tags(self):
         '''Return a list of all tags occurring in the entry text.'''
 
-        # TODO do this in python using _gen_text()
         command = r'grep -o "#\S\+\b" "{}" || true'.format(self.pathname)
         matches = check_output(command, shell=True, universal_newlines=True)
 
@@ -80,8 +75,7 @@ class Entry():
         return matches
 
 
-# TODO move this to the Entry class definition. 
-def new_entry(timestamp=None, device_name=config.device_name):
+def new_entry(timestamp=None, device_name=DEVICE_NAME):
     '''Return a new (not currently existing) entry.
     
     Note that the directory structure may not exist.'''
