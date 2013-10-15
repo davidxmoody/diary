@@ -1,17 +1,9 @@
-#!/usr/bin/env python3
-
-# This script should:
-# - Provide all functionality currently provided by the `diary` script. 
-# - Encapsulate everything related to using the diary scripts from a terminal.
-
-import config
-from config import pad_char, color_middle, color_padding, color_end
+from config import pad_char, color_middle, color_padding, color_end, terminal_width
 import textwrap
 import time
 
 def get_date_string(entry, format='%A %d %B %Y %I:%M%p'):
     '''Return formatted string representing the entry creation date.'''
-    # TODO add additional information (like today/yesterday/in the future).
     return time.strftime(format, time.localtime(float(entry.timestamp)))
 
 def get_header(entry, width):
@@ -29,10 +21,6 @@ def get_header(entry, width):
            color_middle  +            middle            + color_end + \
            color_padding + padding_right +    right     + color_end
 
-# TODO add search term highlighting after this stage
-# TODO skip final lines if they are empty?
-# TODO add markdown formatting?
-# TODO put header generation in separate method?
 def _gen_formatted(entry, width):
     '''Return a generator over the formatted, wrapped lines of an entry.'''
 
@@ -47,6 +35,6 @@ def _gen_formatted(entry, width):
         for wrapped_line in wrapped_text:
             yield wrapped_line
 
-def formatted(entry, width=config.terminal_width):
+def formatted(entry, width=terminal_width):
     '''Return a list of formatted lines, wrapped to width.'''
     return '\n'.join(_gen_formatted(entry, width)) + '\n\n'
