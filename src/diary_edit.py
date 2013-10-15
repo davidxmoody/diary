@@ -4,11 +4,13 @@
 import sys
 from subprocess import call
 import diary_range
-import config
+
+DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
+DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
 
 def edit_entry(entry, 
-               editor_existing=config.default_editor_existing,
-               editor_new=config.default_editor_new):
+               editor_existing=DEFAULT_EDITOR_EXISTING,
+               editor_new=DEFAULT_EDITOR_NEW):
     '''Execute editor on filename.
     
     Also creates the required directory structure if it does not exist.'''
