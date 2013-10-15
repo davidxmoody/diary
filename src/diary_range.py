@@ -7,11 +7,19 @@
 import config
 from os import makedirs, listdir
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
+from os.path import expandvars, expanduser
 import time
 import argparse
 import re
 from subprocess import check_output, call
 from itertools import islice
+
+#TODO change this to be settable from the command line
+#DIR_DIARY = realpath(expanduser(expandvars('~/.diary')))
+DIR_DIARY = realpath(expanduser(expandvars('~/space/diary/test-entries')))
+DIR_DATA = join(DIR_DIARY, 'data')
+DIR_ENTRIES = join(DIR_DATA, 'entries')
+
 
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
@@ -82,7 +90,7 @@ def new_entry(timestamp=None, device_name=config.device_name):
     month = time.strftime('%Y-%m', time.localtime(timestamp))
     filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
 
-    return [Entry(config.dir_entries, month, filename)]
+    return [Entry(DIR_ENTRIES, month, filename)]
 
 def _find_with_command(command):
     results = check_output(command, shell=True, universal_newlines=True)
@@ -90,20 +98,20 @@ def _find_with_command(command):
 
 def find_by_timestamp(timestamp):
     '''Returns any entries with the given timestamp.'''
-    command = 'find "{}" -iname "*-{}-*"'.format(config.dir_entries, timestamp)
+    command = 'find "{}" -iname "*-{}-*"'.format(DIR_ENTRIES, timestamp)
     return _find_with_command(command)
 
 def modified_since(timestamp=0):
     '''Returns all entries last modified after the given timestamp.'''
-    command = 'find "{}" -type f -newermt @{}'.format(config.dir_entries, timestamp)
+    command = 'find "{}" -type f -newermt @{}'.format(DIR_ENTRIES, timestamp)
     return _find_with_command(command)
 
 def walk_all_entries(reverse=False):
     '''Iterates over all entries.'''
-    for month in sorted(listdir(config.dir_entries), reverse=reverse):
-        for filename in sorted(listdir(join(config.dir_entries, month)), 
+    for month in sorted(listdir(DIR_ENTRIES), reverse=reverse):
+        for filename in sorted(listdir(join(DIR_ENTRIES, month)), 
                                reverse=reverse):
-            yield Entry(config.dir_entries, month, filename)
+            yield Entry(DIR_ENTRIES, month, filename)
 
 def range_of_entries(slice_args):
     '''Returns all entries in the given range.'''
