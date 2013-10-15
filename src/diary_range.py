@@ -12,41 +12,7 @@ import argparse
 import re
 from subprocess import check_output, call
 from itertools import islice
-import shelve
 
-# Open cache shelf.
-cache_path = config.dir_entries_cache
-if not exists(cache_path):
-    makedirs(cache_path)
-cache_shelf = shelve.open(cache_path + '/range-cache', writeback=False)
-
-def cached(func):
-    '''Cache the results of a function, recalculate when cache is outdated.'''
-
-    # TODO preserve name and docstring
-    def wrapper(self, *args):
-
-        id = self.timestamp
-        func_tuple = (func.__name__, args)
-
-        cached_attrs = cache_shelf.get(id, None)
-
-        if cached_attrs is None or cached_attrs['mtime'] != self.getmtime():
-            cache_shelf[id] = { 'mtime': self.getmtime() }
-
-        elif func_tuple in cached_attrs:
-            return cached_attrs[func_tuple]
-
-        result = func(self, *args)
-        cached_attrs = cache_shelf[id]
-        cached_attrs[func_tuple] = result
-        cache_shelf[id] = cached_attrs
-        return result
-
-    return wrapper
-
-# TODO move all formatting related methods to a separate module
-#      only keep the _gen_text() method
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
 
@@ -75,13 +41,11 @@ class Entry():
         else:
             return getmtime(self.pathname)
 
-    @cached
     def contains(self, search_string):
         '''Return True if the entry contains the given search string.'''
         command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
         return call(command, shell=True) == 0
 
-    @cached
     def wordcount(self):
         '''Return the number of space separated words in the entry.'''
         # TODO do wordcount in python
@@ -94,7 +58,6 @@ class Entry():
             for line in f:
                 yield line.strip()
 
-    @cached
     def tags(self):
         '''Return a list of all tags occurring in the entry text.'''
 

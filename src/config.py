@@ -12,12 +12,6 @@ DEFAULT_CONFIG_FILE = realpath(expanduser(expandvars('~/.diaryrc')))
 dir_diary = realpath(expanduser(expandvars('~/space/diary/test-entries')))
 dir_data = join(dir_diary, 'data')
 dir_entries = join(dir_data, 'entries')
-# TODO store cache elsewhere
-dir_cache = join(dir_diary, 'cache')
-dir_wordcounts = join(dir_cache, 'wordcounts')
-dir_logs = join(dir_data, 'logs')
-dir_chain = join(dir_cache, 'chain')
-dir_entries_cache = join(dir_cache, 'entries')
 
 
 # TODO change all of these back when installing scripts properly
@@ -26,9 +20,6 @@ dir_entries_cache = join(dir_cache, 'entries')
 
 #device_name = expandvars('$HOSTNAME')
 device_name = expandvars('$HOSTNAME-testing')
-
-#tags_file = realpath(expanduser(expandvars('~/.diary-tags')))
-tags_file = realpath(expanduser(expandvars('~/space/diary/dev/config/diary-tags')))
 
 default_editor_existing = 'vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 default_editor_new = default_editor_existing + ' "+startinsert"'

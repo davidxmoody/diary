@@ -4,7 +4,6 @@
 # - Provide all functionality currently provided by the `diary` script. 
 # - Encapsulate everything related to using the diary scripts from a terminal.
 
-from diary_range import cached
 import config
 from config import pad_char, color_middle, color_padding, color_end
 import textwrap
@@ -48,11 +47,6 @@ def _gen_formatted(entry, width):
         for wrapped_line in wrapped_text:
             yield wrapped_line
 
-# It's kind of a cheat to use cached on a non-method.
-@cached
-def _formatted(entry, width):
-    return '\n'.join(_gen_formatted(entry, width)) + '\n\n'
-            
 def formatted(entry, width=config.terminal_width):
     '''Return a list of formatted lines, wrapped to width.'''
-    return _formatted(entry, width)
+    return '\n'.join(_gen_formatted(entry, width)) + '\n\n'
