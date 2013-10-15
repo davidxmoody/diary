@@ -1,12 +1,7 @@
-#!/usr/bin/env python3
-
 import argparse
 from itertools import islice
 import diary_range
-import diary_list
-
-# TODO Add search term logging and additional command line options from 
-#      previous diary-search bash script. 
+from presenter import display_entries
 
 parser = argparse.ArgumentParser(description='Search for words or tags.')
 
@@ -44,4 +39,4 @@ search_string = '\|'.join(search_strings)
 entries = diary_range.filter_entries(search_string)
 entries = islice(entries, args.max)
 
-diary_list.display_entries(entries)
+display_entries(entries)
