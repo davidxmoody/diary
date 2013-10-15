@@ -1,10 +1,17 @@
 import diary_range
 import sys
 from subprocess import Popen, PIPE
-
-from config import pad_char, color_middle, color_padding, color_end, terminal_width
+from subprocess import check_output
 import textwrap
 import time
+
+pad_char = '='
+color_middle = '\033[1;34m'   # Bold blue.
+color_padding = '\033[0;34m'  # Blue.
+color_bold = '\033[1;37m'     # Bold white.
+color_end = '\033[0m'
+
+terminal_width = int(check_output('tput cols', shell=True).strip())
 
 
 def get_date_string(entry, format='%A %d %B %Y %I:%M%p'):

@@ -3,7 +3,6 @@
 # TODO load these values from a user specified config file using configparser
 
 from os.path import expanduser, expandvars, realpath, join
-from subprocess import check_output
 
 DEFAULT_CONFIG_FILE = realpath(expanduser(expandvars('~/.diaryrc')))
 
@@ -23,12 +22,3 @@ device_name = expandvars('$HOSTNAME-testing')
 
 default_editor_existing = 'vim "+syntax off" "+set spell" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 default_editor_new = default_editor_existing + ' "+startinsert"'
-
-pad_char = '='
-color_middle = '\033[1;34m'   # Bold blue.
-color_padding = '\033[0;34m'  # Blue.
-color_bold = '\033[1;37m'     # Bold white.
-color_end = '\033[0m'
-
-# This might not work on non-Linux devices.
-terminal_width = int(check_output('tput cols', shell=True).strip())
