@@ -57,6 +57,7 @@ def display_entries(entries):
         for entry in entries:
             less_process.stdin.write(bytes(formatted(entry), 'UTF-8'))
         less_process.stdin.close()
+        less_process.wait()
 
     except BrokenPipeError:
         # Less process closed by user (hopefully) so stop quietly
