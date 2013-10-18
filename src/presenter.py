@@ -53,9 +53,11 @@ def display_entries(entries):
 
     less_process = Popen('less -R', stdin=PIPE, shell=True)
 
-    for entry in entries:
-        if less_process.poll() is None:  # Still running
+    try:
+        for entry in entries:
             less_process.stdin.write(bytes(formatted(entry), 'UTF-8'))
+        less_process.stdin.close()
 
-    less_process.stdin.close()
-    less_process.wait()
+    except BrokenPipeError:
+        # Less process closed by user (hopefully) so stop quietly
+        pass
