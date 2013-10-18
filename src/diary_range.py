@@ -1,22 +1,12 @@
-from os import makedirs, listdir
+import os
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 from os.path import expandvars, expanduser
+#TODO figure out whether to use only time or only datetime
 import time
-import argparse
+import datetime
 import re
 from subprocess import check_output, call
 from itertools import islice
-
-#TODO change these to be settable from the command line
-#DIR_DIARY = realpath(expanduser(expandvars('~/.diary')))
-DIR_DIARY = realpath(expanduser(expandvars('~/space/diary/test-entries')))
-DIR_DATA = join(DIR_DIARY, 'data')
-DIR_ENTRIES = join(DIR_DATA, 'entries')
-
-#TODO change back and check that $HOSTNAME actually works (I think it doesn't)
-#DEVICE_NAME = expandvars('$HOSTNAME')
-DEVICE_NAME = expandvars('testing')
-
 
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
@@ -33,7 +23,7 @@ class Entry():
         '''Create the entry's base directory (if it does not exist).'''
         directory = dirname(self.pathname)
         if not exists(directory):
-            makedirs(directory)
+            os.makedirs(directory)
 
     def exists(self):
         '''Return True if the entry exists.'''
@@ -45,6 +35,9 @@ class Entry():
             return None
         else:
             return getmtime(self.pathname)
+
+    def get_date(self):
+        return datetime.date.fromtimestamp(int(self.timestamp))
 
     def contains(self, search_string):
         '''Return True if the entry contains the given search string.'''
@@ -75,155 +68,65 @@ class Entry():
         return matches
 
 
-def new_entry(timestamp=None, device_name=DEVICE_NAME):
-    '''Return a new (not currently existing) entry.
-    
-    Note that the directory structure may not exist.'''
+class Helper():
 
-    timestamp = int(time.time()) if timestamp is None else int(timestamp)
-    month = time.strftime('%Y-%m', time.localtime(timestamp))
-    filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
+    def __init__(self, dir_base):
+        #TODO check that dir exists, if not create it
+        #TODO normalise/absolutise path?
+        self.dir_base = dir_base
+        self.dir_entries = realpath(expanduser(expandvars(
+                join(dir_base, 'data', 'entries'))))
 
-    return [Entry(DIR_ENTRIES, month, filename)]
+    def new_entry(self, timestamp=None, device_name='unknown'):
+        '''Return a new (not currently existing) entry.
+        
+        Note that the directory structure may not exist.'''
 
-def _find_with_command(command):
-    results = check_output(command, shell=True, universal_newlines=True)
-    return [ Entry(result) for result in results.split('\n') if len(result)>0 ]
+        timestamp = int(time.time()) if timestamp is None else int(timestamp)
+        month = time.strftime('%Y-%m', time.localtime(timestamp))
+        filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
 
-def find_by_timestamp(timestamp):
-    '''Returns any entries with the given timestamp.'''
-    command = 'find "{}" -iname "*-{}-*"'.format(DIR_ENTRIES, timestamp)
-    return _find_with_command(command)
+        return Entry(self.dir_entries, month, filename)
 
-def modified_since(timestamp=0):
-    '''Returns all entries last modified after the given timestamp.'''
-    command = 'find "{}" -type f -newermt @{}'.format(DIR_ENTRIES, timestamp)
-    return _find_with_command(command)
+    def get_entries(self, descending=False, min_date=None, max_date=None):
+        '''Return an generator over all entries.'''
 
-def walk_all_entries(reverse=False):
-    '''Iterates over all entries.'''
-    for month in sorted(listdir(DIR_ENTRIES), reverse=reverse):
-        for filename in sorted(listdir(join(DIR_ENTRIES, month)), 
-                               reverse=reverse):
-            yield Entry(DIR_ENTRIES, month, filename)
+        for month in sorted(os.listdir(self.dir_entries), reverse=descending):
+            #TODO skip over months not within date range
+            for filename in sorted(os.listdir(join(self.dir_entries, month)), 
+                                   reverse=descending):
 
-def range_of_entries(slice_args):
-    '''Returns all entries in the given range.'''
+                entry = Entry(self.dir_entries, month, filename)
 
-    start, stop, step = slice_args
-
-    # If start, stop and step are all positive (or None) then use islice.
-    if (step is None or step > 0) and \
-       (start is None or start >= 0) and \
-       (stop is None or stop >=0):
-        return islice(walk_all_entries(), start, stop, step)
-
-    # If start, stop and step are all negative (or None) then use islice.
-    elif (step is not None and step < 0) and \
-         (start is None or start < 0) and \
-         (stop is None or stop < 0):
-        start = None if start is None else -1*start
-        stop = None if stop is None else -1*stop
-        step = None if step is None else -1*step
-        return islice(walk_all_entries(reverse=True), start, stop, step)
-
-    # If there is a mixture of positives and negatives then use regular slice.
-    else:
-        return list(walk_all_entries())[start:stop:step]
-
-def last(num_entries=0):
-    '''Return the most recent entries in decending order.'''
-    return range_of_entries((None, -1*num_entries, -1))
-
-def single_entry(index):
-    '''Return a single entry at the given index.'''
-    if index >= 0:
-        return range_of_entries((index, index+1, 1))
-    else:
-        return range_of_entries((None if index==-1 else index+1, index, -1))
-
-def filter_entries(search_string, entries=None):
-    '''Filter entries by presence of the (regular expression) search string.
-
-    If entries is None then search all entries in reverse order.'''
-
-    if entries is None: 
-        entries = walk_all_entries(reverse=True)
-
-    for entry in entries:
-        if entry.contains(search_string):
-            yield entry
-
-
-def range_type(string, range_re=re.compile(
-            r'^([+_-]?[0-9]+)?:([+_-]?[0-9]+)?(?::([+_-]?[0-9]+))?$')):
-
-    '''Returns (start, stop, step) for the given slice.'''
-    match = range_re.match(string)
-    if not match: 
-        raise argparse.ArgumentTypeError('invalid range')
-    
-    start, stop, step = match.groups()
-    start = None if start is None else int(start.replace('_', '-'))
-    stop = None if stop is None else int(stop.replace('_', '-'))
-    step = None if step is None else int(step.replace('_', '-'))
-
-    return (start, stop, step)
-
-class QueueAction(argparse.Action):
-    '''Appends (dest, args) pairs to 'queue' in the returned Namespace.'''
-    def __call__(self, parser, namespace, value, option_string=None):
-        if not hasattr(namespace, 'queue'): 
-            namespace.queue = []
-        namespace.queue.append( (self.dest, value) )
-
-
-parser = argparse.ArgumentParser(description='Get entry filenames.')
-
-parser.add_argument('-n', '--new', nargs='?', type=int, 
-                    dest='new_entry', metavar='NEW',
-                    help='new entry with given timestamp', 
-                    action=QueueAction, default=argparse.SUPPRESS)
-
-parser.add_argument('-r', '--range', type=range_type,
-                    dest='range_of_entries', metavar='SLICE',
-                    help='range of entries',
-                    action=QueueAction, default=argparse.SUPPRESS)
+                if min_date is not None and entry.get_date() < min_date:
+                    if descending: break 
+                    else: continue
                     
-parser.add_argument('-i', '--index', type=int,
-                    dest='single_entry', metavar='INDEX',
-                    help='single entry at INDEX',
-                    action=QueueAction, default=argparse.SUPPRESS)
-                    
-parser.add_argument('-t', '--timestamp', type=int,
-                    dest='find_by_timestamp', metavar='TIMESTAMP',
-                    help='all entries created on TIMESTAMP',
-                    action=QueueAction, default=argparse.SUPPRESS)
+                if max_date is not None and entry.get_date() > max_date:
+                    if descending: continue 
+                    else: break
 
-parser.add_argument('-m', '--modified', type=int,
-                    dest='modified_since', metavar='MODIFIED',
-                    help='all entries modified since MODIFIED',
-                    action=QueueAction, default=argparse.SUPPRESS)
-
-parser.add_argument('-s', '--search', type=str,
-                    dest='filter_entries', metavar='SEARCH',
-                    help='all entries containing SEARCH',
-                    action=QueueAction, default=argparse.SUPPRESS)
-
-
-def process_args():
-    '''Return a list of all entries specified by the command line args.'''
-
-    args = parser.parse_args()
-
-    if hasattr(args, 'queue'):
-        for func_name, value in args.queue:
-            for entry in globals()[func_name](value):
                 yield entry
 
+    def search_entries(self, *search_terms, entries=None):
+        if entries is None: entries = self.get_entries(True)
 
-# If running as script then print the filenames of all entries. 
-if __name__ == '__main__':
+        for entry in entries:
+            if all(entry.contains(term) for term in search_terms):
+                yield entry
 
-    for entry in process_args():
-        print(entry.pathname)
+    def _find_with_command(self, command):
+        results = check_output(command, shell=True, universal_newlines=True)
+        return ( Entry(result) for result in results.split('\n') if len(result)>0 )
+
+    # never used
+    #TODO keep this but implement differently
+    def find_by_timestamp(self, timestamp):
+        '''Returns any entries with the given timestamp.'''
+        command = 'find "{}" -iname "*-{}-*"'.format(DIR_ENTRIES, timestamp)
+        return _find_with_command(command)
+
+
+def connect(dir_base):
+    print('connecting to:', dir_base)
+    return Helper(dir_base)
