@@ -11,6 +11,7 @@ from itertools import islice
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
 
+    #TODO can't I just use a + instead of a * here? Check this.
     _filename_re = re.compile(
             r'^diary-(-?[0-9]+)-([a-zA-Z0-9_][a-zA-Z0-9_-]*)\.([a-z]+)$')
 
@@ -109,6 +110,7 @@ class Helper():
                 yield entry
 
     def search_entries(self, *search_terms, entries=None):
+        '''Filter entries by search terms.'''
         if entries is None: entries = self.get_entries(True)
 
         for entry in entries:
@@ -126,5 +128,4 @@ class Helper():
 
 
 def connect(dir_base):
-    print('connecting to:', dir_base)
     return Helper(dir_base)

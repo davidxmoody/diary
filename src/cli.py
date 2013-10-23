@@ -4,14 +4,8 @@ import subprocess
 import diary_range
 from presenter import display_entries
 
-#TODO update this when necessary, is there a better way to do this?
 PROGRAM_NAME = 'diary'
-VERSION_NUMBER = '2.0'
-
-# Keywords to support:
-# - wordcount (or stats): wordcount summary of all entries, other stats maybe
-# - chain: calculate max chain length for tags in tag file (custom subtraction amount)
-# - range (or filenames or something): print filenames in specified range (or make this an optional argument to list/search)
+VERSION_NUMBER = '2.0.0'
 
 
 #TODO Feature wishlist:
@@ -24,6 +18,10 @@ VERSION_NUMBER = '2.0'
 # - add default device name selection (use the $HOSTNAME) 
 # - aliases for commands (ls, wc, etc.)
 # - allow the edit command to perform direct searches instead of only opening entries by timestamp?
+# - print stats other than word and entry counts (tag counts, etc.)
+# - print graphs instead of just summaries
+# - command to print filenames of entries matching a search
+# - implement diary chain script to calculate the maximum chain length of recurring tags (with customisable penalties for missing days)
 
 # - user modifiable config file, located either in home dir or specific to diary dir (diary dir one should take precidence)
 # - set default editors in config file
@@ -63,7 +61,7 @@ def new_command(args):
 
 def list_command(args):
     #TODO pay attention to range args when choosing which entries to display
-    entries = diary_range.connect(args.base).get_entries(descending=True)
+    entries = diary_range.connect(args.base).get_entries(descending=args.descending, min_date=args.after, max_date=args.before)
     display_entries(entries)
 
 def search_command(args):
@@ -101,6 +99,7 @@ def wordcount_command(args):
 
 # Filter options parser (shared between commands processing multiple entries)
 filter_parser = argparse.ArgumentParser(add_help=False)
+#TODO convert to fuzzy dates here
 filter_parser.add_argument('--before', metavar='DATE')
 filter_parser.add_argument('--after', metavar='DATE')
 filter_parser.add_argument('--asc', action='store_false', dest='descending')
@@ -121,11 +120,11 @@ subparsers = parser.add_subparsers()
 #TODO edit and new seem to be almost identical, combine them into one? Ditto for search and list
 #TODO add help text for optional arguments
 subparser = subparsers.add_parser('edit')
-subparser.add_argument('timestamp', nargs='?')
+subparser.add_argument('timestamp', type=int, nargs='?')
 subparser.set_defaults(func=edit_command)
 
 subparser = subparsers.add_parser('new')
-subparser.add_argument('timestamp', nargs='?')
+subparser.add_argument('timestamp', type=int, nargs='?')
 subparser.set_defaults(func=new_command)
 
 subparser = subparsers.add_parser('list', parents=[filter_parser])
@@ -143,8 +142,11 @@ subparser.add_argument('-g', '--group-by', dest='group', metavar='DATE_FORMAT')
 subparser.set_defaults(func=wordcount_command, descending=False)
 
 
+# Call the function corresponding to the selected command or print usage
 args = parser.parse_args()
 if hasattr(args, 'func'):
     args.func(args)
 else:
     parser.print_usage()
+
+#TODO only do this if the script is running as __main__
