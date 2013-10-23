@@ -4,8 +4,22 @@ import subprocess
 import diary_range
 from presenter import display_entries
 
+#TODO update version number when necessary
 PROGRAM_NAME = 'diary'
 VERSION_NUMBER = '2.0.0'
+
+
+# Try to load fuzzy date parsing if it is installed, otherwise use strptime
+try:
+    import dateutil.parser
+    def custom_date(date_string):
+        return dateutil.parser.parse(date_string, fuzzy=True)
+
+except:
+    import datetime
+    def custom_date(date_string):
+        #TODO try multiple different time formats until one works (e.g. YYYY-MM, YYYY-MM-DD, YYYY, DD/MM/YY, etc.)
+        return datetime.datetime.strptime(date_string, '%Y-%m')
 
 
 #TODO Feature wishlist:
@@ -29,6 +43,8 @@ VERSION_NUMBER = '2.0.0'
 # - search options settable in config file
 # - set device name in config file, ability to link to an external file for the device name
 # - user configurable commands/aliases
+
+#TODO re-write so that args is unpacked before being passed to the command functions
 
 DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
@@ -60,18 +76,17 @@ def new_command(args):
     _edit_entry(entry)
 
 def list_command(args):
-    #TODO pay attention to range args when choosing which entries to display
     entries = diary_range.connect(args.base).get_entries(descending=args.descending, min_date=args.after, max_date=args.before)
     display_entries(entries)
 
 def search_command(args):
-    entries = diary_range.connect(args.base).search_entries(*args.search_terms)
+    entries = diary_range.connect(args.base).search_entries(*args.search_terms, descending=args.descending, min_date=args.after, max_date=args.before)
     display_entries(entries)
 
 def wordcount_command(args):
     #TODO clean this up a bit and move to a separate module?
     if args.group is None: args.group = 'Total'
-    entries = diary_range.connect(args.base).get_entries() #TODO add filtering
+    entries = diary_range.connect(args.base).get_entries(descending=args.descending, min_date=args.after, max_date=args.before)
     wordcounts = {}
     entry_counts = {}
 
@@ -99,9 +114,8 @@ def wordcount_command(args):
 
 # Filter options parser (shared between commands processing multiple entries)
 filter_parser = argparse.ArgumentParser(add_help=False)
-#TODO convert to fuzzy dates here
-filter_parser.add_argument('--before', metavar='DATE')
-filter_parser.add_argument('--after', metavar='DATE')
+filter_parser.add_argument('--before', type=custom_date, metavar='DATE')
+filter_parser.add_argument('--after', type=custom_date, metavar='DATE')
 filter_parser.add_argument('--asc', action='store_false', dest='descending')
 filter_parser.add_argument('--desc', action='store_true', dest='descending')
 filter_parser.set_defaults(descending=True)
@@ -139,14 +153,16 @@ subparser = subparsers.add_parser('wordcount', parents=[filter_parser], aliases=
 subparser.add_argument('-y', '--year', action='store_const', const='%Y', dest='group')
 subparser.add_argument('-m', '--month', action='store_const', const='%Y-%m', dest='group')
 subparser.add_argument('-g', '--group-by', dest='group', metavar='DATE_FORMAT')
-subparser.set_defaults(func=wordcount_command, descending=False)
+#TODO default to ascending order without breaking the regular default
+subparser.set_defaults(func=wordcount_command)
 
 
-# Call the function corresponding to the selected command or print usage
-args = parser.parse_args()
-if hasattr(args, 'func'):
-    args.func(args)
-else:
-    parser.print_usage()
+def process_args():
+    args = parser.parse_args()
+    if hasattr(args, 'func'):
+        args.func(args)
+    else:
+        parser.print_usage()
 
-#TODO only do this if the script is running as __main__
+if __name__ == '__main__':
+    process_args()

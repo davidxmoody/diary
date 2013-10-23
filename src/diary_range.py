@@ -38,7 +38,7 @@ class Entry():
             return getmtime(self.pathname)
 
     def get_date(self):
-        return datetime.date.fromtimestamp(int(self.timestamp))
+        return datetime.datetime.fromtimestamp(int(self.timestamp))
 
     def contains(self, search_string):
         '''Return True if the entry contains the given search string.'''
@@ -109,9 +109,9 @@ class Helper():
 
                 yield entry
 
-    def search_entries(self, *search_terms, entries=None):
+    def search_entries(self, *search_terms, entries=None, **kwargs):
         '''Filter entries by search terms.'''
-        if entries is None: entries = self.get_entries(True)
+        if entries is None: entries = self.get_entries(**kwargs)
 
         for entry in entries:
             if all(entry.contains(term) for term in search_terms):
