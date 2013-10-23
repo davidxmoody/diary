@@ -119,12 +119,10 @@ class Helper():
         results = check_output(command, shell=True, universal_newlines=True)
         return ( Entry(result) for result in results.split('\n') if len(result)>0 )
 
-    # never used
-    #TODO keep this but implement differently
     def find_by_timestamp(self, timestamp):
         '''Returns any entries with the given timestamp.'''
-        command = 'find "{}" -iname "*-{}-*"'.format(DIR_ENTRIES, timestamp)
-        return _find_with_command(command)
+        command = 'find "{}" -iname "*-{}-*"'.format(self.dir_entries, timestamp)
+        return self._find_with_command(command)
 
 
 def connect(dir_base):
