@@ -1,7 +1,7 @@
 import os
 from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
 from os.path import expandvars, expanduser
-#TODO figure out whether to use only time or only datetime
+#TODO only use datetime
 import time
 import datetime
 import re
@@ -11,10 +11,10 @@ from itertools import islice
 class Entry():
     '''Encapsulates entry manipulation functionality.'''
 
-    #TODO can't I just use a + instead of a * here? Check this.
     _filename_re = re.compile(
-            r'^diary-(-?[0-9]+)-([a-zA-Z0-9_][a-zA-Z0-9_-]*)\.([a-z]+)$')
+            r'^diary-([0-9]+)-([a-zA-Z0-9_-]+)\.([a-z]+)$')
 
+    #TODO rewrite this to use the @property decorator instead of functions
     def __init__(self, *path_components):
         self.pathname = join(*path_components)
         match = Entry._filename_re.match(basename(self.pathname))
@@ -29,13 +29,6 @@ class Entry():
     def exists(self):
         '''Return True if the entry exists.'''
         return isfile(self.pathname)
-
-    def getmtime(self):
-        '''Return the timestamp when the entry was last modified.'''
-        if not self.exists(): 
-            return None
-        else:
-            return getmtime(self.pathname)
 
     def get_date(self):
         return datetime.datetime.fromtimestamp(int(self.timestamp))
@@ -55,18 +48,6 @@ class Entry():
         with open(self.pathname) as f:
             for line in f:
                 yield line.strip()
-
-    def tags(self):
-        '''Return a list of all tags occurring in the entry text.'''
-
-        command = r'grep -o "#\S\+\b" "{}" || true'.format(self.pathname)
-        matches = check_output(command, shell=True, universal_newlines=True)
-
-        matches = matches.split('\n')
-        matches = [ match.lstrip('#').rstrip() for match in matches ]
-        matches = [ match for match in matches if len(match)>0 ]
-
-        return matches
 
 
 class Helper():
@@ -93,7 +74,6 @@ class Helper():
         '''Return an generator over all entries.'''
 
         for month in sorted(os.listdir(self.dir_entries), reverse=descending):
-            #TODO skip over months not within date range
             for filename in sorted(os.listdir(join(self.dir_entries, month)), 
                                    reverse=descending):
 

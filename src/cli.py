@@ -1,10 +1,8 @@
 import argparse
-#TODO move these imports to the functions where they are needed?
 import subprocess
 import diary_range
 from presenter import display_entries
 
-#TODO update version number when necessary
 PROGRAM_NAME = 'diary'
 VERSION_NUMBER = '2.0.0'
 
@@ -13,13 +11,13 @@ VERSION_NUMBER = '2.0.0'
 try:
     import dateutil.parser
     def custom_date(date_string):
+        #TODO use a reference date (or two) so that today's date doesn't fill in the unspecified bits
         return dateutil.parser.parse(date_string, fuzzy=True)
 
 except:
     import datetime
     def custom_date(date_string):
-        #TODO try multiple different time formats until one works (e.g. YYYY-MM, YYYY-MM-DD, YYYY, DD/MM/YY, etc.)
-        return datetime.datetime.strptime(date_string, '%Y-%m')
+        return datetime.datetime.strptime(date_string, '%Y-%m-%d')
 
 
 #TODO Feature wishlist:
@@ -142,6 +140,7 @@ subparser.add_argument('timestamp', type=int, nargs='?')
 subparser.set_defaults(func=new_command)
 
 subparser = subparsers.add_parser('list', parents=[filter_parser])
+#TODO make this option work
 subparser.add_argument('--search', action='append', dest='search_terms', metavar='SEARCH_TERM')
 subparser.set_defaults(func=list_command)
 

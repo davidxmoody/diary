@@ -2,33 +2,33 @@ from subprocess import check_output, Popen, PIPE
 import textwrap
 import time
 
-pad_char = '='
-color_middle = '\033[1;34m'   # Bold blue.
-color_padding = '\033[0;34m'  # Blue.
-color_bold = '\033[1;37m'     # Bold white.
-color_end = '\033[0m'
+PAD_CHAR = '='
+COLOR_MIDDLE = '\033[1;34m'   # Bold blue.
+COLOR_PADDING = '\033[0;34m'  # Blue.
+COLOR_END = '\033[0m'
 
-terminal_width = int(check_output('tput cols', shell=True).strip())
+DATE_FORMAT = '%a %d %b %Y %H:%M'
+TERMINAL_WIDTH = int(check_output('tput cols', shell=True).strip())
 
 
-def get_date_string(entry, format='%A %d %B %Y %I:%M%p'):
+def get_date_string(entry, format=DATE_FORMAT):
     '''Return formatted string representing the entry creation date.'''
     return time.strftime(format, time.localtime(float(entry.timestamp)))
 
 def get_header(entry, width):
     '''Return a colored header string padded to the correct width.'''
 
-    left = pad_char + '{} words'.format(entry.wordcount())
-    right = str(entry.timestamp) + pad_char
+    left = PAD_CHAR + '{} words'.format(entry.wordcount())
+    right = str(entry.timestamp) + PAD_CHAR
     middle = ' {} '.format(get_date_string(entry))
 
-    padding_left = pad_char * int(width/2 - len(left) - len(middle)/2)
-    padding_right = pad_char * (width - len(left) - 
+    padding_left = PAD_CHAR * int(width/2 - len(left) - len(middle)/2)
+    padding_right = PAD_CHAR * (width - len(left) - 
                         len(padding_left) - len(middle) - len(right))
 
-    return color_padding +     left      + padding_left + color_end + \
-           color_middle  +            middle            + color_end + \
-           color_padding + padding_right +    right     + color_end
+    return COLOR_PADDING +     left      + padding_left + COLOR_END + \
+           COLOR_MIDDLE  +            middle            + COLOR_END + \
+           COLOR_PADDING + padding_right +    right     + COLOR_END
 
 def _gen_formatted(entry, width):
     '''Return a generator over the formatted, wrapped lines of an entry.'''
@@ -44,7 +44,7 @@ def _gen_formatted(entry, width):
         for wrapped_line in wrapped_text:
             yield wrapped_line
 
-def formatted(entry, width=terminal_width):
+def formatted(entry, width=TERMINAL_WIDTH):
     '''Return a list of formatted lines, wrapped to width.'''
     return '\n'.join(_gen_formatted(entry, width)) + '\n\n'
 
