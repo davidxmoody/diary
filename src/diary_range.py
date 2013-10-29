@@ -10,8 +10,7 @@ from itertools import islice
 
 class Entry():
 
-    _filename_re = re.compile(
-            r'^diary-([0-9]+)-([a-zA-Z0-9_-]+)\.([a-z]+)$')
+    _filename_re = re.compile(r'^diary-([0-9]+)-([a-zA-Z0-9_-]+)\.([a-z]+)$')
 
     def __init__(self, *path_components):
         self.pathname = join(*path_components)
@@ -39,9 +38,7 @@ class Entry():
 
     @property
     def wordcount(self):
-        #TODO do this in python (using regular expressions?)
-        command = 'wc -w < "{}"'.format(self.pathname)
-        return int(check_output(command, shell=True).strip())
+        return len(re.findall(r'\S+', self.text))
 
     @property
     def text(self):
