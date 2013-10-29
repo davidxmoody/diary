@@ -28,9 +28,7 @@ class Entry():
         return isfile(self.pathname)
 
     def contains(self, search_string):
-        '''Return True if the entry contains the given search string.'''
-        command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
-        return call(command, shell=True) == 0
+        return re.search(search_string, self.text, re.I)
 
     @property
     def date(self):
