@@ -81,7 +81,7 @@ def list_command(args):
 
 def search_command(args):
     entries = diary_range.connect(args.base).search_entries(*args.search_terms, descending=args.descending, min_date=args.after, max_date=args.before)
-    display_entries(entries)
+    display_entries(entries, args.search_terms)
 
 def wordcount_command(args):
     #TODO clean this up a bit and move to a separate module?

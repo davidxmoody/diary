@@ -1,10 +1,12 @@
 from subprocess import check_output, Popen, PIPE
 import textwrap
 import time
+import re
 
 PAD_CHAR = '='
-COLOR_MIDDLE = '\033[1;34m'   # Bold blue.
-COLOR_PADDING = '\033[0;34m'  # Blue.
+COLOR_MIDDLE = '\033[1;34m'     # Bold blue
+COLOR_PADDING = '\033[0;34m'    # Blue
+COLOR_HIGHLIGHT = '\033[1;31m'  # Bold red
 COLOR_END = '\033[0m'
 
 DATE_FORMAT = '%a %d %b %Y %H:%M'
@@ -32,7 +34,14 @@ def get_header(entry, width):
            COLOR_MIDDLE  +            middle            + COLOR_END + \
            COLOR_PADDING + padding_right +    right     + COLOR_END
 
-def _gen_formatted(entry, width):
+def highlighted(text, search_terms):
+    if len(search_terms)==0: return text
+    re_string = '(' + '|'.join(re.escape(term) for term in search_terms) + ')'
+    re_obj = re.compile(re_string, re.I)
+    repl = r'{}\1{}'.format(COLOR_HIGHLIGHT, COLOR_END)
+    return re_obj.sub(repl, text)
+
+def _gen_formatted(entry, search_terms, width):
     '''Return a generator over the formatted, wrapped paragraphs of an entry.'''
 
     yield get_header(entry, width)
@@ -41,20 +50,21 @@ def _gen_formatted(entry, width):
 
     for line in entry._gen_text():
         wrapped_para = wrapper.fill(line)
-        yield wrapped_para
+        highlighted_para = highlighted(wrapped_para, search_terms)
+        yield highlighted_para
 
-def formatted(entry, width=TERMINAL_WIDTH):
+def formatted(entry, search_terms, width=TERMINAL_WIDTH):
     '''Return the text of entry wrapped to width with a header.'''
-    return '\n'.join(_gen_formatted(entry, width)) + '\n\n'
+    return '\n'.join(_gen_formatted(entry, search_terms, width)) + '\n\n'
 
-def display_entries(entries):
+def display_entries(entries, search_terms=[]):
     '''Open a less pipe to display the given entries to the user.'''
 
     less_process = Popen('less -R', stdin=PIPE, shell=True)
 
     try:
         for entry in entries:
-            less_process.stdin.write(bytes(formatted(entry), 'UTF-8'))
+            less_process.stdin.write(bytes(formatted(entry, search_terms), 'UTF-8'))
         less_process.stdin.close()
         less_process.wait()
 
