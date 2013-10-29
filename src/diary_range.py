@@ -43,15 +43,9 @@ class Entry():
         command = 'wc -w < "{}"'.format(self.pathname)
         return int(check_output(command, shell=True).strip())
 
-    def _gen_text(self):
-        '''Return a generator over the lines of the entry.'''
-        with open(self.pathname) as f:
-            for line in f:
-                #TODO Why is this being stripped?
-                yield line.strip()
-
     def text(self):
-        return '\n'.join(self._gen_text())
+        with open(self.pathname) as f:
+            return f.read()
 
 
 class Helper():

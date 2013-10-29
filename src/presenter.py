@@ -50,7 +50,7 @@ def _gen_formatted(entry, search_terms, width):
 
     wrapper = textwrap.TextWrapper(width=width)
 
-    for line in entry._gen_text():
+    for line in entry.text().splitlines():
         wrapped_para = wrapper.fill(line)
         highlighted_para = highlighted(wrapped_para, search_terms)
         yield highlighted_para
