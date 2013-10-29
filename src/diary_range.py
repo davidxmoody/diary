@@ -47,7 +47,11 @@ class Entry():
         '''Return a generator over the lines of the entry.'''
         with open(self.pathname) as f:
             for line in f:
+                #TODO Why is this being stripped?
                 yield line.strip()
+
+    def text(self):
+        return '\n'.join(self._gen_text())
 
 
 class Helper():
