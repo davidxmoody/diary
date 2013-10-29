@@ -14,17 +14,12 @@ DATE_FORMAT = '%a %d %b %Y %H:%M'
 TERMINAL_WIDTH = int(check_output('tput cols', shell=True).strip())
 
 
-def get_date_string(entry, format=DATE_FORMAT):
-    '''Return formatted string representing the entry creation date.'''
-    #TODO use the entry's date rather than timestamp
-    return time.strftime(format, time.localtime(float(entry.timestamp)))
-
 def get_header(entry, width):
     '''Return a colored header string padded to the correct width.'''
 
-    left = PAD_CHAR + '{} words'.format(entry.wordcount())
+    left = PAD_CHAR + '{} words'.format(entry.wordcount)
     right = str(entry.timestamp) + PAD_CHAR
-    middle = ' {} '.format(get_date_string(entry))
+    middle = ' {} '.format(entry.date.strftime(DATE_FORMAT))
 
     padding_left = PAD_CHAR * int(width/2 - len(left) - len(middle)/2)
     padding_right = PAD_CHAR * (width - len(left) - 
@@ -50,7 +45,7 @@ def _gen_formatted(entry, search_terms, width):
 
     wrapper = textwrap.TextWrapper(width=width)
 
-    for line in entry.text().splitlines():
+    for line in entry.text.splitlines():
         wrapped_para = wrapper.fill(line)
         highlighted_para = highlighted(wrapped_para, search_terms)
         yield highlighted_para

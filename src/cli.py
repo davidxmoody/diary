@@ -63,11 +63,11 @@ def wordcount_command(conn, group_by, descending, after, before, **kwargs):
     entry_counts = {}
 
     for entry in entries:
-        group = entry.get_date().strftime(group_by)
+        group = entry.date.strftime(group_by)
         if group not in wordcounts:
             wordcounts[group] = 0
             entry_counts[group] = 0
-        wordcounts[group] += entry.wordcount()
+        wordcounts[group] += entry.wordcount
         entry_counts[group] += 1
 
     if len(wordcounts)>1:

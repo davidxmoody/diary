@@ -9,12 +9,10 @@ from subprocess import check_output, call
 from itertools import islice
 
 class Entry():
-    '''Encapsulates entry manipulation functionality.'''
 
     _filename_re = re.compile(
             r'^diary-([0-9]+)-([a-zA-Z0-9_-]+)\.([a-z]+)$')
 
-    #TODO rewrite this to use the @property decorator instead of functions
     def __init__(self, *path_components):
         self.pathname = join(*path_components)
         match = Entry._filename_re.match(basename(self.pathname))
@@ -30,19 +28,22 @@ class Entry():
         '''Return True if the entry exists.'''
         return isfile(self.pathname)
 
-    def get_date(self):
-        return datetime.datetime.fromtimestamp(int(self.timestamp))
-
     def contains(self, search_string):
         '''Return True if the entry contains the given search string.'''
         command = 'grep -qi "{}" "{}"'.format(search_string, self.pathname)
         return call(command, shell=True) == 0
 
+    @property
+    def date(self):
+        return datetime.datetime.fromtimestamp(int(self.timestamp))
+
+    @property
     def wordcount(self):
-        '''Return the number of space separated words in the entry.'''
+        #TODO do this in python (using regular expressions?)
         command = 'wc -w < "{}"'.format(self.pathname)
         return int(check_output(command, shell=True).strip())
 
+    @property
     def text(self):
         with open(self.pathname) as f:
             return f.read()
@@ -77,11 +78,11 @@ class Helper():
 
                 entry = Entry(self.dir_entries, month, filename)
 
-                if min_date is not None and entry.get_date() < min_date:
+                if min_date is not None and entry.date < min_date:
                     if descending: break 
                     else: continue
                     
-                if max_date is not None and entry.get_date() > max_date:
+                if max_date is not None and entry.date > max_date:
                     if descending: continue 
                     else: break
 
