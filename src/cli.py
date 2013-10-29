@@ -21,29 +21,6 @@ except:
     def custom_date(date_string):
         return datetime.datetime.strptime(date_string, '%Y-%m-%d')
 
-
-#TODO Feature wishlist:
-
-# - custom description and usage
-# - set default diary dir (~/.diary)
-# - create new entries with custom timestamp and/or device_name
-# - case sensitivity options for search (both to enable and disable)
-# - automatic (configurable) word boundaries added to search expressions (both to enable and disable)
-# - add default device name selection (use the $HOSTNAME) 
-# - aliases for commands (ls, wc, etc.)
-# - allow the edit command to perform direct searches instead of only opening entries by timestamp?
-# - print stats other than word and entry counts (tag counts, etc.)
-# - print graphs instead of just summaries
-# - command to print filenames of entries matching a search
-# - implement diary chain script to calculate the maximum chain length of recurring tags (with customisable penalties for missing days)
-
-# - user modifiable config file, located either in home dir or specific to diary dir (diary dir one should take precidence)
-# - set default editors in config file
-# - set default sort order and date ranges in config file
-# - search options settable in config file
-# - set device name in config file, ability to link to an external file for the device name
-# - user configurable commands/aliases
-
 #TODO re-write so that args is unpacked before being passed to the command functions
 
 DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
@@ -84,7 +61,7 @@ def search_command(args):
     display_entries(entries, args.search_terms)
 
 def wordcount_command(args):
-    #TODO clean this up a bit and move to a separate module?
+    #TODO clean this up a bit and move to a separate module? Move to the presenter module?
     if args.group is None: args.group = 'Total'
     entries = diary_range.connect(args.base).get_entries(descending=args.descending, min_date=args.after, max_date=args.before)
     wordcounts = {}
@@ -160,6 +137,7 @@ subparser.set_defaults(func=wordcount_command)
 
 def process_args():
     args = parser.parse_args()
+    #TODO rewrite to unpack the namespace with vars()
     if hasattr(args, 'func'):
         args.func(args)
     else:

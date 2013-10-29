@@ -35,6 +35,8 @@ def get_header(entry, width):
            COLOR_PADDING + padding_right +    right     + COLOR_END
 
 def highlighted(text, search_terms):
+    #TODO reuse the same re_obj between paragraphs
+    #TODO fix bug where searching with word boundaries doesn't highlight the term
     if len(search_terms)==0: return text
     re_string = '(' + '|'.join(re.escape(term) for term in search_terms) + ')'
     re_obj = re.compile(re_string, re.I)
