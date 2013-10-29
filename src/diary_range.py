@@ -1,7 +1,5 @@
 import os
 from os.path import realpath, join, basename, expandvars, expanduser
-#TODO only use datetime
-import time
 import datetime
 import re
 import subprocess
@@ -61,8 +59,12 @@ class Helper():
         
         Note that the directory structure may not exist.'''
 
-        timestamp = int(time.time()) if timestamp is None else int(timestamp)
-        month = time.strftime('%Y-%m', time.localtime(timestamp))
+        entry_date = datetime.datetime.today() if timestamp is None else \
+                     datetime.datetime.fromtimestamp(timestamp)
+        
+        timestamp = entry_date.strftime('%s')
+        month = entry_date.strftime('%Y-%m')
+
         filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
 
         return Entry(self.dir_entries, month, filename)
