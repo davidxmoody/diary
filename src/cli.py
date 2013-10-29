@@ -32,37 +32,33 @@ def _edit_entry(entry,
     editor = editor_existing if entry.exists() else editor_new
     subprocess.call('{} "{}"'.format(editor, entry.pathname), shell=True)
 
-def edit_command(base, timestamp, **kwargs):
+def edit_command(conn, timestamp, **kwargs):
     # No timestamp given -> edit most recent entry
     if timestamp is None:
-        entry = diary_range.connect(base).get_entries(descending=True).__next__()
+        entry = conn.get_entries(descending=True).__next__()
         _edit_entry(entry)
 
     # Timestamp given -> try to edit that entry
     else:
-        entries = list(diary_range.connect(base).find_by_timestamp(timestamp))
+        entries = list(conn.find_by_timestamp(timestamp))
         if len(entries)==0:
             print("No entries found for timestamp: {}".format(timestamp))
         else:
             _edit_entry(entries[0])
         # Ignore the case where more than one entry exists with the given timestamp
 
-def new_command(base, timestamp, **kwargs):
-    entry = diary_range.connect(base).new_entry(timestamp)
+def new_command(conn, timestamp, **kwargs):
+    entry = conn.new_entry(timestamp)
     _edit_entry(entry)
 
-def list_command(base, descending, after, before, **kwargs):
-    entries = diary_range.connect(base).get_entries(descending=descending, min_date=after, max_date=before)
-    display_entries(entries)
-
-def search_command(base, search_terms, descending, after, before, **kwargs):
-    entries = diary_range.connect(base).search_entries(*search_terms, descending=descending, min_date=after, max_date=before)
+def search_command(conn, search_terms, descending, after, before, **kwargs):
+    entries = conn.search_entries(*search_terms, descending=descending, min_date=after, max_date=before)
     display_entries(entries, search_terms)
 
-def wordcount_command(base, group_by, descending, after, before, **kwargs):
+def wordcount_command(conn, group_by, descending, after, before, **kwargs):
     #TODO clean this up a bit and move to a separate module? Move to the presenter module?
     if group_by is None: group_by = 'Total'
-    entries = diary_range.connect(base).get_entries(descending=descending, min_date=after, max_date=before)
+    entries = conn.get_entries(descending=descending, min_date=after, max_date=before)
     wordcounts = {}
     entry_counts = {}
 
@@ -117,14 +113,17 @@ subparser = subparsers.add_parser('new')
 subparser.add_argument('timestamp', type=int, nargs='?')
 subparser.set_defaults(func=new_command)
 
+
+# The 'list' command is essentially identical to the 'search' command 
+# except that it specifies search terms with a different syntax
 subparser = subparsers.add_parser('list', parents=[filter_parser])
-#TODO make this option work
 subparser.add_argument('--search', action='append', dest='search_terms', metavar='SEARCH_TERM')
-subparser.set_defaults(func=list_command)
+subparser.set_defaults(func=search_command, search_terms=[])
 
 subparser = subparsers.add_parser('search', parents=[filter_parser])
-subparser.add_argument('search_terms', nargs='+')
+subparser.add_argument('search_terms', nargs='*')
 subparser.set_defaults(func=search_command)
+
 
 subparser = subparsers.add_parser('wordcount', parents=[filter_parser], aliases=['wc'])
 subparser.add_argument('-y', '--year', action='store_const', const='%Y', dest='group_by')
@@ -137,7 +136,8 @@ subparser.set_defaults(func=wordcount_command)
 def process_args():
     args = parser.parse_args()
     if hasattr(args, 'func'):
-        args.func(**vars(args))
+        conn = diary_range.connect(args.base)
+        args.func(conn, **vars(args))
     else:
         parser.print_usage()
 
