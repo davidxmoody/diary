@@ -18,7 +18,7 @@ def get_header(entry, width):
     '''Return a colored header string padded to the correct width.'''
 
     left = PAD_CHAR + '{} words'.format(entry.wordcount)
-    right = str(entry.timestamp) + PAD_CHAR
+    right = entry.date.strftime('%s') + PAD_CHAR
     middle = ' {} '.format(entry.date.strftime(DATE_FORMAT))
 
     padding_left = PAD_CHAR * int(width/2 - len(left) - len(middle)/2)

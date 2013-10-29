@@ -1,5 +1,4 @@
 import os
-from os.path import realpath, join, basename, expandvars, expanduser
 import datetime
 import re
 import subprocess
@@ -9,16 +8,16 @@ DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
 
 class Entry():
 
-    _filename_re = re.compile(r'^diary-([0-9]+)-([a-zA-Z0-9_-]+)\.([a-z]+)$')
+    _filename_re = re.compile(r'^diary-([0-9]+)-([a-zA-Z0-9_-]+)\.txt$')
 
     def __init__(self, *path_components):
-        self.pathname = join(*path_components)
-        match = Entry._filename_re.match(basename(self.pathname))
-        self.timestamp, self.device_name, self.extension = match.groups()
+        self._pathname = os.path.join(*path_components)
+        match = Entry._filename_re.match(os.path.basename(self._pathname))
+        self._timestamp, self._device_name = match.groups()
 
     @property
     def date(self):
-        return datetime.datetime.fromtimestamp(int(self.timestamp))
+        return datetime.datetime.fromtimestamp(int(self._timestamp))
 
     @property
     def wordcount(self):
@@ -26,7 +25,7 @@ class Entry():
 
     @property
     def text(self):
-        with open(self.pathname) as f:
+        with open(self._pathname) as f:
             return f.read()
 
     def contains(self, search_string):
@@ -36,12 +35,12 @@ class Entry():
                           editor_existing=DEFAULT_EDITOR_EXISTING,
                           editor_new=DEFAULT_EDITOR_NEW):
 
-        directory = os.path.dirname(self.pathname)
+        directory = os.path.dirname(self._pathname)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        editor = editor_existing if os.path.isfile(self.pathname) else editor_new
-        subprocess.call('{} "{}"'.format(editor, self.pathname), shell=True)
+        editor = editor_existing if os.path.isfile(self._pathname) else editor_new
+        subprocess.call('{} "{}"'.format(editor, self._pathname), shell=True)
         
 
 
@@ -51,8 +50,8 @@ class Helper():
         #TODO check that dir exists, if not create it
         #TODO normalise/absolutise path?
         self.dir_base = dir_base
-        self.dir_entries = realpath(expanduser(expandvars(
-                join(dir_base, 'data', 'entries'))))
+        self.dir_entries = os.path.realpath(os.path.expanduser(os.path.expandvars(
+                os.path.join(dir_base, 'data', 'entries'))))
 
     def new_entry(self, timestamp=None, device_name='unknown'):
         '''Return a new (not currently existing) entry.
@@ -73,7 +72,7 @@ class Helper():
         '''Return an generator over all entries.'''
 
         for month in sorted(os.listdir(self.dir_entries), reverse=descending):
-            for filename in sorted(os.listdir(join(self.dir_entries, month)), 
+            for filename in sorted(os.listdir(os.path.join(self.dir_entries, month)), 
                                    reverse=descending):
 
                 entry = Entry(self.dir_entries, month, filename)
@@ -88,11 +87,9 @@ class Helper():
 
                 yield entry
 
-    def search_entries(self, *search_terms, entries=None, **kwargs):
+    def search_entries(self, *search_terms, **kwargs):
         '''Filter entries by search terms.'''
-        if entries is None: entries = self.get_entries(**kwargs)
-
-        for entry in entries:
+        for entry in self.get_entries(**kwargs):
             if all(entry.contains(term) for term in search_terms):
                 yield entry
 
