@@ -22,21 +22,11 @@ except:
         return datetime.datetime.strptime(date_string, '%Y-%m-%d')
 
 
-DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
-DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
-
-def _edit_entry(entry, 
-                editor_existing=DEFAULT_EDITOR_EXISTING,
-                editor_new=DEFAULT_EDITOR_NEW):
-    entry.mkdir()
-    editor = editor_existing if entry.exists() else editor_new
-    subprocess.call('{} "{}"'.format(editor, entry.pathname), shell=True)
-
 def edit_command(conn, timestamp, **kwargs):
     # No timestamp given -> edit most recent entry
     if timestamp is None:
         entry = conn.get_entries(descending=True).__next__()
-        _edit_entry(entry)
+        entry.command_line_edit()
 
     # Timestamp given -> try to edit that entry
     else:
@@ -44,12 +34,12 @@ def edit_command(conn, timestamp, **kwargs):
         if len(entries)==0:
             print("No entries found for timestamp: {}".format(timestamp))
         else:
-            _edit_entry(entries[0])
+            entries[0].command_line_edit()
         # Ignore the case where more than one entry exists with the given timestamp
 
 def new_command(conn, timestamp, **kwargs):
     entry = conn.new_entry(timestamp)
-    _edit_entry(entry)
+    entry.command_line_edit()
 
 def search_command(conn, search_terms, descending, after, before, **kwargs):
     entries = conn.search_entries(*search_terms, descending=descending, min_date=after, max_date=before)

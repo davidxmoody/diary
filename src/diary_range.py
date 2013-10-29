@@ -1,12 +1,13 @@
 import os
-from os.path import realpath, join, basename, dirname, exists, isfile, getmtime
-from os.path import expandvars, expanduser
+from os.path import realpath, join, basename, expandvars, expanduser
 #TODO only use datetime
 import time
 import datetime
 import re
-from subprocess import check_output, call
-from itertools import islice
+import subprocess
+
+DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
+DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
 
 class Entry():
 
@@ -16,19 +17,6 @@ class Entry():
         self.pathname = join(*path_components)
         match = Entry._filename_re.match(basename(self.pathname))
         self.timestamp, self.device_name, self.extension = match.groups()
-
-    def mkdir(self):
-        '''Create the entry's base directory (if it does not exist).'''
-        directory = dirname(self.pathname)
-        if not exists(directory):
-            os.makedirs(directory)
-
-    def exists(self):
-        '''Return True if the entry exists.'''
-        return isfile(self.pathname)
-
-    def contains(self, search_string):
-        return re.search(search_string, self.text, re.I)
 
     @property
     def date(self):
@@ -42,6 +30,21 @@ class Entry():
     def text(self):
         with open(self.pathname) as f:
             return f.read()
+
+    def contains(self, search_string):
+        return re.search(search_string, self.text, re.I)
+
+    def command_line_edit(self,
+                          editor_existing=DEFAULT_EDITOR_EXISTING,
+                          editor_new=DEFAULT_EDITOR_NEW):
+
+        directory = os.path.dirname(self.pathname)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        editor = editor_existing if os.path.isfile(self.pathname) else editor_new
+        subprocess.call('{} "{}"'.format(editor, self.pathname), shell=True)
+        
 
 
 class Helper():
@@ -92,7 +95,7 @@ class Helper():
                 yield entry
 
     def _find_with_command(self, command):
-        results = check_output(command, shell=True, universal_newlines=True)
+        results = subprocess.check_output(command, shell=True, universal_newlines=True)
         return ( Entry(result) for result in results.split('\n') if len(result)>0 )
 
     def find_by_timestamp(self, timestamp):
