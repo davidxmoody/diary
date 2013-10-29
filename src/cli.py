@@ -21,7 +21,6 @@ except:
     def custom_date(date_string):
         return datetime.datetime.strptime(date_string, '%Y-%m-%d')
 
-#TODO re-write so that args is unpacked before being passed to the command functions
 
 DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
@@ -33,42 +32,42 @@ def _edit_entry(entry,
     editor = editor_existing if entry.exists() else editor_new
     subprocess.call('{} "{}"'.format(editor, entry.pathname), shell=True)
 
-def edit_command(args):
+def edit_command(base, timestamp, **kwargs):
     # No timestamp given -> edit most recent entry
-    if args.timestamp is None:
-        entry = diary_range.connect(args.base).get_entries(descending=True).__next__()
+    if timestamp is None:
+        entry = diary_range.connect(base).get_entries(descending=True).__next__()
         _edit_entry(entry)
 
     # Timestamp given -> try to edit that entry
     else:
-        entries = list(diary_range.connect(args.base).find_by_timestamp(args.timestamp))
+        entries = list(diary_range.connect(base).find_by_timestamp(timestamp))
         if len(entries)==0:
-            print("No entries found for timestamp: {}".format(args.timestamp))
+            print("No entries found for timestamp: {}".format(timestamp))
         else:
             _edit_entry(entries[0])
         # Ignore the case where more than one entry exists with the given timestamp
 
-def new_command(args):
-    entry = diary_range.connect(args.base).new_entry(args.timestamp)
+def new_command(base, timestamp, **kwargs):
+    entry = diary_range.connect(base).new_entry(timestamp)
     _edit_entry(entry)
 
-def list_command(args):
-    entries = diary_range.connect(args.base).get_entries(descending=args.descending, min_date=args.after, max_date=args.before)
+def list_command(base, descending, after, before, **kwargs):
+    entries = diary_range.connect(base).get_entries(descending=descending, min_date=after, max_date=before)
     display_entries(entries)
 
-def search_command(args):
-    entries = diary_range.connect(args.base).search_entries(*args.search_terms, descending=args.descending, min_date=args.after, max_date=args.before)
-    display_entries(entries, args.search_terms)
+def search_command(base, search_terms, descending, after, before, **kwargs):
+    entries = diary_range.connect(base).search_entries(*search_terms, descending=descending, min_date=after, max_date=before)
+    display_entries(entries, search_terms)
 
-def wordcount_command(args):
+def wordcount_command(base, group_by, descending, after, before, **kwargs):
     #TODO clean this up a bit and move to a separate module? Move to the presenter module?
-    if args.group is None: args.group = 'Total'
-    entries = diary_range.connect(args.base).get_entries(descending=args.descending, min_date=args.after, max_date=args.before)
+    if group_by is None: group_by = 'Total'
+    entries = diary_range.connect(base).get_entries(descending=descending, min_date=after, max_date=before)
     wordcounts = {}
     entry_counts = {}
 
     for entry in entries:
-        group = entry.get_date().strftime(args.group)
+        group = entry.get_date().strftime(group_by)
         if group not in wordcounts:
             wordcounts[group] = 0
             entry_counts[group] = 0
@@ -85,7 +84,7 @@ def wordcount_command(args):
 
     format_string = '{:>'+str(longest_group)+'}:  {:>'+str(longest_wc)+'} words,  {:>'+str(longest_ec)+'} entries'
 
-    for group in sorted(wordcounts.keys(), reverse=args.descending):
+    for group in sorted(wordcounts.keys(), reverse=descending):
         print(format_string.format(group, wordcounts[group], entry_counts[group]))
 
 
@@ -128,18 +127,17 @@ subparser.add_argument('search_terms', nargs='+')
 subparser.set_defaults(func=search_command)
 
 subparser = subparsers.add_parser('wordcount', parents=[filter_parser], aliases=['wc'])
-subparser.add_argument('-y', '--year', action='store_const', const='%Y', dest='group')
-subparser.add_argument('-m', '--month', action='store_const', const='%Y-%m', dest='group')
-subparser.add_argument('-g', '--group-by', dest='group', metavar='DATE_FORMAT')
+subparser.add_argument('-y', '--year', action='store_const', const='%Y', dest='group_by')
+subparser.add_argument('-m', '--month', action='store_const', const='%Y-%m', dest='group_by')
+subparser.add_argument('-g', '--group-by', dest='group_by', metavar='DATE_FORMAT')
 #TODO default to ascending order without breaking the regular default
 subparser.set_defaults(func=wordcount_command)
 
 
 def process_args():
     args = parser.parse_args()
-    #TODO rewrite to unpack the namespace with vars()
     if hasattr(args, 'func'):
-        args.func(args)
+        args.func(**vars(args))
     else:
         parser.print_usage()
 
