@@ -22,23 +22,12 @@ except:
         return datetime.datetime.strptime(date_string, '%Y-%m-%d')
 
 
-def edit_command(conn, timestamp, **kwargs):
-    # No timestamp given -> edit most recent entry
-    if timestamp is None:
-        entry = conn.get_entries(descending=True).__next__()
-        entry.command_line_edit()
+def edit_command(conn, entry_id, **kwargs):
+    entry = conn.find_by_id(entry_id) if entry_id else conn.most_recent_entry()
+    entry.command_line_edit()
 
-    # Timestamp given -> try to edit that entry
-    else:
-        entries = list(conn.find_by_timestamp(timestamp))
-        if len(entries)==0:
-            print("No entries found for timestamp: {}".format(timestamp))
-        else:
-            entries[0].command_line_edit()
-        # Ignore the case where more than one entry exists with the given timestamp
-
-def new_command(conn, timestamp, **kwargs):
-    entry = conn.new_entry(timestamp)
+def new_command(conn, date, **kwargs):
+    entry = conn.new_entry(date)
     entry.command_line_edit()
 
 def search_command(conn, search_terms, descending, after, before, **kwargs):
@@ -96,11 +85,11 @@ subparsers = parser.add_subparsers()
 #TODO edit and new seem to be almost identical, combine them into one? Ditto for search and list
 #TODO add help text for optional arguments
 subparser = subparsers.add_parser('edit')
-subparser.add_argument('timestamp', type=int, nargs='?')
+subparser.add_argument('entry_id', nargs='?')
 subparser.set_defaults(func=edit_command)
 
 subparser = subparsers.add_parser('new')
-subparser.add_argument('timestamp', type=int, nargs='?')
+subparser.add_argument('date', type=custom_date, nargs='?')
 subparser.set_defaults(func=new_command)
 
 

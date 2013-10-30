@@ -16,6 +16,10 @@ class Entry():
         self._timestamp, self._device_name = match.groups()
 
     @property
+    def id(self):
+        return '{}-{}'.format(self._timestamp, self._device_name)
+
+    @property
     def date(self):
         return datetime.datetime.fromtimestamp(int(self._timestamp))
 
@@ -47,29 +51,27 @@ class Entry():
 class Helper():
 
     def __init__(self, dir_base):
-        #TODO check that dir exists, if not create it
-        #TODO normalise/absolutise path?
         self.dir_base = dir_base
         self.dir_entries = os.path.realpath(os.path.expanduser(os.path.expandvars(
                 os.path.join(dir_base, 'data', 'entries'))))
 
-    def new_entry(self, timestamp=None, device_name='unknown'):
-        '''Return a new (not currently existing) entry.
-        
-        Note that the directory structure may not exist.'''
+        if not os.path.exists(self.dir_entries):
+            print('Creating diary database at: {}'.format(self.dir_base))
+            os.makedirs(self.dir_entries)
 
-        entry_date = datetime.datetime.today() if timestamp is None else \
-                     datetime.datetime.fromtimestamp(timestamp)
-        
-        timestamp = entry_date.strftime('%s')
-        month = entry_date.strftime('%Y-%m')
+
+    def new_entry(self, date=None, device_name='unknown'):
+        if date is None: date = datetime.datetime.today()
+
+        timestamp = date.strftime('%s')
+        month = date.strftime('%Y-%m')
 
         filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
 
         return Entry(self.dir_entries, month, filename)
 
+
     def get_entries(self, descending=False, min_date=None, max_date=None):
-        '''Return an generator over all entries.'''
 
         for month in sorted(os.listdir(self.dir_entries), reverse=descending):
             for filename in sorted(os.listdir(os.path.join(self.dir_entries, month)), 
@@ -87,20 +89,22 @@ class Helper():
 
                 yield entry
 
+
     def search_entries(self, *search_terms, **kwargs):
-        '''Filter entries by search terms.'''
         for entry in self.get_entries(**kwargs):
             if all(entry.contains(term) for term in search_terms):
                 yield entry
 
-    def _find_with_command(self, command):
-        results = subprocess.check_output(command, shell=True, universal_newlines=True)
-        return ( Entry(result) for result in results.split('\n') if len(result)>0 )
 
-    def find_by_timestamp(self, timestamp):
-        '''Returns any entries with the given timestamp.'''
-        command = 'find "{}" -iname "*-{}-*"'.format(self.dir_entries, timestamp)
-        return self._find_with_command(command)
+    def most_recent_entry(self):
+        return self.get_entries(descending=True).__next__()
+
+    
+    def find_by_id(self, entry_id):
+        for entry in self.get_entries():
+            if entry.id == entry_id:
+                return entry
+
 
 
 def connect(dir_base):
