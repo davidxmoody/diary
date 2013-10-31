@@ -1,3 +1,9 @@
+Command line scripts:
+- custom description and usage
+- set default diary dir (~/.diary)
+- set default device name (use $HOSTNAME)
+
+
 Data storage model:
 - automated tests
 - full backup to archive file, restore from archive file, verify current database, incremental backup, backup excluding pictures/video/audio
@@ -6,26 +12,20 @@ Data storage model:
 - indexing/search caching
 
 
-Command line scripts:
-- custom description and usage
-- set default diary dir (~/.diary)
-- set default device name (use $HOSTNAME)
-- case sensitivity options for search (both to enable and disable)
-- automatic (configurable) word boundaries added to search expressions (both to enable and disable)
-- more aliases for commands? (ls)
-- more detailed stats, print graphs too, tag analyser (or leave to the more graphically orientated browser based version)
-- re-implement diary-chain script?
-
 Config file (.diaryrc):
 - either in home dir or diary data dir
 - set default editors
 - search options settable in config file (case insensitivity, highlight colours, etc.)
 - set device name in config file, ability to link to an external file for the device name
 - user configurable commands/aliases
+- automatic (configurable) word boundaries added to search expressions (both to enable and disable)
+- case sensitivity options for search (both to enable and disable)
 
 
 Browser based server:
 - tag aliases, tag stemming, 'is a' relationship
+- tag analyser
+- statistics graphs (wordcount over time)
 - build automation script/install script
 - saved searches (aka bookmarks)
 - link to/quote other entries inline (`diary://` syntax?)
