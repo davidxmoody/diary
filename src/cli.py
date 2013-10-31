@@ -6,29 +6,22 @@ from fuzzydate import custom_date
 PROGRAM_NAME = 'diary'
 VERSION_NUMBER = '2.0.0'
 
-
-# Filter options parser (shared between commands processing multiple entries)
-filter_parser = argparse.ArgumentParser(add_help=False)
-filter_parser.add_argument('--before', type=custom_date, metavar='DATE')
-filter_parser.add_argument('--after', type=custom_date, metavar='DATE')
-filter_parser.add_argument('--asc', action='store_false', dest='descending')
-filter_parser.add_argument('--desc', action='store_true', dest='descending')
-filter_parser.set_defaults(descending=True)
+#TODO add help text for optional arguments
+#TODO add default base dir and device name
 
 
-# Setup main parser
+# Setup main parser ###########################################################
 parser = argparse.ArgumentParser(description='') 
 parser.add_argument('--version', action='version', 
         version='{} {}'.format(PROGRAM_NAME, VERSION_NUMBER))
 parser.add_argument('-b', '--base', help='path to base folder')
 
-
-# Setup subparsers for each command
 subparsers = parser.add_subparsers()
 
-#TODO add help text for optional arguments
 
-# The 'edit' command edits the most recent entry or the entry specified by entry_id
+
+# 'edit' command ##############################################################
+# Edit the most recent entry or the entry specified by entry_id
 def edit_command(conn, entry_id, **kwargs):
     entry = conn.find_by_id(entry_id) if entry_id else conn.most_recent_entry()
     entry.command_line_edit()
@@ -38,7 +31,9 @@ subparser.add_argument('entry_id', nargs='?')
 subparser.set_defaults(func=edit_command)
 
 
-# The 'new' command creates and edits a new entry with the current date or the given date
+
+# 'new' command ###############################################################
+# Create and edit a new entry with the current date or the given date
 def new_command(conn, date, **kwargs):
     entry = conn.new_entry(date)
     entry.command_line_edit()
@@ -48,24 +43,29 @@ subparser.add_argument('date', type=custom_date, nargs='?')
 subparser.set_defaults(func=new_command)
 
 
-#TODO make list an actual alias to search, also add the --search option to the general filter?
-#TODO stop using the shared searching filter?
-# The 'search' command displays all entries containing all of the given search_terms
+
+# 'search' command ############################################################
+# Display all entries containing all of the given search_terms
 def search_command(conn, search_terms, descending, after, before, **kwargs):
-    entries = conn.search_entries(*search_terms, descending=descending, min_date=after, max_date=before)
+    entries = conn.search_entries(*search_terms, descending=descending, 
+                                  min_date=after, max_date=before)
     display_entries(entries, search_terms)
 
-subparser = subparsers.add_parser('search', parents=[filter_parser])
+subparser = subparsers.add_parser('search', aliases=['list'])
 subparser.add_argument('search_terms', nargs='*')
-subparser.set_defaults(func=search_command)
+subparser.add_argument('--before', type=custom_date, metavar='DATE')
+subparser.add_argument('--after', type=custom_date, metavar='DATE')
+#TODO add --on option
+#TODO try out --to and --from arguments instead?
+subparser.add_argument('--asc', action='store_false', dest='descending')
+subparser.add_argument('--desc', action='store_true', dest='descending')
+subparser.set_defaults(descending=True)
+subparser.set_defaults(func=search_command, descending=True)
 
-# The 'list' command is identical to the search command but with slightly different syntax
-subparser = subparsers.add_parser('list', parents=[filter_parser])
-subparser.add_argument('--search', action='append', dest='search_terms', metavar='SEARCH_TERM')
-subparser.set_defaults(func=search_command, search_terms=[])
 
 
-# The 'wordcount' command pretty prints wordcount statistics
+# 'wordcount' command #########################################################
+# Pretty print wordcount statistics for all entries
 def wordcount_command(conn, group_by, **kwargs):
 
     if group_by is None: group_by = 'Total'
@@ -102,7 +102,8 @@ subparser.add_argument('-g', '--group-by', dest='group_by', metavar='DATE_FORMAT
 subparser.set_defaults(func=wordcount_command)
 
 
-# Process args and run the corresponding function
+
+# Process args ################################################################
 def process_args():
     args = parser.parse_args()
     if hasattr(args, 'func'):
