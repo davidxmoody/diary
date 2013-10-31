@@ -10,8 +10,9 @@ COLOR_HIGHLIGHT = '\033[1;31m'  # Bold red
 COLOR_END = '\033[0m'
 
 DATE_FORMAT = '%a %d %b %Y %H:%M'
-#TODO add a try clause which defaults to 70 if this fails
-TERMINAL_WIDTH = int(check_output('tput cols', shell=True).strip())
+
+try: TERMINAL_WIDTH = int(check_output('tput cols', shell=True).strip())
+except: TERMINAL_WIDTH = 70
 
 
 def get_header(entry, width):

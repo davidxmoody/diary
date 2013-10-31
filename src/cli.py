@@ -66,39 +66,39 @@ subparser.set_defaults(func=search_command, search_terms=[])
 
 
 # The 'wordcount' command pretty prints wordcount statistics
-def wordcount_command(conn, group_by, descending, after, before, **kwargs):
-    #TODO clean this up a bit and move to a separate module? Move to the presenter module?
+def wordcount_command(conn, group_by, **kwargs):
+
     if group_by is None: group_by = 'Total'
-    entries = conn.get_entries(descending=descending, min_date=after, max_date=before)
     wordcounts = {}
     entry_counts = {}
 
-    for entry in entries:
+    for entry in conn.get_entries():
         group = entry.date.strftime(group_by)
         if group not in wordcounts:
-            wordcounts[group] = 0
-            entry_counts[group] = 0
+            wordcounts[group], entry_counts[group] = 0, 0
         wordcounts[group] += entry.wordcount
         entry_counts[group] += 1
 
-    if len(wordcounts)>1:
-        wordcounts['Total'] = sum(wordcounts.values())
-        entry_counts['Total'] = sum(entry_counts.values())
+    results = [ (group, wordcounts[group], entry_counts[group]) for group in sorted(wordcounts.keys()) ]
 
-    longest_wc = max(len(str(wordcount)) for wordcount in wordcounts.values())
-    longest_ec = max(len(str(entry_count)) for entry_count in entry_counts.values())
-    longest_group = max(len(group) for group in wordcounts.keys())
+    if len(results)>1:
+        results.append( ('Total', sum(wordcounts.values()), sum(entry_counts.values())) )
+    
+    max_lengths = { 'len_group': max( len(str(result[0])) for result in results ),
+                    'len_wc': len(str(results[-1][1])),
+                    'len_ec': len(str(results[-1][2])) }
 
-    format_string = '{:>'+str(longest_group)+'}:  {:>'+str(longest_wc)+'} words,  {:>'+str(longest_ec)+'} entries'
+    format_string = '{0:>{len_group}}:  {1:>{len_wc}} words,  {2:>{len_ec}} entries'
 
-    for group in sorted(wordcounts.keys(), reverse=descending):
-        print(format_string.format(group, wordcounts[group], entry_counts[group]))
+    for result in results:
+        print(format_string.format(*result, **max_lengths))
 
-subparser = subparsers.add_parser('wordcount', parents=[filter_parser], aliases=['wc'])
+
+subparser = subparsers.add_parser('wordcount', aliases=['wc'])
 subparser.add_argument('-y', '--year', action='store_const', const='%Y', dest='group_by')
 subparser.add_argument('-m', '--month', action='store_const', const='%Y-%m', dest='group_by')
+subparser.add_argument('-w', '--weekday', action='store_const', const='%u %a', dest='group_by')
 subparser.add_argument('-g', '--group-by', dest='group_by', metavar='DATE_FORMAT')
-#TODO default to ascending order without breaking the regular default
 subparser.set_defaults(func=wordcount_command)
 
 
