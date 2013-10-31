@@ -1,61 +1,75 @@
 from subprocess import check_output, Popen, PIPE
-import textwrap
-import time
+from textwrap import TextWrapper
 import re
 
-PAD_CHAR = '='
-COLOR_MIDDLE = '\033[1;34m'     # Bold blue
-COLOR_PADDING = '\033[0;34m'    # Blue
-COLOR_HIGHLIGHT = '\033[1;31m'  # Bold red
-COLOR_END = '\033[0m'
+STYLE = {
+    'pad': '=',
+    'col_middle': '\033[1;34m',     # Bold blue
+    'col_padding': '\033[0;34m',    # Blue
+    'col_highlight': '\033[1;31m',  # Bold red
+    'col_end': '\033[0m',
+    'date_format': '%a %d %b %Y %H:%M',
+}
 
-DATE_FORMAT = '%a %d %b %Y %H:%M'
-
+#TODO do this using shutil.get_terminal_size()
 try: TERMINAL_WIDTH = int(check_output('tput cols', shell=True).strip())
 except: TERMINAL_WIDTH = 70
 
 
-def get_header(entry, width):
+def _get_header(entry, width):
     '''Return a colored header string padded to the correct width.'''
 
-    left = PAD_CHAR + '{} words'.format(entry.wordcount)
-    right = entry.id + PAD_CHAR
-    middle = ' {} '.format(entry.date.strftime(DATE_FORMAT))
+    # Date of entry in the middle
+    middle = ' {0:{date_format}} '.format(entry.date, **STYLE)
+    
+    # Wordcount on the left
+    len_left = (width - len(middle))//2
+    left = '{pad}{0} words'.format(entry.wordcount, **STYLE)
+    left = '{0:{pad}<{1}}'.format(left, len_left, **STYLE)
 
-    padding_left = PAD_CHAR * int(width/2 - len(left) - len(middle)/2)
-    padding_right = PAD_CHAR * (width - len(left) - 
-                        len(padding_left) - len(middle) - len(right))
+    # Entry id on the right
+    len_right = width - len(middle) - len_left
+    right = '{0}{pad}'.format(entry.id, **STYLE)
+    right = '{0:{pad}>{1}}'.format(right, len_right, **STYLE)
 
-    return COLOR_PADDING +     left      + padding_left + COLOR_END + \
-           COLOR_MIDDLE  +            middle            + COLOR_END + \
-           COLOR_PADDING + padding_right +    right     + COLOR_END
+    # Add colours to each section and concatenate
+    left = '{col_padding}{0}{col_end}'.format(left, **STYLE)
+    middle = '{col_middle}{0}{col_end}'.format(middle, **STYLE)
+    right = '{col_padding}{0}{col_end}'.format(right, **STYLE)
 
-def highlighted(text, search_terms):
-    #TODO reuse the same re_obj between paragraphs
-    #TODO fix bug where searching with word boundaries doesn't highlight the term
-    if len(search_terms)==0: return text
-    re_string = '(' + '|'.join(re.escape(term) for term in search_terms) + ')'
-    re_obj = re.compile(re_string, re.I)
-    repl = r'{}\1{}'.format(COLOR_HIGHLIGHT, COLOR_END)
-    return re_obj.sub(repl, text)
+    return left + middle + right
 
-def _gen_formatted(entry, search_terms, width):
-    '''Return a generator over the formatted, wrapped paragraphs of an entry.'''
 
-    yield get_header(entry, width)
+def _gen_wrapped(lines, width):
+    wrapper = TextWrapper(width=width)
+    for line in lines:
+        yield wrapper.fill(line)
+        #TODO which works better?
+        #yield wrapper.wrap(line)
 
-    wrapper = textwrap.TextWrapper(width=width)
+def _gen_highlighted(lines, search_terms):
+    pattern = '(' + '|'.join(search_terms) + ')'
+    repl = r'{col_highlight}\1{col_end}'.format(**STYLE)
+    re_obj = re.compile(pattern, re.I)
 
-    for line in entry.text.splitlines():
-        wrapped_para = wrapper.fill(line)
-        highlighted_para = highlighted(wrapped_para, search_terms)
-        yield highlighted_para
+    for line in lines:
+        yield re_obj.sub(repl, line)
 
-def formatted(entry, search_terms, width=TERMINAL_WIDTH):
+
+def formatted(entry, search_terms=None, width=TERMINAL_WIDTH):
     '''Return the text of entry wrapped to width with a header.'''
-    return '\n'.join(_gen_formatted(entry, search_terms, width)) + '\n\n'
 
-def display_entries(entries, search_terms=[]):
+    lines = entry.text.splitlines()
+    lines = _gen_wrapped(lines, width)
+    if search_terms and len(search_terms)>0:
+        lines = _gen_highlighted(lines, search_terms)
+
+    header = _get_header(entry, width)
+
+    return header + '\n' + '\n'.join(lines) + '\n\n'
+
+
+def display_entries(entries, search_terms=None):
     '''Open a less pipe to display the given entries to the user.'''
 
     less_process = Popen('less -R', stdin=PIPE, shell=True)
@@ -67,5 +81,4 @@ def display_entries(entries, search_terms=[]):
         less_process.wait()
 
     except BrokenPipeError:
-        # Less process closed by user (hopefully) so stop quietly
-        pass
+        pass  # Less process closed by user (hopefully) so stop quietly
