@@ -1,6 +1,9 @@
 from subprocess import check_output, Popen, PIPE
 from textwrap import TextWrapper
 import re
+from shutil import get_terminal_size
+
+TERMINAL_WIDTH = get_terminal_size()[0]
 
 STYLE = {
     'pad': '=',
@@ -11,10 +14,6 @@ STYLE = {
     'date_format': '%a %d %b %Y %H:%M',
 }
 
-#TODO do this using shutil.get_terminal_size()
-try: TERMINAL_WIDTH = int(check_output('tput cols', shell=True).strip())
-except: TERMINAL_WIDTH = 70
-
 
 def _get_header(entry, width):
     '''Return a colored header string padded to the correct width.'''
@@ -22,15 +21,15 @@ def _get_header(entry, width):
     # Date of entry in the middle
     middle = ' {0:{date_format}} '.format(entry.date, **STYLE)
     
-    # Wordcount on the left
-    len_left = (width - len(middle))//2
-    left = '{pad}{0} words'.format(entry.wordcount, **STYLE)
-    left = '{0:{pad}<{1}}'.format(left, len_left, **STYLE)
-
     # Entry id on the right
-    len_right = width - len(middle) - len_left
-    right = '{0}{pad}'.format(entry.id, **STYLE)
+    len_right = (width - len(middle))//2
+    right = '{pad}{0}{pad}'.format(entry.id, **STYLE)
     right = '{0:{pad}>{1}}'.format(right, len_right, **STYLE)
+
+    # Wordcount on the left
+    len_left = width - len(middle) -len(right)
+    left = '{pad}{0} words{pad}'.format(entry.wordcount, **STYLE)
+    left = '{0:{pad}<{1}}'.format(left, len_left, **STYLE)
 
     # Add colours to each section and concatenate
     left = '{col_padding}{0}{col_end}'.format(left, **STYLE)
@@ -44,8 +43,6 @@ def _gen_wrapped(lines, width):
     wrapper = TextWrapper(width=width)
     for line in lines:
         yield wrapper.fill(line)
-        #TODO which works better?
-        #yield wrapper.wrap(line)
 
 def _gen_highlighted(lines, search_terms):
     pattern = '(' + '|'.join(search_terms) + ')'
