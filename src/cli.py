@@ -3,7 +3,7 @@ from diary_range import connect
 from presenter import display_entries
 from fuzzydate import custom_date
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 
 # SETUP MAIN PARSER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,7 +25,11 @@ subparsers = parser.add_subparsers(title='subcommands')
 
 def edit_command(conn, entry_id, **kwargs):
     entry = conn.find_by_id(entry_id) if entry_id else conn.most_recent_entry()
-    entry.command_line_edit()
+    if entry:
+        entry.command_line_edit()
+    else:
+        print('No entry to edit', 
+              'for entry_id: {}'.format(entry_id) if entry_id else '')
 
 subparser = subparsers.add_parser('edit',
     description='Open Vim to edit the most recent entry '
@@ -105,6 +109,9 @@ def wordcount_command(conn, group_by, **kwargs):
     if len(results)>1:
         results.append( ('Total', sum(wordcounts.values()), 
                                   sum(entry_counts.values())) )
+
+    if len(results)==0:
+        results.append( ('Total', 0, 0) )
     
     max_lengths = {'len_group': max(len(str(result[0])) for result in results),
                    'len_wc': len(str(results[-1][1])),

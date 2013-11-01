@@ -58,7 +58,7 @@ class connect():
     def __init__(self, dir_base):
         self.dir_base = dir_base
         self.dir_entries = os.path.realpath(os.path.expanduser(os.path.expandvars(
-                os.path.join(dir_base, 'data', 'entries'))))
+                os.path.join(dir_base, 'entries'))))
 
         if not os.path.exists(self.dir_entries):
             print('Creating diary database at: {}'.format(self.dir_base))
@@ -102,7 +102,10 @@ class connect():
 
 
     def most_recent_entry(self):
-        return self.get_entries(descending=True).__next__()
+        try:
+            return self.get_entries(descending=True).__next__()
+        except StopIteration:
+            return None
 
     
     def find_by_id(self, entry_id):
