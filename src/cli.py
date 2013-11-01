@@ -5,8 +5,6 @@ from fuzzydate import custom_date
 
 __version__ = '2.0.0'
 
-#TODO add default base dir and device name
-
 
 # SETUP MAIN PARSER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -14,9 +12,10 @@ parser = ArgumentParser(
     description='A program for writing and viewing a personal diary')
 
 parser.add_argument('--version', action='version', 
-        version='%(prog)s {}'.format(__version__))
+    version='%(prog)s {}'.format(__version__))
 
-parser.add_argument('-b', '--base', help='path to base folder')
+parser.add_argument('-b', '--base', default='~/.diary', 
+    help='path to base folder')
 
 subparsers = parser.add_subparsers(title='subcommands')
 
