@@ -3,6 +3,11 @@ import datetime
 import re
 import subprocess
 
+# Strip non- word or dash characters from device name
+DEVICE_NAME = 'unknown'
+try: DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
+except: pass
+
 DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
 DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
 
@@ -48,7 +53,7 @@ class Entry():
         
 
 
-class Helper():
+class connect():
 
     def __init__(self, dir_base):
         self.dir_base = dir_base
@@ -60,7 +65,7 @@ class Helper():
             os.makedirs(self.dir_entries)
 
 
-    def new_entry(self, date=None, device_name='unknown'):
+    def new_entry(self, date=None, device_name=DEVICE_NAME):
         if date is None: date = datetime.datetime.today()
 
         timestamp = date.strftime('%s')
@@ -104,8 +109,3 @@ class Helper():
         for entry in self.get_entries():
             if entry.id == entry_id:
                 return entry
-
-
-
-def connect(dir_base):
-    return Helper(dir_base)
