@@ -1,25 +1,20 @@
-Command line scripts:
-- custom description and usage
-- set default diary dir (~/.diary)
-- set default device name (use $HOSTNAME)
-
-
 Data storage model:
 - automated tests
 - full backup to archive file, restore from archive file, verify current database, incremental backup, backup excluding pictures/video/audio
 - track view counts, search logs, other usage data
-- start and end dates
-- indexing/search caching
+- start and end dates (or start date and duration)
+- indexing (with word stemming)
+- faster way to search by tag
+- cache frequent searches automatically
 
 
 Config file (.diaryrc):
-- either in home dir or diary data dir
+- either in home dir or diary data dir (or both)
 - set default editors
 - search options settable in config file (case insensitivity, highlight colours, etc.)
 - set device name in config file, ability to link to an external file for the device name
 - user configurable commands/aliases
 - automatic (configurable) word boundaries added to search expressions (both to enable and disable)
-- case sensitivity options for search (both to enable and disable)
 
 
 Browser based server:
@@ -32,7 +27,7 @@ Browser based server:
 - Markdown formatting (with images and links)
 - photos
 - jump to relevant section of search result/search term highlighting
-- entries rated with importance level
+- entries rated with importance level (implement with tags)
 - entry drafts
 - timeline viewing model
 - define custom "eras" to act as date range aliases
@@ -43,11 +38,12 @@ Browser based server:
 Feature wishlist:
 - graph mood data
 - private entries, obfuscated until password given
+- hidden entries (using the 'hidden' tag)
 - bash auto-completion of diary commands
 - tag analyser
 - custom status board (in HTML)
 - task list
-- reminders to self, custom, task reminders, reminder to write an entry every day
+- reminders to self, task reminders
 
 
 Silly feature wishlist:
