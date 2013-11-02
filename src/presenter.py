@@ -57,7 +57,7 @@ def formatted(entry, search_terms=None, width=TERMINAL_WIDTH):
     '''Return the text of entry wrapped to width with a header.'''
 
     lines = entry.text.splitlines()
-    lines = _gen_wrapped(lines, width)
+    lines = _gen_wrapped(lines, width-1)
     if search_terms and len(search_terms)>0:
         lines = _gen_highlighted(lines, search_terms)
 
