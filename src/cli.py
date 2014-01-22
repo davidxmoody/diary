@@ -3,6 +3,8 @@ from diary_range import connect
 from presenter import display_entries
 from fuzzydate import custom_date
 
+from web_exporter import export_command
+
 __version__ = '2.0.1'
 
 
@@ -140,6 +142,18 @@ group_by.add_argument('-g', '--group-by', metavar='DATE_FORMAT',
                           'same formatted date, e.g. "%%Y-%%m-%%d"')
 
 subparser.set_defaults(func=wordcount_command)
+
+
+
+# EXPORT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# export_command function is imported from the web_exporter module
+
+subparser = subparsers.add_parser('export',
+    description='Export static web pages containing diary entries',
+    help='export diary as static web pages')
+
+subparser.set_defaults(func=export_command)
 
 
 
