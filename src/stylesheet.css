@@ -1,15 +1,53 @@
 .entry {
   background-color: rgb(200,200,200);
   margin: 1em 20% 1em 20%;
-  padding: 0.2em;
+  padding: 0.3em;
   border: 1px solid black;
   border-radius: 4px;
   font-family: sans-serif;
   font-size: 1.5em;
 }
 
+.entry-header {
+  height: 2.4em;
+}
+
+.entry-header .date {
+  font-size: 1.8em;
+  text-align: left;
+  float: left;
+}
+
+.entry-header .metadata {
+  float: right;
+}
+
+.entry-header .wordcount {
+  font-size: 0.7em;
+  color: gray;
+  text-align: right;
+  float: right;
+  clear: right;
+}
+
+.entry-header .wordcount:after {
+  content: ' words';
+}
+
+.entry-header .id {
+  font-size: 0.5em;
+  color: gray;
+  text-align: right;
+  float: right;
+  clear: right;
+}
+
+
+
 .hashtag {
   background-color: darkgray;
+  font-family: monospace;
+  border-radius: 4px;
 }
 
 .hashtag:before {

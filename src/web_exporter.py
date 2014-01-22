@@ -14,7 +14,13 @@ html_template = '''<!DOCTYPE html>
 
 entry_template = '''
 <div class="entry">
-  <div class="entry-header">id: {entry.date}</div>
+  <div class="entry-header">
+    <div class="date">{entry.date:%a %d %b %Y %H:%M}</div>
+    <div class="metadata">
+      <div class="wordcount">{entry.wordcount}</div>
+      <div class="id">{entry.id}</div>
+    </div>
+  </div>
   <div class="entry-body">{formatted_text}</div>
 </div>
 '''
