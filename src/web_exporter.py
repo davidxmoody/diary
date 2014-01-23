@@ -14,7 +14,7 @@ html_template = '''<!DOCTYPE html>
 
 entry_template = '''
 <div class="entry">
-  <div class="entry-header">
+  <div class="entry-head">
     <div class="date">{entry.date:%a %d %b %Y %H:%M}</div>
     <div class="metadata">
       <div class="wordcount">{entry.wordcount}</div>
