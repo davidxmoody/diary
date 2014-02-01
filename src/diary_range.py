@@ -8,8 +8,8 @@ DEVICE_NAME = 'unknown'
 try: DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
 except: pass
 
-DEFAULT_EDITOR_EXISTING = 'vim "+syntax off" "+set spell" "+set nonumber" "+set wrap" "+set linebreak" "+set breakat=\ " "+set display=lastline"'
-DEFAULT_EDITOR_NEW = DEFAULT_EDITOR_EXISTING + ' "+startinsert"'
+EDITOR_COMMAND = 'vim'
+
 
 class Entry():
 
@@ -40,16 +40,11 @@ class Entry():
     def contains(self, search_string):
         return re.search(search_string, self.text, re.I)
 
-    def command_line_edit(self,
-                          editor_existing=DEFAULT_EDITOR_EXISTING,
-                          editor_new=DEFAULT_EDITOR_NEW):
-
+    def command_line_edit(self):
         directory = os.path.dirname(self._pathname)
         if not os.path.exists(directory):
             os.makedirs(directory)
-
-        editor = editor_existing if os.path.isfile(self._pathname) else editor_new
-        subprocess.call('{} "{}"'.format(editor, self._pathname), shell=True)
+        subprocess.call('{} "{}"'.format(EDITOR_COMMAND, self._pathname), shell=True)
         
 
 
