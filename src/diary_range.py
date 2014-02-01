@@ -60,6 +60,19 @@ class connect():
             os.makedirs(self.dir_entries)
 
 
+    @property
+    def dir_html(self):
+        dir_html = os.path.realpath(os.path.expanduser(os.path.expandvars(
+                os.path.join(self.dir_base, 'html'))))
+
+        if not os.path.exists(dir_html):
+            print('Creating html directory at: {}'.format(dir_html))
+            os.makedirs(dir_html)
+
+        return dir_html
+
+
+
     def new_entry(self, date=None, device_name=DEVICE_NAME):
         if date is None: date = datetime.datetime.today()
 

@@ -1,43 +1,53 @@
 .entry {
   font-family: sans-serif;
   font-size: 1em;
+
   width: 500px;
   padding: 0.3em;
   border: 1px solid #B3B3B2;
   border-radius: 4px;
   margin: auto;
   margin-bottom: 10px;
-  margin-top: 10px; }
+  margin-top: 10px;
+}
 
 .entry-body {
-  color: #808080; }
+  color: #808080;
+}
 
 .entry-head {
   height: 2.4em;
-  border-bottom: 1px solid #B3B3B2; }
+  border-bottom: 1px solid #B3B3B2;
+}
 
 .entry-head .metadata {
-  float: right; }
+  float: right;
+}
 
 .entry-head .date {
   font-size: 1.8em;
   text-align: left;
   float: left;
-  color: #777777; }
+  color: #777777;
+}
 
 .entry-head .wordcount {
   font-size: 0.7em;
   color: #B3B3B2;
   text-align: right;
   float: right;
-  clear: right; }
+  clear: right;
+}
 
 .entry-head .id {
   font-size: 0.5em;
   color: #B3B3B2;
   text-align: right;
   float: right;
-  clear: right; }
+  clear: right;
+}
+
+$button-size: 40px;
 
 .prev-day {
   position: fixed;
@@ -45,12 +55,13 @@
   float: left;
   width: 0;
   height: 0;
-  border-left: 40px solid transparent;
-  border-top: 40px solid transparent;
-  border-bottom: 40px solid transparent;
-  border-left: 40px solid transparent;
-  border-right: 40px solid gray;
-  margin-top: 20px; }
+  border-left: $button-size solid transparent;
+  border-top: $button-size solid transparent;
+  border-bottom: $button-size solid transparent;
+  border-left: $button-size solid transparent;
+  border-right: $button-size solid gray;
+  margin-top: 20px;
+}
 
 .next-day {
   position: fixed;
@@ -58,17 +69,22 @@
   float: right;
   width: 0;
   height: 0;
-  border-top: 40px solid transparent;
-  border-bottom: 40px solid transparent;
-  border-right: 40px solid transparent;
-  border-left: 40px solid gray;
-  margin-top: 20px; }
+  border-top: $button-size solid transparent;
+  border-bottom: $button-size solid transparent;
+  border-right: $button-size solid transparent;
+  border-left: $button-size solid gray;
+  margin-top: 20px;
+}
+
+
 
 .hashtag {
   background-color: #DDDDDD;
   font-family: monospace;
-  border-radius: 4px; }
+  border-radius: 4px;
+}
 
 /* TODO make it so that the hash is in the regular text rather than added later*/
 .hashtag:before {
-  content: '#'; }
+  content: '#';
+}
