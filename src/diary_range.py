@@ -37,6 +37,10 @@ class Entry():
         with open(self._pathname) as f:
             return f.read()
 
+    @property
+    def mtime(self):
+        return os.path.getmtime(self._pathname)
+
     def contains(self, search_string):
         return re.search(search_string, self.text, re.I)
 
