@@ -1,18 +1,13 @@
 from markdown import markdown
 import re
-
-#TODO remove these absulute paths
-with open('/home/david/space/diary/dev/templates/entry.html', 'r') as f:
-    entry_template = f.read()
-with open('/home/david/space/diary/dev/templates/day.html', 'r') as f:
-    day_template = f.read()
+import os
+from .templates.entry import entry_template
+from .templates.day import day_template
 
 
 def format_entry(entry):
     # Substitute hashtags first
     # Note: this won't work properly when hash symbols appear in source code fragments
-    #TODO Try adding the '#' back in at this point? Will it still get 
-    #     transformed by markdown even though it's in the hashtag span?
     text = entry.text
     text = re.sub(r'(#\w+)', r'<span class="hashtag">\1</span>', text)
 
@@ -48,12 +43,13 @@ def export_command(conn, **kwargs):
         html = format_day(day_to_entries[day], links, day)
         filename = '{}/{}.html'.format(conn.dir_html, day)
         with open(filename, 'w') as f:
-            f.write(html)
             print('Writing to file: {}'.format(filename))
+            f.write(html)
 
-
-#TODO remove this
-if __name__ == '__main__':
-    import diary_range
-    conn = diary_range.connect('~/.diary')
-    export_command(conn)
+    # Link the stylesheet
+    #TODO do this in a better way
+    stylesheet_path = re.sub('exporter.py', 'stylesheet.css', os.path.realpath(__file__))
+    destination = conn.dir_html+'/stylesheet.css'
+    if not os.path.exists(destination):
+        print('Linking to stylesheet at:', stylesheet_path)
+        os.symlink(stylesheet_path, destination)

@@ -3,7 +3,7 @@ from diary_range import connect
 from presenter import display_entries
 from fuzzydate import custom_date
 
-from web_exporter import export_command
+from web.exporter import export_command
 
 __version__ = '2.0.1'
 
@@ -147,7 +147,7 @@ subparser.set_defaults(func=wordcount_command)
 
 # EXPORT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# export_command function is imported from the web_exporter module
+# export_command function is imported from the web.exporter module
 
 subparser = subparsers.add_parser('export',
     description='Export static web pages containing diary entries',

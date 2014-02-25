@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+day_template = '''<!DOCTYPE html>
 <html>
   <head>
     <title>{date:%A %d %B %Y} - {num_entries} entries</title>
@@ -14,4 +14,4 @@
       {entries}
     </div>
   </body>
-</html>
+</html>'''
