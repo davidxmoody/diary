@@ -53,3 +53,11 @@ def export_command(conn, **kwargs):
     if not os.path.exists(destination):
         print('Linking to stylesheet at:', stylesheet_path)
         os.symlink(stylesheet_path, destination)
+
+    # Create a today.html link to the most recent page
+    most_recent_page = '{}/{}.html'.format(conn.dir_html, days[-1])
+    today_destination = '{}/today.html'.format(conn.dir_html)
+    if os.path.exists(today_destination):
+        os.remove(today_destination)
+    print('Creating "today.html" link pointing to:', most_recent_page)
+    os.symlink(most_recent_page, today_destination)
