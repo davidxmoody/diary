@@ -4,9 +4,10 @@ import re
 import subprocess
 
 # Strip non- word or dash characters from device name
-DEVICE_NAME = 'unknown'
-try: DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
-except: pass
+try:
+    DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
+except:
+    DEVICE_NAME = 'unknown'
 
 EDITOR_COMMAND = 'vim'
 
