@@ -40,11 +40,13 @@ def export_command(conn, **kwargs):
         # links, could improve this or write a better implentation altogether
         links = days[:i+10][-20:]
 
-        html = format_day(day_to_entries[day], links, day)
         filename = '{}/{}.html'.format(conn.dir_html, day)
-        with open(filename, 'w') as f:
-            print('Writing to file: {}'.format(filename))
-            f.write(html)
+
+        if not os.path.exists(filename) or any(entry.mtime>os.path.getmtime(filename) for entry in day_to_entries[day]):
+            html = format_day(day_to_entries[day], links, day)
+            with open(filename, 'w') as f:
+                print('Writing to file: {}'.format(filename))
+                f.write(html)
 
     # Link the stylesheet
     #TODO do this in a better way
@@ -57,7 +59,10 @@ def export_command(conn, **kwargs):
     # Create a today.html link to the most recent page
     most_recent_page = '{}/{}.html'.format(conn.dir_html, days[-1])
     today_destination = '{}/today.html'.format(conn.dir_html)
-    if os.path.exists(today_destination):
-        os.remove(today_destination)
-    print('Creating "today.html" link pointing to:', most_recent_page)
-    os.symlink(most_recent_page, today_destination)
+    if os.path.exists(today_destination) and os.path.realpath(most_recent_page)==os.path.realpath(today_destination):
+        pass
+    else:
+        if os.path.exists(today_destination):
+            os.remove(today_destination)
+        print('Creating "today.html" link pointing to:', most_recent_page)
+        os.symlink(most_recent_page, today_destination)
