@@ -1,6 +1,8 @@
 from flask import Flask, abort
-from flask.ext.restful import Api, Resource, marshal_with, fields, marshal
+from flask.ext.restful import Api, Resource, fields, marshal, reqparse
 from diary_range import connect
+from fuzzydate import custom_date
+from itertools import islice
 
 app = Flask(__name__)
 api = Api(app)
@@ -18,12 +20,11 @@ entry_fields = {
 
 
 class Entry(Resource):
-    @marshal_with(entry_fields)
     def get(self, entry_id):
         #TODO add custom fields option
         entry = conn.find_by_id(entry_id)
         if entry is None: abort(404)
-        return entry
+        return marshal(entry, entry_fields)
 
     def put(self, entry_id):
         pass
@@ -32,9 +33,28 @@ class Entry(Resource):
         pass
 
 
+parser = reqparse.RequestParser()
+parser.add_argument('before', type=custom_date)
+parser.add_argument('after', type=custom_date)
+parser.add_argument('modifiedSince', type=int, default=0)
+parser.add_argument('order', type=str, default='asc')
+parser.add_argument('q', type=str, action='append', default=[])
+parser.add_argument('fields', type=str, action='append')
+parser.add_argument('offset', type=int, default=0)
+parser.add_argument('limit', type=int, default=50)
+
+
 class Entries(Resource):
     def get(self):
-        entries = conn.get_entries()
+        args = parser.parse_args()
+        print(args)
+        entries = conn.search_entries(*args['q'], 
+                                      descending=(args['order']=='desc'), 
+                                      max_date=args['before'],
+                                      min_date=args['after'])
+        entries = filter(lambda e: e.mtime>args['modifiedSince'], entries)
+        entries = islice(entries, args['offset'], args['offset']+args['limit'])
+
         return [marshal(entry, entry_fields) for entry in entries]
 
     def post(self):
