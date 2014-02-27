@@ -2,6 +2,7 @@ import os
 import datetime
 import re
 import subprocess
+from markdown import markdown
 
 # Strip non- word or dash characters from device name
 try:
@@ -37,6 +38,11 @@ class Entry():
     def text(self):
         with open(self._pathname) as f:
             return f.read()
+
+    @property
+    def html(self):
+        tagged_text = re.sub(r'(#\w+)', r'<span class="hashtag">\1</span>', self.text)
+        return markdown(tagged_text)
 
     @property
     def mtime(self):
