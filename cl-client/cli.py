@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from diary_range import connect
+from entries_proxy import connect
 from presenter import display_entries
 from fuzzydate import custom_date
 
