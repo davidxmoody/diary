@@ -3,8 +3,6 @@ from entries_proxy import connect
 from presenter import display_entries
 from fuzzydate import custom_date
 
-from web.exporter import export_command
-
 __version__ = '2.0.1'
 
 
@@ -65,7 +63,7 @@ subparser.set_defaults(func=new_command)
 # SEARCH ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def search_command(conn, search_terms, descending, after, before, **kwargs):
-    entries = conn.search_entries(*search_terms, descending=descending, 
+    entries = conn.get_entries(search_terms=search_terms, descending=descending, 
                                   min_date=after, max_date=before)
     display_entries(entries, search_terms)
 
@@ -142,18 +140,6 @@ group_by.add_argument('-g', '--group-by', metavar='DATE_FORMAT',
                           'same formatted date, e.g. "%%Y-%%m-%%d"')
 
 subparser.set_defaults(func=wordcount_command)
-
-
-
-# EXPORT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# export_command function is imported from the web.exporter module
-
-subparser = subparsers.add_parser('export',
-    description='Export static web pages containing diary entries',
-    help='export diary as static web pages')
-
-subparser.set_defaults(func=export_command)
 
 
 
