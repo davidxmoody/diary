@@ -8,4 +8,3 @@ except:
     import datetime
     def custom_date(date_string):
         return datetime.datetime.strptime(date_string, '%Y-%m-%d')
-

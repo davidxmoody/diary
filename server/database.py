@@ -51,11 +51,11 @@ class Entry():
     def contains(self, search_string):
         return re.search(search_string, self.text, re.I)
 
-    def command_line_edit(self):
+    def command_line_edit(self, command=EDITOR_COMMAND):
         directory = os.path.dirname(self._pathname)
         if not os.path.exists(directory):
             os.makedirs(directory)
-        subprocess.call('{} "{}"'.format(EDITOR_COMMAND, self._pathname), shell=True)
+        subprocess.call('{} "{}"'.format(command, self._pathname), shell=True)
         
 
 
@@ -83,16 +83,26 @@ class connect():
         return dir_html
 
 
-
     def new_entry(self, date=None, device_name=DEVICE_NAME):
         if date is None: date = datetime.datetime.today()
 
-        timestamp = date.strftime('%s')
-        month = date.strftime('%Y-%m')
+        # This avoids the bug of not being able to create multiple entries in
+        # the same second, a better approach would be to not have the date tied
+        # to the ID so closely and allow multiple entries with the same date to
+        # exist
 
-        filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
+        while True:
+            timestamp = date.strftime('%s')
+            month = date.strftime('%Y-%m')
+            filename = 'diary-{}-{}.txt'.format(timestamp, device_name)
+            entry = Entry(self.dir_entries, month, filename)
 
-        return Entry(self.dir_entries, month, filename)
+            if os.path.exists(entry._pathname):
+                date += datetime.timedelta(seconds=1)
+            else:
+                break
+
+        return entry
 
 
     def get_entries(self, descending=False, min_date=None, max_date=None):
