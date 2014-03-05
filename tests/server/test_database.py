@@ -15,44 +15,81 @@ class DatabaseTestCase(unittest.TestCase):
     def populate(self, num_entries=20):
         for i in range(num_entries):
             entry = self.conn.new_entry()
-            text = random_text()
-            #TODO change the way new entries have their text edited
-            entry.command_line_edit('echo -n "{}" >'.format(text))
-
-    def test_new_entry(self):
-        entry = self.conn.new_entry()
-        text = 'hello world'
-        entry.command_line_edit('echo -n "{}" >'.format(text))
-        self.assertEqual(text, entry.text)
+            entry.text = random_text()
 
     def test_empty_initially(self):
         num_entries = len(list(self.conn.get_entries()))
         self.assertEqual(num_entries, 0)
 
+    def test_new_entry(self):
+        entry = self.conn.new_entry()
+        text = 'hello world'
+        entry.text = text
+        self.assertEqual(text, entry.text)
+
     def test_populate(self):
-        self.populate(20)
+        self.populate(15)
         num_actual_entries = len(list(self.conn.get_entries()))
-        self.assertEqual(20, num_actual_entries)
+        self.assertEqual(15, num_actual_entries)
 
     def test_persistence(self):
-        self.populate(20)
+        self.populate(15)
         texts = []
         for entry in self.conn.get_entries():
             texts.append(entry.text)
 
         self.conn = connect(self.temp_dir.name)
-        num_actual_entries = len(list(self.conn.get_entries()))
-        self.assertEqual(20, num_actual_entries)
         new_texts = []
         for entry in self.conn.get_entries():
             new_texts.append(entry.text)
+
         self.assertEqual(texts, new_texts)
+        self.assertEqual(len(texts), 15)
 
     def test_search(self):
         letters = 'abcdefghijklmnopqrstuvwxyz#'
         random_string = ''.join(random.choice(letters) for i in range(20))
         text = random_text() + random_string + random_text()
+
         self.populate()
-        self.conn.new_entry().command_line_edit('echo -n "{}" >'.format(text))
-        search_result = list(self.conn.search_entries(random_string))[0]
-        self.assertEqual(search_result.text, text)
+        self.conn.new_entry().text = text
+        search_results = list(self.conn.search_entries(random_string))
+
+        self.assertEqual(len(search_results), 1)
+        self.assertEqual(search_results[0].text, text)
+
+    def test_editing(self):
+        entry = self.conn.new_entry()
+        original_text = 'hello world'
+        entry.text = original_text
+        self.assertEqual(entry.text, original_text)
+
+        entry.text = 'qwerty'
+        self.assertNotEqual(original_text, entry.text)
+
+    def test_wordcount(self):
+        entry = self.conn.new_entry()
+        entry.text = 'hello world'
+        self.assertEqual(entry.wordcount, 2)
+
+    def test_most_recent(self):
+        self.populate()
+        entry = self.conn.new_entry()
+        entry.text = 'hello world'
+        most_recent = self.conn.most_recent_entry()
+        self.assertEqual(entry.id, most_recent.id)
+
+    def test_find_by_id(self):
+        self.populate(20)
+        entry = list(self.conn.get_entries())[10]
+        found_entry = self.conn.find_by_id(entry.id)
+        self.assertEqual(entry.id, found_entry.id)
+        self.assertEqual(entry.text, found_entry.text)
+
+    def test_descending_get_entries(self):
+        self.populate()
+        ascending_entries = list(self.conn.get_entries(descending=False))
+        descending_entries = list(self.conn.get_entries(descending=True))
+        for entry1, entry2 in zip(ascending_entries, reversed(descending_entries)):
+            self.assertEqual(entry1.id, entry2.id)
+            self.assertEqual(entry1.text, entry2.text)

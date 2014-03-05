@@ -39,6 +39,12 @@ class Entry():
         with open(self._pathname) as f:
             return f.read()
 
+    @text.setter
+    def text(self, text):
+        self._mkdir()
+        with open(self._pathname, 'w') as f:
+            f.write(text)
+
     @property
     def html(self):
         tagged_text = re.sub(r'(#\w+)', r'<span class="hashtag">\1</span>', self.text)
@@ -52,10 +58,14 @@ class Entry():
         return re.search(search_string, self.text, re.I)
 
     def command_line_edit(self, command=EDITOR_COMMAND):
+        self._mkdir()
+        subprocess.call('{} "{}"'.format(command, self._pathname), shell=True)
+
+    def _mkdir(self):
         directory = os.path.dirname(self._pathname)
         if not os.path.exists(directory):
             os.makedirs(directory)
-        subprocess.call('{} "{}"'.format(command, self._pathname), shell=True)
+        
         
 
 
@@ -69,18 +79,6 @@ class connect():
         if not os.path.exists(self.dir_entries):
             print('Creating diary database at: {}'.format(self.dir_base))
             os.makedirs(self.dir_entries)
-
-
-    @property
-    def dir_html(self):
-        dir_html = os.path.realpath(os.path.expanduser(os.path.expandvars(
-                os.path.join(self.dir_base, 'html'))))
-
-        if not os.path.exists(dir_html):
-            print('Creating html directory at: {}'.format(dir_html))
-            os.makedirs(dir_html)
-
-        return dir_html
 
 
     def new_entry(self, date=None, device_name=DEVICE_NAME):
