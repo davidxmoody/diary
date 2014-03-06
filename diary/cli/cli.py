@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
-from entries_proxy import connect
-from presenter import display_entries
-from fuzzydate import custom_date
+from diary.server.database import connect
+from .presenter import display_entries
+from diary.utils.fuzzydate import custom_date
 
 __version__ = '2.0.1'
 
@@ -63,7 +63,7 @@ subparser.set_defaults(func=new_command)
 # SEARCH ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def search_command(conn, search_terms, descending, after, before, **kwargs):
-    entries = conn.get_entries(search_terms=search_terms, descending=descending, 
+    entries = conn.search_entries(*search_terms, descending=descending, 
                                   min_date=after, max_date=before)
     display_entries(entries, search_terms)
 
