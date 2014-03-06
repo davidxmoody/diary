@@ -1,7 +1,7 @@
 import unittest
 import random
 from tempfile import TemporaryDirectory
-from diary.database.database import connect
+from diary.database import connect
 from .filler_text import random_text
 
 class DatabaseTestCase(unittest.TestCase):

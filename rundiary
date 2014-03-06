@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 
-from diary.cli.cli import process_args
+from diary.cli import process_args
 
 process_args()

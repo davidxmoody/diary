@@ -1,7 +1,7 @@
 from flask import Flask, abort
 from flask.ext.restful import Api, Resource, fields, marshal, reqparse
-from database import connect
-from fuzzydate import custom_date
+from diary.database import connect
+from diary.fuzzydate import custom_date
 from itertools import islice
 
 app = Flask(__name__)

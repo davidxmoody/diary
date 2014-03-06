@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
-from diary.database.database import connect
-from .presenter import display_entries
-from diary.utils.fuzzydate import custom_date
+from diary.database import connect
+from diary.presenter import display_entries
+from diary.fuzzydate import custom_date
 
 __version__ = '2.0.1'
 
