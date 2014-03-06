@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from diary.server.database import connect
+from diary.database.database import connect
 from .presenter import display_entries
 from diary.utils.fuzzydate import custom_date
 
