@@ -1,5 +1,5 @@
 import unittest
-from diary.fuzzydate import custom_date
+from diary.utils import custom_date
 
 class CustomDateTestCase(unittest.TestCase):
     def test_custom_date(self):
