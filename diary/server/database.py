@@ -66,7 +66,6 @@ class Entry():
         if not os.path.exists(directory):
             os.makedirs(directory)
         
-        
 
 
 class connect():
