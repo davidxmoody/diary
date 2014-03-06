@@ -15,7 +15,7 @@ parser.add_argument('--version', action='version',
     version='%(prog)s {}'.format(__version__))
 
 parser.add_argument('-b', '--base', default='~/.diary', 
-    help='path to base folder')
+    help='path to base folder (defaults to `~/.diary`)')
 
 subparsers = parser.add_subparsers(title='subcommands')
 
@@ -23,10 +23,13 @@ subparsers = parser.add_subparsers(title='subcommands')
 
 # EDIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def edit_command(conn, entry_id, **kwargs):
+def edit_command(conn, entry_id, editor, message, **kwargs):
     entry = conn.find_by_id(entry_id) if entry_id else conn.most_recent_entry()
     if entry:
-        entry.command_line_edit()
+        if message is not None:
+            entry.text = message
+        else:
+            entry.command_line_edit(editor)
     else:
         print('No entry to edit', 
               'for entry_id: {}'.format(entry_id) if entry_id else '')
@@ -38,6 +41,10 @@ subparser = subparsers.add_parser('edit',
 
 subparser.add_argument('entry_id', nargs='?', 
     help='entry id of the form "$timestamp-$device_name"')
+subparser.add_argument('-e', '--editor', default='vim',
+    help='editor to write the entry with (defaults to `vim`)')
+subparser.add_argument('-m', '--message', 
+    help='directly set the text of the entry to MESSAGE')
 
 subparser.set_defaults(func=edit_command)
 
@@ -45,16 +52,23 @@ subparser.set_defaults(func=edit_command)
 
 # NEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def new_command(conn, date, **kwargs):
+def new_command(conn, date, editor, message, **kwargs):
     entry = conn.new_entry(date)
-    entry.command_line_edit()
+    if message is not None:
+        entry.text = message
+    else:
+        entry.command_line_edit(editor)
 
 subparser = subparsers.add_parser('new',
     description='Open Vim to edit a new entry',
     help='create a new entry')
 
-subparser.add_argument('date', type=custom_date, nargs='?', 
+subparser.add_argument('-d', '--date', type=custom_date, 
     help='date of the new entry (defaults to now)')
+subparser.add_argument('-e', '--editor', default='vim',
+    help='editor to write the entry with (defaults to `vim`)')
+subparser.add_argument('-m', '--message', 
+    help='directly set the text of the entry to MESSAGE')
 
 subparser.set_defaults(func=new_command)
 
@@ -62,10 +76,10 @@ subparser.set_defaults(func=new_command)
 
 # SEARCH ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def search_command(conn, search_terms, descending, after, before, **kwargs):
+def search_command(conn, search_terms, descending, after, before, pipe_to, **kwargs):
     entries = conn.search_entries(*search_terms, descending=descending, 
                                   min_date=after, max_date=before)
-    display_entries(entries, search_terms)
+    display_entries(entries, pipe_to, search_terms)
 
 subparser = subparsers.add_parser('search', aliases=['list'],
     description='Display entries containing all of the given search terms',
@@ -73,6 +87,9 @@ subparser = subparsers.add_parser('search', aliases=['list'],
 
 subparser.add_argument('search_terms', nargs='*',
     help='any number of regular expressions to search for')
+
+subparser.add_argument('--pipe-to', metavar='COMMAND', default='less -R',
+    help='pipe output to the given command')
 
 subparser.add_argument('--before', type=custom_date, metavar='DATE',
     help='only show entries occurring before DATE')
@@ -145,8 +162,8 @@ subparser.set_defaults(func=wordcount_command)
 
 # PROCESS ARGS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def process_args():
-    args = parser.parse_args()
+def process_args(arg_list=None):
+    args = parser.parse_args(arg_list)
     if hasattr(args, 'func'):
         conn = connect(args.base)
         args.func(conn, **vars(args))

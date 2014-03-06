@@ -66,10 +66,10 @@ def formatted(entry, search_terms=None, width=TERMINAL_WIDTH):
     return header + '\n' + '\n'.join(lines) + '\n\n'
 
 
-def display_entries(entries, search_terms=None):
-    '''Open a less pipe to display the given entries to the user.'''
+def display_entries(entries, display_command, search_terms=None):
+    '''Open a separate process to display the given entries to the user.'''
 
-    less_process = Popen('less -R', stdin=PIPE, shell=True)
+    less_process = Popen(display_command, stdin=PIPE, shell=True)
 
     try:
         for entry in entries:

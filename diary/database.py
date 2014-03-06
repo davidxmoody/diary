@@ -10,8 +10,6 @@ try:
 except:
     DEVICE_NAME = 'unknown'
 
-EDITOR_COMMAND = 'vim'
-
 
 class Entry():
 
@@ -57,7 +55,7 @@ class Entry():
     def contains(self, search_string):
         return re.search(search_string, self.text, re.I)
 
-    def command_line_edit(self, command=EDITOR_COMMAND):
+    def command_line_edit(self, command):
         self._mkdir()
         subprocess.call('{} "{}"'.format(command, self._pathname), shell=True)
 
@@ -76,7 +74,8 @@ class connect():
                 os.path.join(dir_base, 'entries'))))
 
         if not os.path.exists(self.dir_entries):
-            print('Creating diary database at: {}'.format(self.dir_base))
+            #TODO put this into a log rather than printing it
+            #print('Creating diary database at: {}'.format(self.dir_base))
             os.makedirs(self.dir_entries)
 
 
