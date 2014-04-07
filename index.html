@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" ng-app>
+<head>
+  <meta charset="UTF-8">
+  <title>Diary app</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  <script src="angular.min.js"></script>
+  <script src="script.js"></script>
+</head>
+<body>
+<div ng-controller="EntriesCtrl">
+  <nav>
+    <ul> <li ng-repeat="day in days"><a href="{{day}}.html">{{day}}</a></li> </ul>
+  </nav>
+  <div class="entries">
+    <div class="entry" ng-repeat="entry in entries">
+      <div class="entry-head">
+        <div class="date">{{entry.date}}</div>
+        <div class="metadata">
+          <div class="wordcount">{{entry.wordcount}}</div>
+          <div class="id">{{entry.id}}</div>
+        </div>
+      </div>
+      <div class="entry-body">
+        {{entry.text}}
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
