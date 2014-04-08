@@ -1,4 +1,6 @@
-window.EntriesCtrl = ($scope) ->
+diaryApp = angular.module('diaryApp', [])
+
+diaryApp.controller 'EntriesCtrl', ($scope) ->
   $scope.helloText = 'hello world'
   $scope.entries = [
     {
@@ -37,4 +39,3 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     '2014-03-19'
     '2014-03-20'
   ]
-

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en" ng-app="diaryApp" ng-controller="EntriesCtrl">
 <head>
   <meta charset="UTF-8">
   <title>Diary app</title>
@@ -8,12 +8,18 @@
   <script src="script.js"></script>
 </head>
 <body>
-<div ng-controller="EntriesCtrl">
+<div>
+  Search: <input ng-model="query"> <span ng-hide="!query || query.length===0">Query is: {{query}}</span>
+  <span>Sort by: </span> 
+  <select ng-model="orderProp" ng-init="orderProp='-date'">
+    <option value="-date">Descending</option>
+    <option value="+date">Ascending</option>
+  </select>
   <nav>
     <ul> <li ng-repeat="day in days"><a href="{{day}}.html">{{day}}</a></li> </ul>
   </nav>
   <div class="entries">
-    <div class="entry" ng-repeat="entry in entries">
+    <div class="entry" ng-repeat="entry in entries | filter: query | orderBy: orderProp">
       <div class="entry-head">
         <div class="date">{{entry.date}}</div>
         <div class="metadata">
