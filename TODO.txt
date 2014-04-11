@@ -1,20 +1,17 @@
 Data storage model:
-- automated tests
-- full backup to archive file, restore from archive file, verify current database, incremental backup, backup excluding pictures/video/audio
+- full/incremental backup to archive file, restore/sync/pull from backup file
 - track view counts, search logs, other usage data
-- start and end dates (or start date and duration)
-- indexing (with word stemming)
-- faster way to search by tag
-- cache frequent searches automatically
+- indexing, cache frequent searches
+- smarter search, add word boundaries automatically, word stemming, case (in)sensitivity
+- add separate time tracking functionality/API
 
 
-Config file (.diaryrc):
-- either in home dir or diary data dir (or both)
+Config file:
+- `.diaryrc` either in home dir or diary data dir (or both)
 - set default editors
-- search options settable in config file (case insensitivity, highlight colours, etc.)
-- set device name in config file, ability to link to an external file for the device name
+- custom CSS/command line styles
+- set device name in config file, ability to link to an external file/command for the device name
 - user configurable commands/aliases
-- automatic (configurable) word boundaries added to search expressions (both to enable and disable)
 
 
 Browser based server:
@@ -24,15 +21,10 @@ Browser based server:
 - build automation script/install script
 - saved searches (aka bookmarks)
 - link to/quote other entries inline (`diary://` syntax?)
-- Markdown formatting (with images and links)
-- photos
-- jump to relevant section of search result/search term highlighting
-- entries rated with importance level (implement with tags)
-- entry drafts
+- search term highlighting
 - timeline viewing model
 - define custom "eras" to act as date range aliases
 - audio/video/handwritten entries
-
 
 
 Feature wishlist:
@@ -44,23 +36,9 @@ Feature wishlist:
 - custom status board (in HTML)
 - task list
 - reminders to self, task reminders
-
-
-Silly feature wishlist:
-- diary curfew, settable by user
-- taskbar integration for Linux version
-- typing speed tracker
 - attach/archive arbitrary files/directories
-- diagram making system, graphs/flowcharts
-- mind maps
-- Gantt and PERT charts for general planning, evidence based planning, scheduling
-- sunrise/sunset times, weather (both predicted and historical)
-- custom dictionary
-- voice commands
+- diagram making system, graphs/flowcharts, extend Markdown syntax?
 - encryption
-- continuous model, just start writing without having to worry about entry boundaries, paragraphs are grouped by closeness in time
-- recipe browser with recipe tag, custom fields for ingredients and ratings, script to generate shopping list from selection (doc with embedded script)
 - view emails on timeline
-- Fitbit/sleep graph data integration
-- track purchases/receipts, take photo of a receipt
-- all entries have titles, auto generated or manual, just use Markdown formatted title at top
+- view internet history on timeline
+- FitBit/sleep graph data integration

@@ -4,10 +4,11 @@ from diary.database import connect
 from diary.utils import custom_date
 from itertools import islice
 
-app = Flask(__name__)
+app = Flask('diary')
 api = Api(app)
 
-conn = connect('~/.diary')
+#TODO manage this connection better
+conn = None
 
 default_entry_fields = {
     'id': fields.String,
@@ -78,5 +79,10 @@ class Entries(Resource):
 api.add_resource(Entry, '/entries/<string:entry_id>')
 api.add_resource(Entries, '/entries')
 
+def start_server(connection, port, *args, **kwargs):
+    global conn
+    conn = connection
+    app.run(port=port, debug=True, *args, **kwargs)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    start_server('~/.diary')

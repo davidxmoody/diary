@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from diary.database import connect
 from diary.presenter import display_entries
 from diary.utils import custom_date
+from diary.server import start_server
 
 __version__ = '2.0.1'
 
@@ -157,6 +158,22 @@ group_by.add_argument('-g', '--group-by', metavar='DATE_FORMAT',
                           'same formatted date, e.g. "%%Y-%%m-%%d"')
 
 subparser.set_defaults(func=wordcount_command)
+
+
+
+# SERVER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def server_command(conn, port, **kwargs):
+    start_server(conn, port)
+
+subparser = subparsers.add_parser('server',
+    description='Start local server on the specified port',
+    help='start local server')
+
+subparser.add_argument('-p', '--port', type=int, default=22022,
+    help='port number to start server on (defaults to 22022)')
+
+subparser.set_defaults(func=server_command)
 
 
 
