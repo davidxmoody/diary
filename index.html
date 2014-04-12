@@ -5,7 +5,10 @@
   <title>Diary app</title>
   <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
   <script src="angular.min.js"></script>
-  <script src="script.js"></script>
+  <script src="angular-resource.min.js"></script>
+  <script src="angular-sanitize.min.js"></script>
+  <script src="entriesservice.js"></script>
+  <script src="entriesctrl.js"></script>
 </head>
 <body>
 <div>
@@ -27,9 +30,7 @@
           <div class="id">{{entry.id}}</div>
         </div>
       </div>
-      <div class="entry-body">
-        {{entry.text}}
-      </div>
+      <div class="entry-body" ng-bind-html="entry.html"></div>
     </div>
   </div>
 </div>
