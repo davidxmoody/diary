@@ -1,10 +1,8 @@
 diaryApp = angular.module('diaryApp', ['diaryServices', 'ngSanitize'])
 
-diaryApp.controller 'EntriesCtrl', ['$scope', 'Entry', ($scope, Entry) ->
-  $scope.entries = Entry.query()
+diaryApp.controller('EntriesCtrl', ['$scope', 'Entry', ($scope, Entry) ->
+  $scope.entries = Entry.search({q:'hello', fields:'date,html,wordcount,id'})
 
-  $scope.days = [
-    '2014-03-19'
-    '2014-03-20'
-  ]
-]
+  $scope.days = ->
+    return _.pluck($scope.entries, 'date')
+])

@@ -1,7 +1,8 @@
 diaryServices = angular.module('diaryServices', ['ngResource'])
 
-constructor = ($resource) ->
-  console.log 'running Entry constructor'
-  return $resource('http://127.0.0.1:22022/entries/', {}, { query: {method: 'GET', isArray: true} })
-
-diaryServices.factory('Entry', ['$resource', constructor])
+diaryServices.factory('Entry', ['$resource', ($resource) ->
+  return $resource('/entries/:entryId', {}, {
+    recent: { method: 'GET', isArray: true, params: { order: 'desc', offset: 0, limit: 10 } }
+    search: { method: 'GET', isArray: true, params: { order: 'desc', offset: 0, limit: 10 } }
+  })
+])

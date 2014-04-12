@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Diary app</title>
   <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  <script src="underscore.min.js"></script>
   <script src="angular.min.js"></script>
   <script src="angular-resource.min.js"></script>
   <script src="angular-sanitize.min.js"></script>
@@ -19,7 +20,7 @@
     <option value="+date">Ascending</option>
   </select>
   <nav>
-    <ul> <li ng-repeat="day in days"><a href="{{day}}.html">{{day}}</a></li> </ul>
+    <ul> <li ng-repeat="day in days() track by $index"><a href="{{day}}.html">{{day}}</a></li> </ul>
   </nav>
   <div class="entries">
     <div class="entry" ng-repeat="entry in entries | filter: query | orderBy: orderProp">
