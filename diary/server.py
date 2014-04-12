@@ -1,13 +1,13 @@
-from flask import Flask, abort
+from flask import Flask, abort, render_template, url_for
 from flask.ext.restful import Api, Resource, fields, marshal, reqparse
 from diary.database import connect
 from diary.utils import custom_date
 from itertools import islice
 
-app = Flask('diary')
+app = Flask('diary', static_url_path='')
 api = Api(app)
 
-#TODO manage this connection better
+#TODO conn is set later when start_server is run, this could be done better
 conn = None
 
 default_entry_fields = {
@@ -19,17 +19,17 @@ default_entry_fields = {
     'wordcount': fields.Integer
 }
 
-def marshal_entry(entry, fields_list=None):
-    if fields_list is None:
+def marshal_entry(entry, fields_string=None):
+    if fields_string is None:
         fields_dict = default_entry_fields
     else:
         fields_dict = { k: v for k, v in default_entry_fields.items() 
-                                                    if k in fields_list }
+                                            if k in fields_string.split(',') }
     return marshal(entry, fields_dict)
 
 
 entry_get_parser = reqparse.RequestParser()
-entry_get_parser.add_argument('fields', type=str, action='append', choices=default_entry_fields.keys())
+entry_get_parser.add_argument('fields', type=str)
 
 class Entry(Resource):
     def get(self, entry_id):
@@ -52,10 +52,7 @@ entries_get_parser.add_argument('after', type=custom_date)
 entries_get_parser.add_argument('modifiedSince', type=int, default=0)
 entries_get_parser.add_argument('order', type=str, default='asc')
 entries_get_parser.add_argument('q', type=str, action='append', default=[])
-#TODO represent fields as a list of strings rather than multiple occurrences of strings
-# i.e. make it so that `?fields=date,id` works instead of having to do
-# `?fields=date&fields=id`
-entries_get_parser.add_argument('fields', type=str, action='append', choices=default_entry_fields.keys())
+entries_get_parser.add_argument('fields', type=str)
 entries_get_parser.add_argument('offset', type=int, default=0)
 entries_get_parser.add_argument('limit', type=int, default=50)
 
@@ -78,6 +75,11 @@ class Entries(Resource):
 
 api.add_resource(Entry, '/entries/<string:entry_id>')
 api.add_resource(Entries, '/entries')
+
+# Send the index page directly from the root address
+@app.route('/')
+def root():
+    return app.send_static_file('index.html')
 
 def start_server(connection, port, *args, **kwargs):
     global conn
