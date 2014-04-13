@@ -25,7 +25,7 @@
   <div class="entries">
     <div class="entry" ng-repeat="entry in entries | filter: query | orderBy: orderProp">
       <div class="entry-head">
-        <div class="date">{{entry.date}}</div>
+        <div class="date">{{getFormattedEntryDate(entry)}}</div>
         <div class="metadata">
           <div class="wordcount">{{entry.wordcount}}</div>
           <div class="id">{{entry.id}}</div>
