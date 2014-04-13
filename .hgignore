@@ -1,2 +1,3 @@
-?script.js$
-?stylesheet.css$
+^script.js$
+^stylesheet.css$
+^.sass-cache$

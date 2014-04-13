@@ -8,20 +8,23 @@
   <script src="underscore.min.js"></script>
   <script src="angular.min.js"></script>
   <script src="angular-resource.min.js"></script>
+  <script src="angular-route.min.js"></script>
   <script src="angular-sanitize.min.js"></script>
   <script src="entriesservice.js"></script>
   <script src="entriesctrl.js"></script>
 </head>
 <body>
 <div>
-  Search: <input ng-model="query"> <span ng-hide="!query || query.length===0">Query is: {{query}}</span>
-  <span>Sort by: </span> 
-  <select ng-model="orderProp" ng-init="orderProp='-date'">
-    <option value="-date">Descending</option>
-    <option value="+date">Ascending</option>
-  </select>
   <nav>
-    <ul> <li ng-repeat="day in days() track by $index"><a href="{{day}}.html">{{day}}</a></li> </ul>
+    <input class="searchbox" placeholder="Search..." ng-model="query">
+    <div class="sortorder">
+      Sort by: 
+      <select ng-model="orderProp" ng-init="orderProp='-date'">
+        <option value="-date">Descending</option>
+        <option value="+date">Ascending</option>
+      </select>
+    </div> 
+    <ul> <li ng-repeat="day in days() track by $index"><a href="#/{{day}}">{{day}}</a></li> </ul>
   </nav>
   <div class="entries">
     <div class="entry" ng-repeat="entry in entries | filter: query | orderBy: orderProp">
