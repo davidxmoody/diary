@@ -13,7 +13,8 @@ conn = None
 default_entry_fields = {
     'id': fields.String,
     'mtime': fields.Integer,
-    'date': fields.DateTime,
+    'timestamp': fields.Integer,
+    #TODO add timezone
     'text': fields.String,
     'html': fields.String,
     'wordcount': fields.Integer

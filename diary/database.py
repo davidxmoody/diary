@@ -29,6 +29,11 @@ class Entry():
         return datetime.datetime.fromtimestamp(int(self._timestamp))
 
     @property
+    def timestamp(self):
+        #TODO add a timezone info property and decide what to do about the date property
+        return self._timestamp
+
+    @property
     def wordcount(self):
         return len(re.findall(r'\S+', self.text))
 
