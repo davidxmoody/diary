@@ -109,12 +109,13 @@ subparser.set_defaults(func=search_command, descending=True)
 
 # WORDCOUNT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def wordcount_command(conn, group_by, **kwargs):
+def wordcount_command(conn, group_by, descending, after, before, **kwargs):
     if group_by is None: group_by = 'Total'
     wordcounts = {}
     entry_counts = {}
 
-    for entry in conn.get_entries():
+    for entry in conn.get_entries(descending=descending, min_date=after, 
+                                                         max_date=before):
         group = entry.date.strftime(group_by)
         if group not in wordcounts:
             wordcounts[group], entry_counts[group] = 0, 0
@@ -150,12 +151,26 @@ group_by.add_argument('-y', '--year', action='store_const', const='%Y',
     dest='group_by', help='group by year')
 group_by.add_argument('-m', '--month', action='store_const', const='%Y-%m', 
     dest='group_by', help='group by month')
+group_by.add_argument('-d', '--day', action='store_const', const='%Y-%m-%d', 
+    dest='group_by', help='group by day')
 group_by.add_argument('-w', '--weekday', action='store_const', const='%u %a', 
     dest='group_by', help='group by weekday')
 group_by.add_argument('-g', '--group-by', metavar='DATE_FORMAT',
     dest='group_by', help='format entry dates with DATE_FORMAT and combine '
                           'wordcount totals for all entries which have the '
                           'same formatted date, e.g. "%%Y-%%m-%%d"')
+
+subparser.add_argument('--before', type=custom_date, metavar='DATE',
+    help='only show entries occurring before DATE')
+subparser.add_argument('--after', type=custom_date, metavar='DATE',
+    help='only show entries occurring after DATE')
+
+sort_order = subparser.add_mutually_exclusive_group()
+sort_order.add_argument('--asc', action='store_false', dest='descending',
+    help='sort in ascending date order')
+sort_order.add_argument('--desc', action='store_true', dest='descending',
+    help='sort in descending date order')
+
 
 subparser.set_defaults(func=wordcount_command)
 
