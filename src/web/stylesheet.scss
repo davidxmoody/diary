@@ -48,6 +48,14 @@ nav {
 
 .entry-body {
   color: #404040;
+
+  img, video {
+    max-width: 100%;
+  }
+
+  pre {
+    overflow-x: auto;
+  }
 }
 
 .entry-head {
@@ -80,10 +88,6 @@ nav {
   text-align: right;
   float: right;
   clear: right;
-}
-
-.entry-body img {
-  width: 100%;
 }
 
 .hashtag {

@@ -9,7 +9,7 @@ def format_entry(entry):
     # Substitute hashtags first
     # Note: this won't work properly when hash symbols appear in source code fragments
     text = entry.text
-    text = re.sub(r'(#\w+)', r'<span class="hashtag">\1</span>', text)
+    text = re.sub(r'(#[A-Za-z0-9_-]+)', r'<span class="hashtag">\1</span>', text)
 
     formatted_text = markdown(text)
 
