@@ -172,6 +172,63 @@ subparser.set_defaults(func=export_command)
 
 
 
+# MOOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#TODO much of this is copied from the wordcount command, should abstract it
+def mood_command(conn, group_by, descending, after, before, **kwargs):
+    if group_by is None: group_by = 'Average'
+    moods = {}
+
+    for entry in conn.get_entries(descending=descending, min_date=after, 
+                                                         max_date=before):
+        try:
+            mood = int(entry.text[0])
+            group = entry.date.strftime(group_by)
+            if group not in moods:
+                moods[group] = []
+            moods[group].append(mood)
+        except:
+            pass
+
+    for group in sorted(moods.keys()):
+        print('{}: {:1.1f}'.format(group, sum(moods[group])/len(moods[group])))
+    
+
+
+subparser = subparsers.add_parser('mood',
+    description='Pretty print mood data summaries',
+    help='print mood data')
+
+group_by = subparser.add_mutually_exclusive_group()
+group_by.add_argument('-y', '--year', action='store_const', const='%Y', 
+    dest='group_by', help='group by year')
+group_by.add_argument('-m', '--month', action='store_const', const='%Y-%m', 
+    dest='group_by', help='group by month')
+group_by.add_argument('-d', '--day', action='store_const', const='%Y-%m-%d', 
+    dest='group_by', help='group by day')
+group_by.add_argument('-w', '--weekday', action='store_const', const='%u %a', 
+    dest='group_by', help='group by weekday')
+group_by.add_argument('-g', '--group-by', metavar='DATE_FORMAT',
+    dest='group_by', help='format entry dates with DATE_FORMAT and combine '
+                          'mood data for all entries which have the '
+                          'same formatted date, e.g. "%%Y-%%m-%%d"')
+
+subparser.add_argument('--before', type=custom_date, metavar='DATE',
+    help='only show entries occurring before DATE')
+subparser.add_argument('--after', type=custom_date, metavar='DATE',
+    help='only show entries occurring after DATE')
+
+sort_order = subparser.add_mutually_exclusive_group()
+sort_order.add_argument('--asc', action='store_false', dest='descending',
+    help='sort in ascending date order')
+sort_order.add_argument('--desc', action='store_true', dest='descending',
+    help='sort in descending date order')
+
+
+subparser.set_defaults(func=mood_command)
+
+
+
 # PROCESS ARGS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def process_args():
