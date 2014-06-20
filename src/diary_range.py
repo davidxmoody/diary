@@ -9,7 +9,10 @@ try:
 except:
     DEVICE_NAME = 'unknown'
 
-EDITOR_COMMAND = 'vim'
+#TODO Revert back this change, it shouldn't be in the diary program, it should
+#     be a "custom editor" command
+date = datetime.datetime.now().strftime('%F')
+EDITOR_COMMAND = 'vim -w ~/.dbox/Dropbox/diary-data/vim-logs/vimdiary-{}.log'.format(date)
 
 
 class Entry():
