@@ -1,6 +1,4 @@
 Database:
-- full/incremental backup to archive file, restore/sync/pull from backup file
-- track search logs, other usage data
 - cache HTML
 - indexing, cache frequent searches
 - smarter search, add word boundaries automatically, word stemming, case (in)sensitivity
@@ -20,20 +18,10 @@ Browser based:
 - build automation script/install script
 - saved searches (aka bookmarks)
 - link to/quote other entries inline
-- search term highlighting
 - timeline viewing model
 
 
 Feature wishlist:
-- graph mood data
 - hidden entries (using the 'hidden' tag)
 - bash auto-completion of diary commands
 - tag analyser
-- custom status board (in HTML)
-- todo.txt app integration
-- reminders to self, task reminders
-- attach/archive arbitrary files/directories
-- encryption
-- view emails on timeline
-- view internet history on timeline
-- FitBit/sleep graph data integration
