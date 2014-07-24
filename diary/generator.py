@@ -1,6 +1,6 @@
 from jinja2 import Environment, PackageLoader
 from os.path import join, realpath, expanduser, expandvars, exists, getmtime
-from os import makedirs
+from os import makedirs, remove, symlink
 from shutil import rmtree
 
 def generate_command(conn, out, watch, clean, **kwargs):
@@ -51,10 +51,22 @@ def generate_command(conn, out, watch, clean, **kwargs):
                 #TODO allow specifying log detail level from cli
                 print('Writing to:', file)
 
-    # Finally copy across stylesheet
+    # Copy across stylesheet
     stylesheet_template = env.get_template('style.css')
     stylesheet_file = join(out, 'style.css')
     if not exists(stylesheet_file):
         with open(stylesheet_file, 'w') as f:
             f.write(stylesheet_template.render())
             print('Writing to: style.css')
+
+    # Create a 'today.html' symbolic link to most recent day
+    most_recent_page = '{}/{}.html'.format(out, all_days[-1])
+    today_destination = '{}/today.html'.format(out)
+    if exists(today_destination) and realpath(most_recent_page)==realpath(today_destination):
+        pass
+    else:
+        if exists(today_destination):
+            remove(today_destination)
+        #TODO log this too
+        print('Creating "today.html" link pointing to:', most_recent_page)
+        symlink(most_recent_page, today_destination)
