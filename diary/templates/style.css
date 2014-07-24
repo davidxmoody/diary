@@ -4,17 +4,22 @@ body {
   overflow-y: scroll;
 }
 
-.header {
-  display: inline-block;
+.previous-day, .next-day {
   position: fixed;
-  top: 0;
-  height: 40px;
-  margin: auto;
-  text-align: center;
+  top: 0px;
+  height: 100%;
+  width: calc(50% - 350px);
+
+  font-size: 60px;
+  text-decoration: none;
+
+  display: table;
 }
 
-.previous-day, .next-day {
-  text-decoration: none;
+.previous-day span, .next-day span {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .previous-day {
@@ -26,12 +31,9 @@ body {
 }
 
 .entries {
-  margin-top: 40px;
 }
 
 .entry {
-  width: 90%;
-  min-width: 500px;
   max-width: 650px;
   padding: 0.3em;
   border: 1px solid #B3B3B2;
