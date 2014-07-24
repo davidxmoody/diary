@@ -3,6 +3,7 @@ import datetime
 import re
 import subprocess
 from markdown import markdown
+import logging
 
 
 class Entry():
@@ -56,6 +57,7 @@ class Entry():
 
     def command_line_edit(self, command):
         self._mkdir()
+        logging.info('Opening editor on entry at: {}'.format(self._pathname))
         subprocess.call('{} "{}"'.format(command, self._pathname), shell=True)
 
     def _mkdir(self):
@@ -73,9 +75,8 @@ class connect():
                 os.path.join(dir_base, 'entries'))))
 
         if not os.path.exists(self.dir_entries):
-            #TODO put this into a log rather than printing it
-            #print('Creating diary database at: {}'.format(self.dir_base))
             os.makedirs(self.dir_entries)
+            logging.info('Creating new database at: {}'.format(self.dir_base))
 
 
     def new_entry(self, date=None, device_name='unknown'):

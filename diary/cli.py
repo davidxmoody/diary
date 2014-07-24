@@ -3,6 +3,7 @@ from diary.database import connect
 from diary.presenter import display_entries
 from diary.utils import custom_date
 from diary.generator import generate_command
+import logging
 import re
 import os
 
@@ -23,7 +24,7 @@ parser = ArgumentParser(
 parser.add_argument('--version', action='version', 
     version='%(prog)s {}'.format(__version__))
 
-parser.add_argument('-b', '--base', default='~/.diary', 
+parser.add_argument('-b', '--base', default=os.path.expandvars('$HOME/.diary'),
     help='path to base folder (defaults to `~/.diary`)')
 
 subparsers = parser.add_subparsers(title='subcommands')
@@ -213,6 +214,10 @@ subparser.set_defaults(func=generate_command)
 def process_args(arg_list=None):
     args = parser.parse_args(arg_list)
     if hasattr(args, 'func'):
+        logging.basicConfig(level=logging.DEBUG, 
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                filename=os.path.join(args.base, '{}.log'.format(DEVICE_NAME)))
+
         conn = connect(args.base)
         args.func(conn, **vars(args))
     else:

@@ -2,6 +2,7 @@ from jinja2 import Environment, PackageLoader
 from os.path import join, realpath, expanduser, expandvars, exists, getmtime
 from os import makedirs, remove, symlink
 from shutil import rmtree
+import logging
 
 def generate_command(conn, out, watch, clean, **kwargs):
 
@@ -9,11 +10,12 @@ def generate_command(conn, out, watch, clean, **kwargs):
     if not out:
         out = join(conn.dir_base, 'html')
     out = realpath(expanduser(expandvars(out)))
+
     if not exists(out):
         makedirs(out)
 
-    # Clean out dir
-    if clean:
+    elif clean:
+        logging.info('Removing existing out dir at: {}'.format(out))
         rmtree(out)
         makedirs(out)
 
@@ -47,9 +49,7 @@ def generate_command(conn, out, watch, clean, **kwargs):
             with open(file, 'w') as f:
                 f.write(template.render(entries=days[day], 
                     next_day=next_days[day], previous_day=previous_days[day]))
-                #TODO log this intstead of printing it
-                #TODO allow specifying log detail level from cli
-                print('Writing to:', file)
+                logging.debug('Writing to: {}'.format(file))
 
     # Copy across stylesheet
     stylesheet_template = env.get_template('style.css')
@@ -67,6 +67,5 @@ def generate_command(conn, out, watch, clean, **kwargs):
     else:
         if exists(today_destination):
             remove(today_destination)
-        #TODO log this too
-        print('Creating "today.html" link pointing to:', most_recent_page)
+        logging.debug('Creating "today.html" link pointing to: {}'.format(most_recent_page))
         symlink(most_recent_page, today_destination)
