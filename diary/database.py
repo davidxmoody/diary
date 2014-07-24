@@ -5,6 +5,7 @@ import subprocess
 from markdown import markdown
 
 # Strip non- word or dash characters from device name
+#TODO move this into cli.py or config file
 try:
     DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
 except:
@@ -50,7 +51,7 @@ class Entry():
 
     @property
     def html(self):
-        tagged_text = re.sub(r'(#\w+)', r'<span class="hashtag">\1</span>', self.text)
+        tagged_text = re.sub(r'(#[A-Za-z0-9_-]+)', r'<span class="hashtag">\1</span>', self.text)
         return markdown(tagged_text)
 
     @property
