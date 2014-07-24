@@ -1,0 +1,17 @@
+{% extends "default.html" %}
+{% block content %}
+  <div class="entries">
+  {% for entry in entries %}
+    <div class="entry">
+      <div class="entry-head">
+        <div class="date">{{ entry.date.strftime('%a %d %b %H:%M') }}</div>
+        <div class="metadata">
+          <div class="wordcount">{{ entry.wordcount }} words</div>
+          <div class="id">{{ entry.id }}</div>
+        </div>
+      </div>
+      <div class="entry-body">{{ entry.html }}</div>
+    </div>
+  {% endfor %}
+  </div>
+{% endblock content %}

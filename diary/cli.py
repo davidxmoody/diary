@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from diary.database import connect
 from diary.presenter import display_entries
 from diary.utils import custom_date
+from diary.generator import generate_command
 import re
 import os
 
@@ -102,6 +103,7 @@ subparser.add_argument('search_terms', nargs='*',
 subparser.add_argument('--pipe-to', metavar='COMMAND', default='less -R',
     help='pipe output to the given command')
 
+#TODO this is shared with wordcount script below, abstract it
 subparser.add_argument('--before', type=custom_date, metavar='DATE',
     help='only show entries occurring before DATE')
 subparser.add_argument('--after', type=custom_date, metavar='DATE',
@@ -183,6 +185,24 @@ sort_order.add_argument('--desc', action='store_true', dest='descending',
 
 
 subparser.set_defaults(func=wordcount_command)
+
+
+
+# GENERATE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# generate_command is imported at the top
+
+subparser = subparsers.add_parser('generate',
+    description='Create a HTML representation of your diary',
+    help='generate HTML diary')
+
+subparser.add_argument('-o', '--out', 
+    help='directory to place HTML (defaults to {your_base_dir}/html)')
+subparser.add_argument('-w', '--watch', action='store_true',
+    help='stay alive and update the HTML whenever entries change')
+
+
+subparser.set_defaults(func=generate_command)
 
 
 
