@@ -2,8 +2,16 @@ from argparse import ArgumentParser
 from diary.database import connect
 from diary.presenter import display_entries
 from diary.utils import custom_date
+import re
+import os
 
 __version__ = '2.0.1'
+
+try:
+    # Strip non- word or dash characters from device name
+    DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
+except:
+    DEVICE_NAME = 'unknown'
 
 
 # SETUP MAIN PARSER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,8 +60,8 @@ subparser.set_defaults(func=edit_command)
 
 # NEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def new_command(conn, date, editor, message, **kwargs):
-    entry = conn.new_entry(date)
+def new_command(conn, date, editor, message, device_name, **kwargs):
+    entry = conn.new_entry(date, device_name)
     if message is not None:
         entry.text = message
     else:
@@ -69,6 +77,9 @@ subparser.add_argument('-e', '--editor', default='vim',
     help='editor to write the entry with (defaults to `vim`)')
 subparser.add_argument('-m', '--message', 
     help='directly set the text of the entry to MESSAGE')
+subparser.add_argument('--device-name', default=DEVICE_NAME, 
+    help='name of the device the entry was created on ' + 
+         '(defaults to `{}`)'.format(DEVICE_NAME))
 
 subparser.set_defaults(func=new_command)
 
@@ -172,63 +183,6 @@ sort_order.add_argument('--desc', action='store_true', dest='descending',
 
 
 subparser.set_defaults(func=wordcount_command)
-
-
-
-# MOOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#TODO much of this is copied from the wordcount command, should abstract it
-def mood_command(conn, group_by, descending, after, before, **kwargs):
-    if group_by is None: group_by = 'Average'
-    moods = {}
-
-    for entry in conn.get_entries(descending=descending, min_date=after, 
-                                                         max_date=before):
-        try:
-            mood = int(entry.text[0])
-            group = entry.date.strftime(group_by)
-            if group not in moods:
-                moods[group] = []
-            moods[group].append(mood)
-        except:
-            pass
-
-    for group in sorted(moods.keys()):
-        print('{}: {:1.1f}'.format(group, sum(moods[group])/len(moods[group])))
-    
-
-
-subparser = subparsers.add_parser('mood',
-    description='Pretty print mood data summaries',
-    help='print mood data')
-
-group_by = subparser.add_mutually_exclusive_group()
-group_by.add_argument('-y', '--year', action='store_const', const='%Y', 
-    dest='group_by', help='group by year')
-group_by.add_argument('-m', '--month', action='store_const', const='%Y-%m', 
-    dest='group_by', help='group by month')
-group_by.add_argument('-d', '--day', action='store_const', const='%Y-%m-%d', 
-    dest='group_by', help='group by day')
-group_by.add_argument('-w', '--weekday', action='store_const', const='%u %a', 
-    dest='group_by', help='group by weekday')
-group_by.add_argument('-g', '--group-by', metavar='DATE_FORMAT',
-    dest='group_by', help='format entry dates with DATE_FORMAT and combine '
-                          'mood data for all entries which have the '
-                          'same formatted date, e.g. "%%Y-%%m-%%d"')
-
-subparser.add_argument('--before', type=custom_date, metavar='DATE',
-    help='only show entries occurring before DATE')
-subparser.add_argument('--after', type=custom_date, metavar='DATE',
-    help='only show entries occurring after DATE')
-
-sort_order = subparser.add_mutually_exclusive_group()
-sort_order.add_argument('--asc', action='store_false', dest='descending',
-    help='sort in ascending date order')
-sort_order.add_argument('--desc', action='store_true', dest='descending',
-    help='sort in descending date order')
-
-
-subparser.set_defaults(func=mood_command)
 
 
 

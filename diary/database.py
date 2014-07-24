@@ -4,13 +4,6 @@ import re
 import subprocess
 from markdown import markdown
 
-# Strip non- word or dash characters from device name
-#TODO move this into cli.py or config file
-try:
-    DEVICE_NAME = re.sub(r'[^\w-]', '', os.uname().nodename)
-except:
-    DEVICE_NAME = 'unknown'
-
 
 class Entry():
 
@@ -85,7 +78,7 @@ class connect():
             os.makedirs(self.dir_entries)
 
 
-    def new_entry(self, date=None, device_name=DEVICE_NAME):
+    def new_entry(self, date=None, device_name='unknown'):
         if date is None: date = datetime.datetime.today()
 
         # This avoids the bug of not being able to create multiple entries in
