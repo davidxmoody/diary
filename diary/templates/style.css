@@ -1,0 +1,92 @@
+body {
+  font-family: sans-serif;
+  font-size: 1.2em;
+  overflow-y: scroll;
+}
+
+.header {
+  display: inline-block;
+  position: fixed;
+  top: 0;
+  height: 40px;
+  margin: auto;
+  text-align: center;
+}
+
+.previous-day, .next-day {
+  text-decoration: none;
+}
+
+.previous-day {
+  left: 0px;
+}
+
+.next-day {
+  right: 0px;
+}
+
+.entries {
+  margin-top: 40px;
+}
+
+.entry {
+  width: 90%;
+  min-width: 500px;
+  max-width: 650px;
+  padding: 0.3em;
+  border: 1px solid #B3B3B2;
+  border-radius: 4px;
+  margin: auto;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.entry-body {
+  color: #404040;
+}
+
+.entry-head {
+  height: 2.4em;
+  border-bottom: 1px solid #B3B3B2;
+}
+
+.entry-head .metadata {
+  float: right;
+}
+
+.entry-head .date {
+  font-size: 1.8em;
+  text-align: left;
+  float: left;
+  color: #404040;
+}
+
+.entry-head .wordcount {
+  font-size: 0.7em;
+  color: #B3B3B2;
+  text-align: right;
+  float: right;
+  clear: right;
+}
+
+.entry-head .id {
+  font-size: 0.5em;
+  color: #B3B3B2;
+  text-align: right;
+  float: right;
+  clear: right;
+}
+
+.hashtag {
+  background-color: #DDDDDD;
+  font-family: monospace;
+  border-radius: 4px;
+}
+
+img, video {
+  max-width: 100%;
+}
+
+pre {
+  overflow-x: auto;
+}

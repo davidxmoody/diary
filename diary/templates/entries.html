@@ -1,5 +1,18 @@
 {% extends "default.html" %}
 {% block content %}
+  <div class="header">
+    <a class="previous-day" href="{{ previous_day }}.html">&#10094; {{ previous_day }}</a>
+    <span class="header-date">
+      {{ entries[0].date.strftime('%A %d %B %Y') }}
+    </span>
+    <span class="header-entry-count">
+      {{ entries | length }} entries
+    </span>
+    <span class="header-wordcount">
+      {{ entries | sum(attribute='wordcount') }} words
+    </span>
+    <a class="next-day" href="{{ next_day }}.html">{{ next_day }} &#10095;</a>
+  </div>
   <div class="entries">
   {% for entry in entries %}
     <div class="entry">
