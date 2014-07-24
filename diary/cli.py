@@ -6,7 +6,7 @@ from diary.generator import generate_command
 import re
 import os
 
-__version__ = '2.0.1'
+__version__ = '2.1.0'
 
 try:
     # Strip non- word or dash characters from device name
