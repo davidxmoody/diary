@@ -200,6 +200,8 @@ subparser.add_argument('-o', '--out',
     help='directory to place HTML (defaults to {your_base_dir}/html)')
 subparser.add_argument('-w', '--watch', action='store_true',
     help='stay alive and update the HTML whenever entries change')
+subparser.add_argument('-c', '--clean', action='store_true',
+    help='remove out dir before generating')
 
 
 subparser.set_defaults(func=generate_command)
