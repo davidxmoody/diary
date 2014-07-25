@@ -43,13 +43,31 @@ def generate_command(conn, out, watch, clean, **kwargs):
     
     # Go through all days and create a separate file for each, but only if one 
     # of the entries has been modified more recently than the file
+    new_day = None
     for day in sorted(days.keys()):
         file = join(out, '{}.html'.format(day))
+        # Hack, remove this
+        if not exists(file):
+            new_day = day
+
         if not exists(file) or any(entry.mtime>getmtime(file) for entry in days[day]):
             with open(file, 'w') as f:
                 f.write(template.render(entries=days[day], 
                     next_day=next_days[day], previous_day=previous_days[day]))
                 logging.debug('Writing to: {}'.format(file))
+
+    # Hack to fix bug where yesterday's "next day" link wouldnt update when
+    # a new entry was created today
+    #TODO this could be done much better or needs a complete refactor
+    # Will also fail when only one day exists
+    if new_day == sorted(days.keys())[-1]:
+        day = sorted(days.keys())[-2]
+        file = join(out, '{}.html'.format(day))
+        with open(file, 'w') as f:
+            f.write(template.render(entries=days[day], 
+                next_day=next_days[day], previous_day=previous_days[day]))
+            logging.debug('Writing to: {}'.format(file))
+
 
     # Copy across stylesheet
     stylesheet_template = env.get_template('style.css')

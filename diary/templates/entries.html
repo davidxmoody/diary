@@ -3,8 +3,8 @@
 {% block title %}{{ entries[0].date.strftime('%a %d %b %Y') }}{% endblock title %}
 
 {% block content %}
-<a class="previous-day" href="{{ previous_day }}.html"><span>&#10094;</span></a>
-<a class="next-day" href="{{ next_day }}.html"><span>&#10095;</span></a>
+<a class="previous-day"{% if previous_day %} href="{{ previous_day }}.html"{% endif %}><span>&#10094;</span></a>
+<a class="next-day"{% if next_day %} href="{{ next_day }}.html"{% endif %}><span>&#10095;</span></a>
   <div class="entries">
   {% for entry in entries %}
     <div class="entry">
