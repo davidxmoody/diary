@@ -22,12 +22,12 @@ def _get_header(entry, width):
     middle = ' {0:{date_format}} '.format(entry.date, **STYLE)
     
     # Entry id on the right
-    len_right = (width - len(middle))//2
+    len_right = max((width - len(middle))//2, 0)
     right = '{pad}{0}{pad}'.format(entry.id, **STYLE)
     right = '{0:{pad}>{1}}'.format(right, len_right, **STYLE)
 
     # Wordcount on the left
-    len_left = width - len(middle) -len(right)
+    len_left = max(width - len(middle) -len(right), 0)
     left = '{pad}{0} words{pad}'.format(entry.wordcount, **STYLE)
     left = '{0:{pad}<{1}}'.format(left, len_left, **STYLE)
 
