@@ -75,7 +75,7 @@ def generate_command(conn, out, watch, clean, **kwargs):
     if not exists(stylesheet_file):
         with open(stylesheet_file, 'w') as f:
             f.write(stylesheet_template.render())
-            print('Writing to: style.css')
+            logging.debug('Writing to: style.css')
 
     # Create a 'today.html' symbolic link to most recent day
     most_recent_page = '{}/{}.html'.format(out, all_days[-1])

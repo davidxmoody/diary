@@ -214,7 +214,7 @@ subparser.set_defaults(func=generate_command)
 def process_args(arg_list=None):
     args = parser.parse_args(arg_list)
     if hasattr(args, 'func'):
-        logging.basicConfig(level=logging.DEBUG, 
+        logging.basicConfig(level=logging.WARNING, 
                 format='%(asctime)s - %(levelname)s - %(message)s',
                 filename=os.path.join(args.base, '{}.log'.format(DEVICE_NAME)))
 
