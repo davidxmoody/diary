@@ -33,23 +33,26 @@ subparsers = parser.add_subparsers(title='subcommands')
 
 # EDIT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def edit_command(conn, entry_id, editor, message, **kwargs):
-    entry = conn.find_by_id(entry_id) if entry_id else conn.most_recent_entry()
+def edit_command(conn, search_terms, entry_id, editor, message, **kwargs):
+    if entry_id:
+        entry = conn.find_by_id(entry_id) if entry_id else conn.most_recent_entry()
+    else:
+        entry = conn.search_entries(*search_terms, descending=True).__next__()
     if entry:
         if message is not None:
             entry.text = message
         else:
             entry.command_line_edit(editor)
     else:
-        print('No entry to edit', 
-              'for entry_id: {}'.format(entry_id) if entry_id else '')
+        print('No entry to edit')
 
 subparser = subparsers.add_parser('edit',
-    description='Open Vim to edit the most recent entry '
-                'or the entry specified by entry_id',
+    description='Open Vim to edit the most recent entry',
     help='edit the most recent entry or a specified entry')
 
-subparser.add_argument('entry_id', nargs='?', 
+subparser.add_argument('search_terms', nargs='*',
+    help='any number of regular expressions to search for')
+subparser.add_argument('--entry-id', 
     help='entry id of the form "$timestamp-$device_name"')
 subparser.add_argument('-e', '--editor', default='vim',
     help='editor to write the entry with (defaults to `vim`)')
