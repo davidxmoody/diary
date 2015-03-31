@@ -43,9 +43,13 @@ Create a new entry with the date 21 October 2014 and the content "Hello world".
 
 Open Vim to edit the most recent entry.
 
-    rundiary edit 1413881692-david-x220
+    rundiary edit --entry-id 1413881692-david-x220
 
 Open Vim to edit the entry with ID equal to `1413881692-david-x220`. The ID can be found on the upper right of the header bar for an entry when viewing them with the `list` command.
+
+    rundiary edit 'hello'
+
+Open Vim edit the first entry containing the word 'hello'.
 
 ### List/search
 
