@@ -7,7 +7,7 @@ import logging
 import re
 import os
 
-__version__ = '2.1.2'
+__version__ = '2.2.0'
 
 try:
     # Strip non- word or dash characters from device name
