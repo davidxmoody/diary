@@ -4,7 +4,7 @@ from os import makedirs, remove, symlink
 from shutil import rmtree
 import logging
 
-def generate_command(conn, out, watch, clean, **kwargs):
+def generate_command(conn, out, clean, **kwargs):
 
     # Check output directory exists, if not then create it
     if not out:
